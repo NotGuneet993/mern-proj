@@ -4,7 +4,10 @@ const cookieParser = require("cookie-parser");
 const cors = require("cors");
 const dotenv = require("dotenv");
 const mongoose = require("mongoose");
-const uri = process.env.URI
+const uri = process.env.URI;
+//  Mongoose queries the lowercase, plural form of the model name as the collection name.
+//  i.e. User.findOne() checks collection titled "users" for object in question (User -> users)
+const User = require("./User");
 
 dotenv.config(); // Load environment variables
 
@@ -45,18 +48,41 @@ app.get("/", (req, res) => {
   res.json({ message: `Server is running! ${test}` });
 });
 
+// Register route
+app.post("/register", async (req, res) => {
+  const { name, email, username, password } = req.body;
+
+  try {
+    const existingUser = await User.findOne({ username });
+    if (existingUser) return res.status(400).json({ success: false, message: "User already exists" });
+
+    const newUser = new User({ name, email, username, password });
+    await newUser.save();
+
+    res.json({ success: true, message: "User registered successfully" });
+  } catch (error) {
+    res.status(500).json({ success: false, message: "Server error" });
+  }
+});
+
 // Login Route
-app.post("/login", (req, res) => {
+app.post("/login", async (req, res) => {
   const { username, password } = req.body;
 
-  // TODO Replace validation skeleton with DB check
-  if (username === "user" && password === "password") {
-    req.session.user = { username }; // Store user in session
-    return res.json({ success: true, message: "Logged in successfully" });
-  }
+  try {
+    const user = await User.findOne({ username });
+    if (!user) return res.status(401).json({ success: false, message: "User not found" });
 
-  res.status(401).json({ success: false, message: "Invalid credentials" });
+    const isMatch = (password == user.password);
+    if (!isMatch) return res.status(401).json({ success: false, message: "Invalid credentials" });
+
+    req.session.user = { id: user._id, username: user.username };
+    res.json({ success: true, message: "Logged in successfully" });
+  } catch (error) {
+    res.status(500).json({ success: false, message: "Server error" });
+  }
 });
+
 
 // Check Auth Route
 app.get("/auth", (req, res) => {
