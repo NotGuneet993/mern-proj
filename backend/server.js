@@ -3,7 +3,8 @@ const session = require("express-session"); // Cookie / Session modules
 const cookieParser = require("cookie-parser");
 const cors = require("cors");
 const dotenv = require("dotenv");
-const { HostAddress } = require("mongodb");
+const mongoose = require("mongoose");
+const uri = process.env.URI
 
 dotenv.config(); // Load environment variables
 
@@ -72,6 +73,12 @@ app.post("/logout", (req, res) => {
     res.json({ success: true, message: "Logged out" });
   });
 });
+
+// Connect MongoDB Client
+mongoose
+  .connect(uri, { useNewUrlParser: true, useUnifiedTopology: true })
+  .then(() => console.log("MongoDB connected ✅"))
+  .catch((err) => console.error("MongoDB connection error:", err));
 
 // Start Server
 app.listen(PORT, () => {
