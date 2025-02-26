@@ -1,0 +1,1 @@
+sshpass -f pw.txt ssh "root@knightnav.net"
