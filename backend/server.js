@@ -5,10 +5,10 @@ const session = require("express-session");
 const app = express();
 const PORT = process.env.PORT || 5001;
 app.use(express.json()); 
-app.use(cookieParser()); 
 
 // middleware  setup
 const cookieParser = require("cookie-parser");
+app.use(cookieParser()); 
 const cors = require("cors");
 const allowedOrigins = [ 
   "https://www.knightnav.net",
