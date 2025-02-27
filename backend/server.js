@@ -1,3 +1,4 @@
+require('dotenv').config();
 const express = require("express");
 const session = require("express-session"); // Cookie / Session modules
 const cookieParser = require("cookie-parser");
@@ -18,10 +19,15 @@ const PORT = process.env.PORT || 5001;
 app.use(express.json()); // Parse JSON request bodies
 app.use(cookieParser()); // Cookies
 
+const allowedOrigins = [ 
+  "https://www.knightnav.net",
+  "http://localhost:5173"
+];
+
 // CORS config
 app.use(
   cors({
-    origin: "https://www.knightnav.net/",
+    origin: allowedOrigins,
     credentials: true, // Cookies / Sessions
   })
 );
@@ -44,7 +50,7 @@ app.use(
 // Sample Route
 const test = "hi";
 
-app.get("/", (req, res) => {
+app.get("/test", (req, res) => {
   res.json({ message: `Server is running! ${test}` });
 });
 
@@ -107,6 +113,6 @@ mongoose
   .catch((err) => console.error("MongoDB connection error:", err));
 
 // Start Server
-app.listen(PORT, () => {
-  console.log(`🚀 Server running on port ${PORT}`);
+app.listen(PORT, "0.0.0.0", () => {
+  console.log(`Server running on port ${PORT}`);
 });
