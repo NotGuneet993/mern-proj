@@ -8,7 +8,7 @@ const mongoose = require("mongoose");
 const uri = process.env.URI;
 //  Mongoose queries the lowercase, plural form of the model name as the collection name.
 //  i.e. User.findOne() checks collection titled "users" for object in question (User -> users)
-const User = require("./User");
+const User = require("./models/Users.js"); // Import User model
 
 dotenv.config(); // Load environment variables
 
@@ -109,10 +109,17 @@ app.post("/logout", (req, res) => {
 // Connect MongoDB Client
 mongoose
   .connect(uri, { useNewUrlParser: true, useUnifiedTopology: true })
-  .then(() => console.log("MongoDB connected ✅"))
+  .then(async () => {
+    console.log("MongoDB connected ✅");
+    const collections = await mongoose.connection.db.listCollections().toArray();
+    console.log("Collections in DB:", collections.map(c => c.name)); // Log available collections
+  })
   .catch((err) => console.error("MongoDB connection error:", err));
-
 // Start Server
 app.listen(PORT, "0.0.0.0", () => {
   console.log(`Server running on port ${PORT}`);
 });
+
+const userRoutes = require("./routes/userRoutes.js");
+app.use("/users", userRoutes);
+
