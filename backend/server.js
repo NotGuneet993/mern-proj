@@ -18,7 +18,6 @@ const allowedOrigins = [
 // MongoDB connection
 const mongoose = require("mongoose");
 const uri = process.env.URI;
-const User = require("./models/Users.js"); 
 
 // CORS config
 app.use(

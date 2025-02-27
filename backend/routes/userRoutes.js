@@ -40,12 +40,12 @@ router.post("/register", async (req, res) => {
     // Check for duplicate emails / usernames
     const em = await User.findOne({ email });
     if (em) {
-      return res.status(409).json({ authorization: false, message: "Email already in use" });
+      return res.status(409).json({ authorization: false, message: `Email already in use` });
     }
-    
+
     const user = await User.findOne({ username });
     if (user) {
-      return res.status(409).json({ authorization: false, message: "User already exists" });
+      return res.status(409).json({ authorization: false, message: `User already exists` });
     }
 
     // No conflicts: create a new user and subsequently save it to Users
@@ -55,12 +55,14 @@ router.post("/register", async (req, res) => {
       username : username,
       password: password,
     });
-
     await newUser.save();
+
+    res.json({ authorization: false, message: "" });
   } catch (error) {
     res.status(500).json({ authorization: false, message: "Server error" });
   }
 
 });
+// TODO create a page to verify email and when email is verified authorize and enter app
 
 module.exports = router;
