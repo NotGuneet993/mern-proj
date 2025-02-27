@@ -3,19 +3,27 @@ const User = require("../models/Users.js");
 
 const router = express.Router();
 
-// Check if email exists in KnightNav.Users
-router.get("/exists/:email", async (req, res) => {
+// Login Route
+// path is: /users/login
+// imputs are am email and password
+// a JSON with "authorization" and "message" is returned
+router.post("/login", async (req, res) => {
+  const { email, password } = req.body;
+
   try {
-    const user = await User.findOne({ email: req.params.email });
-    if (user) {
-        console.log(res.json.value);
-        return res.json({ exists: true });
-    } else {
-        console.log(res.json.value);
-      return res.json({ exists: false });
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(401).json({ authorization: false, message: "User not found" });
     }
-  } catch (err) {
-    res.status(500).json({ message: err.message });
+
+    // Normally, you should hash and compare passwords, but for simplicity:
+    if (password !== user.password) {
+      return res.status(401).json({ authorization: false, message: "Invalid credentials" });
+    }
+
+    res.json({ authorization: true });
+  } catch (error) {
+    res.status(500).json({ authorization: false, message: "Server error" });
   }
 });
 
