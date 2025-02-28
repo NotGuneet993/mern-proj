@@ -1,12 +1,17 @@
-// Uses Mailgun to send an email to a new user's inbox.
-// The email itself contains nothing meaningful, yet.
-async function sendSimpleMessage(mg, name, email) {
+// Uses Mailgun to send a verification email to a new user's inbox.
+async function sendVerification(mg, name, email, token) {
+  
+  // Token will be checked through single use /verify route
+  const verifLink = `https://knightnav.net/verify?token=${token}`;
+  
   try {
-    const data = await mg.messages.create("support.knightnav.net", {
-      from: "KnightNav Support <accounts@support.knightnav.net>",
+    const data = await mg.messages.create("knightnav.net", {
+      from: "KnightNav Support <support@knightnav.net>",
       to: [`<${email}>`],
       subject: `Hi, ${name}!`,
-      text: "Welcome to KnightNav! Please verify your email to activate your account.",
+      text: "Welcome to KnightNav! Please verify your email to activate your account by clicking here.",
+      html: `<p>Welcome to KnightNav!\ 
+Please verify your email to activate your account by clicking <a href="${verifLink}">here</a>.</p>`
     });
 
     console.log(data); // logs response data
@@ -15,4 +20,4 @@ async function sendSimpleMessage(mg, name, email) {
   }
 }
 
-module.exports = sendSimpleMessage;
+module.exports = sendVerification;

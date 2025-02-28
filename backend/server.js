@@ -6,24 +6,24 @@ const app = express();
 const PORT = process.env.PORT || 5001;
 app.use(express.json()); 
 
-// middleware setup
-const cookieParser = require("cookie-parser");
-app.use(cookieParser()); 
+// CORS config
 const cors = require("cors");
 const allowedOrigins = [ 
   "https://www.knightnav.net",
   "http://localhost:5173"
 ];
-
-// CORS config
 app.use(
   cors({
     origin: allowedOrigins,
-    credentials: true, // Cookies / Sessions
+    credentials: true, // Will account for Cookies / Sessions
   })
 );
 
-// Session Middleware
+// Cookie middleware
+const cookieParser = require("cookie-parser");
+app.use(cookieParser());
+
+// Session middleware
 app.use(
   session({
     secret: "hi",
@@ -37,6 +37,13 @@ app.use(
       },
   })
 );
+
+// Token middleware
+const crypto = require("crypto");
+app.use((req, res, next) => {
+  req.crypto = crypto;
+  next();
+});
 
 // Connect MongoDB Client
 const mongoose = require("mongoose");
@@ -60,7 +67,7 @@ const mg = mailgun.client({
   key: process.env.mailgun || "API_KEY",
 });
 
-// Mailgun Middleware
+// Mailgun middleware
 app.use((req, res, next) => {
   req.mailgun = mg;
   next();

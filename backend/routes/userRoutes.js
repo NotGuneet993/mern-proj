@@ -1,6 +1,6 @@
 const express = require("express");
 const User = require("../models/Users.js");
-const ssm = require("../functions/mailgun.js");
+const sendVerification = require("../functions/mailgun.js");
 
 const router = express.Router();
 
@@ -58,10 +58,17 @@ router.post("/register", async (req, res) => {
     });
     await newUser.save();
 
-    // Email testing
+    // Email verification
     const mg = req.mailgun;
-    ssm(mg, name, email);
+    const crypto = req.crypto;
 
+    const tk = crypto.randomBytes(32).toString("hex");
+    // TODO Make /verify route (see line 4 of ../functions/mailgun.js)
+    // TODO Store token somewhere that can be accessed by /verify route
+    await sendVerification(mg, name, email, tk);
+    // TODO Established 'verified' property in Users as a boolean
+
+    // TODO Use established 'verified' property to determine if user is authorized or not
     res.json({ authorization: false, message: "" });
   } catch (error) {
     res.status(500).json({ authorization: false, message: `Server error : ${error}` });
