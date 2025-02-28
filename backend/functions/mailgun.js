@@ -2,7 +2,7 @@
 async function sendVerification(mg, name, email, token) {
   
   // Token will be checked through single use /verify route
-  const verifLink = `https://knightnav.net/verify?token=${token}`;
+  const verifLink = `https://knightnav.net/users/verify?token=${token}`;
   
   try {
     const data = await mg.messages.create("knightnav.net", {
