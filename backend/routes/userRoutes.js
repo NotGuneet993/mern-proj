@@ -90,7 +90,8 @@ router.get("/verify", async (req, res) => {
     // Compare tokens
     const user = await User.findOne({ token });
     if (!user) {
-      return res.status(401).json({ authorization: false, message: "Invalid token" });
+      res.status(401).json({ authorization: false, message: "Invalid token" });
+      // TODO Redirect to some failed verification page
     }
     
     // All good, update the statuses of the newly created user.
@@ -98,6 +99,7 @@ router.get("/verify", async (req, res) => {
     await user.updateOne({ token: ""});
     
     res.json({ authorization: true, message: "" });
+    // TODO Redirect to some home page
   } catch (error) {
     res.status(500).json({ authorization: false, message: `Server error : ${error}` });
   }
