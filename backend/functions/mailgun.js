@@ -3,7 +3,7 @@
 async function sendSimpleMessage(mg, name, email) {
   try {
     const data = await mg.messages.create("support.knightnav.net", {
-      from: "KnightNav Support <postmaster@support.knightnav.net>",
+      from: "KnightNav Support <accounts@support.knightnav.net>",
       to: [`<${email}>`],
       subject: `Hi, ${name}!`,
       text: "Welcome to KnightNav! Please verify your email to activate your account.",
