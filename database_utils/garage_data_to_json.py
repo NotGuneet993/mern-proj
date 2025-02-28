@@ -33,8 +33,8 @@ def process_garages(df):
 
     for garage in garages:
         garage_data = {
-            "garage": garage.split()[1],  # Extract just the letter (A, B, C, etc.)
-            "location": "Here",  # Placeholder location
+            "garage": garage.split()[1],  # Get the garage name
+            "location": "Here",  # Placeholder location (TODO)
             "capacity_schedule": []
         }
 
