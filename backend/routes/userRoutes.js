@@ -1,5 +1,6 @@
 const express = require("express");
 const User = require("../models/Users.js");
+const ssm = require("../functions/mailgun.js");
 
 const router = express.Router();
 
@@ -25,7 +26,7 @@ router.post("/login", async (req, res) => {
 
     res.json({ authorization: true, message: "" });
   } catch (error) {
-    res.status(500).json({ authorization: false, message: "Server error" });
+    res.status(500).json({ authorization: false, message: `Server error : ${error}` });
   }
 });
 
@@ -57,9 +58,13 @@ router.post("/register", async (req, res) => {
     });
     await newUser.save();
 
+    // Email testing
+    const mg = req.mailgun;
+    ssm(mg, name, email);
+
     res.json({ authorization: false, message: "" });
   } catch (error) {
-    res.status(500).json({ authorization: false, message: "Server error" });
+    res.status(500).json({ authorization: false, message: `Server error : ${error}` });
   }
 
 });
