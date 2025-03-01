@@ -9,10 +9,10 @@ const router = express.Router();
 // inputs are an email and password
 // a JSON with "authorization" and "message" is returned
 router.post("/login", async (req, res) => {
-  const { email, password } = req.body;
+  const { username, email, password } = req.body;
 
   try {
-    const user = await User.findOne({ email }); // TODO Also allow username as input
+    const user = await User.findOne({$or: [{email:email}, {username: username}]}); 
     if (!user) {
       return res.status(401).json({ authorization: false, message: "User not found" });
     }
