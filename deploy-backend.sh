@@ -11,5 +11,6 @@ echo "Copying files to server..."
 sshpass -f ../pw.txt scp -r *.js "$SERVER_USER@$SERVER_IP:$REMOTE_DIR" || { echo "File transfer failed!"; exit 1; }
 sshpass -f ../pw.txt scp -r models/*.js "$SERVER_USER@$SERVER_IP:$REMOTE_DIR/models/" || { echo "File transfer failed!"; exit 1; }
 sshpass -f ../pw.txt scp -r routes/*.js "$SERVER_USER@$SERVER_IP:$REMOTE_DIR/routes/" || { echo "File transfer failed!"; exit 1; }
+sshpass -f ../pw.txt scp -r functions/*.js "$SERVER_USER@$SERVER_IP:$REMOTE_DIR/functions/" || { echo "File transfer failed!"; exit 1; }
 
 echo "Deployment successful!"
