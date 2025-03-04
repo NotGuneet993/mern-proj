@@ -73,6 +73,10 @@ app.use((req, res, next) => {
   next();
 });
 
+// Generate graph data
+const genGraph = require("./functions/tsrspmods.js");
+genGraph();
+
 /*
 API Endpoints -----------------------------------------------------------
 */
