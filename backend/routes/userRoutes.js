@@ -105,4 +105,6 @@ router.get("/verify", async (req, res) => {
   }
 });
 
+// TODO: endpoint for user to fetch schedules
+
 module.exports = router;
