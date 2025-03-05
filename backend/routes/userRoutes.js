@@ -63,7 +63,8 @@ router.post("/register", async (req, res) => {
     const mg = req.mailgun;
     const crypto = req.crypto;
     const token = crypto.randomBytes(32).toString("hex");
-    console.log(token); // Uncomment to test
+    // Uncomment to test, make it a comment when pushing
+    //console.log(token);
     
     // Assign verification token to user and save in database to cross reference in /verify
     newUser.token = `${token}`;
@@ -95,7 +96,8 @@ router.post("/forgot", async (req, res) => {
       const mg = req.mailgun;
       const crypto = req.crypto;
       const token = crypto.randomBytes(32).toString("hex");
-      console.log(token); // Uncomment to test
+      // Uncomment to test, make it a comment when pushing
+      // console.log(token);
 
       // Apply token to user and send verification email
       await user.updateOne({ token: `${token}` });
@@ -121,14 +123,16 @@ router.get("/verify", async (req, res) => {
   const {token , type} = req.query;
   
   try { 
-    // Compare tokens
+    // Check for existing token and if the found user is email verified
     const user = await User.findOne({ token });
     if ( !user || (type == "forgot" && user.emailVerified == false) ) {
-      if (user) { console.log("Attempted forgot password with unverified email"); } // Uncomment to test
+      // Uncomment to test, make it a comment when pushing
+      //if (user) { console.log("Attempted forgot password with unverified email"); } 
       return res.status(401).json({ authorization: false, message: "Invalid token" });
       // TODO Redirect to some 404 page
     }
 
+    // Save current time and time of token creation
     const curTime = new Date().getMinutes();
     const tkTime = user.tkTime;
 
@@ -138,17 +142,20 @@ router.get("/verify", async (req, res) => {
 
     // Check if the token timed out (5 or more minutes)
     if ( curTime - tkTime >= 5) {
-      console.log("Verification attempted with expired token"); // Uncomment to test
+      // Uncomment to test, make it a comment when pushing
+      //console.log("Verification attempted with expired token");
       return res.status(401).json({ authorization: false, message: "Invalid token" });
       // TODO Redirect to some 404 page
     }
 
+    // Successful registration
     if (type == "register") {
       await user.updateOne({ emailVerified: true });
       return res.json({ authorization: true, message: "New user succcessfully verified." });
       // TODO Grab user info, save it to the session, and redirect them to the home page
     }
-
+    
+    // Proceed to change password
     else if (type == "forgot") {
       return res.json({ authorization: false, message: "Current user successfully verified." });
       // TODO Redirect to change password page
