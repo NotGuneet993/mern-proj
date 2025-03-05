@@ -1,8 +1,14 @@
 import "../styles/LandingPage.css"
 import nodemap from "../assets/nodemap.png"
 
+import { useState } from "react";
+
 export default function LandingPage() {
-    return (
+
+    const [count, setCount] = useState(0);
+
+
+    return (        
         <div className="flex h-screen overflow-hidden">
 
             <div className="w-1/2 h-full">
@@ -21,6 +27,10 @@ export default function LandingPage() {
                 </p>
                 <button className="mt-6 px-6 py-3 bg-blue-500 text-white rounded-lg shadow-md hover:bg-blue-600 transition">
                     Get Started
+                </button>
+                <br />
+                <button onClick={() => setCount(prev => prev + 1)}>
+                    Count: {count}
                 </button>
             </div>
         </div>
