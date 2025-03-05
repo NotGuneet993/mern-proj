@@ -1,10 +1,11 @@
 // Uses Mailgun to send a verification email to a new user's inbox.
 async function sendVerification(mg, name, email, token, type) {
+async function sendVerification(mg, name, email, token, type) {
   
   // Token will be checked through single use /verify route
   const verifLink = `https://knightnav.net/api/users/verify?token=${token}&type=${type}`;
   
-  // Generate email components based on verification type
+  // Formulate email message based on verification type
   let [subject, text, html] = "";
 
   if (type == "register") {
@@ -44,7 +45,6 @@ ${verifLink}`;
 <p>${verifLink}</p>`;
   }
 
-  // Inject generated email components and send it
   try {
     const data = await mg.messages.create("knightnav.net", {
       from: "KnightNav Support <support@knightnav.net>",
@@ -52,9 +52,12 @@ ${verifLink}`;
       subject: subject,
       text: text,
       html: html,
+      subject: subject,
+      text: text,
+      html: html,
     });
 
-    console.log(data); // logs response data
+    console.log(data); // logs response data TODO delete when email verif is confirmed fully functional
   } catch (error) {
     console.log(error); //logs any error
   }
