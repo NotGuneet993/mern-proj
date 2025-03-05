@@ -16,10 +16,8 @@ router.post("/login", async (req, res) => {
     if (!user) {
       return res.status(401).json({ authorization: false, message: "User not found" });
     }
-
-    // Normally, you should hash and compare passwords, but for simplicity:
-    // Note: The passwords are hashed before backend has access to them, so ln 22 is still valid
-    // since we'd just be checking a hashed password from login against a hashed password in DB -Zen
+    
+    // This if statement holds, we're checking a pw hashed through frontend against a hashed pw in DB
     if (password !== user.password) {
       return res.status(401).json({ authorization: false, message: "Invalid credentials" });
     }
@@ -64,8 +62,6 @@ router.post("/register", async (req, res) => {
     const mg = req.mailgun;
     const crypto = req.crypto;
     const token = crypto.randomBytes(32).toString("hex");
-    console.log(`This token is being printed by /register in userRoutes.js and should be deleted when \
-we are done testing email verification.\nToken: ${token}`); // TODO Delete when we're live
     
     // Assign verification token to user and save in database to cross reference in /verify
     newUser.token = `${token}`;
@@ -99,7 +95,10 @@ router.get("/verify", async (req, res) => {
     await user.updateOne({ token: ""});
     
     res.json({ authorization: true, message: "" });
-    // TODO Redirect to some home page
+    // TODO
+    // Either redirect back to login (authorization is actually still false now)
+    // Instantly grab their info and save it to the session and take them to the home page
+    
   } catch (error) {
     res.status(500).json({ authorization: false, message: `Server error : ${error}` });
   }

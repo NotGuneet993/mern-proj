@@ -75,7 +75,9 @@ app.use((req, res, next) => {
 
 // Generate graph data
 const genGraph = require("./functions/tsrspmods.js");
-genGraph();
+let { edges, labels, shortestPaths } = genGraph();
+// TODO When Ronan finalizes the graph these will become static and we can just store it in DB for good
+// TODO Something with this data
 
 /*
 API Endpoints -----------------------------------------------------------
