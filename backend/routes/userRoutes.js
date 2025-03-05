@@ -22,7 +22,7 @@ router.post("/login", async (req, res) => {
       return res.status(401).json({ authorization: false, message: "Invalid credentials" });
     }
 
-    res.json({ authorization: true, message: "" });
+    res.json({ authorization: true, message: "Login Successfully" });
   } catch (error) {
     res.status(500).json({ authorization: false, message: `Server error : ${error}` });
   }
@@ -103,5 +103,7 @@ router.get("/verify", async (req, res) => {
     res.status(500).json({ authorization: false, message: `Server error : ${error}` });
   }
 });
+
+// TODO: endpoint for user to fetch schedules
 
 module.exports = router;

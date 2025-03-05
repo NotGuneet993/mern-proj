@@ -87,6 +87,8 @@ API Endpoints -----------------------------------------------------------
 const userRoutes = require("./routes/userRoutes.js");
 app.use("/users", userRoutes); 
 
+const scheduleRoutes = require("./routes/scheduleRoutes.js");
+app.use("/schedule", scheduleRoutes);
 
 // Start Server -------------- DO NOT PUT ANYTHING UNDER THIS LINE
 app.listen(PORT, "0.0.0.0", () => {
