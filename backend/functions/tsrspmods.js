@@ -1,8 +1,8 @@
 const dijkstras = require("./dijkstra.js");
 
 async function pmo() {
-    // Step 1: Import ../map.json
-    const map = require(`../map.json`);
+    // Step 1: Import ../../assets/map.json
+    const map = require(`../../assets/map.json`);
 
     let nodes = map["nodes"];
 
