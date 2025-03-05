@@ -83,7 +83,7 @@ we are done testing email verification.\nToken: ${token}`); // TODO Delete when 
 // path is /users/verify
 // Sole input is token from verification link acting as query
 // a JSON with "authorization" and "message" is returned
-router.post("/verify", async (req, res) => {
+router.get("/verify", async (req, res) => {
   const { token } = req.query;
   
   try { 
