@@ -5,6 +5,7 @@ import Navbar from './components/Navbar'
 import LandingPage from './pages/LandingPage'
 import LoginPage from './pages/LoginPage'
 import DashboardPage from './pages/DashboardPage'
+import StimPage from './pages/StimPage'
 
 function App() {
   return (
@@ -15,6 +16,7 @@ function App() {
         <Route path='/' element={<LandingPage />} />
         <Route path="/get-started" element={<LoginPage />} />
         <Route path="/dashboard" element={<DashboardPage />} />
+        <Route path="/stim" element={<StimPage />} />
       </Routes>
     </div>
   )
