@@ -53,8 +53,9 @@ router.post("/register", async (req, res) => {
       email : email,
       username : username,
       password: password,
-      verified: false,
+      emailVerified: false,
       token : "",
+      tkTime : "",
     });
 
 
@@ -62,11 +63,16 @@ router.post("/register", async (req, res) => {
     const mg = req.mailgun;
     const crypto = req.crypto;
     const token = crypto.randomBytes(32).toString("hex");
+    console.log(token); // Uncomment to test
     
     // Assign verification token to user and save in database to cross reference in /verify
     newUser.token = `${token}`;
+    let curTime = new Date().getMinutes();
+    newUser.tkTime = curTime;
     await newUser.save();
-    await sendVerification(mg, name, email, token);
+
+    // Send verification email
+    await sendVerification(mg, name, email, token, "register");
 
     res.json({ authorization: false, message: "" });
   } catch (error) {
@@ -75,35 +81,84 @@ router.post("/register", async (req, res) => {
 
 });
 
+// Forgot password route
+// path is /users/forgot
+// Sole input is the email entered in forgot password page
+// a JSON with "authorization" and "message" is returned
+router.post("/forgot", async (req, res) => {
+  const { email } = req.body;
+
+  try {
+    const user = await User.findOne({ email });
+    if (user) {
+      // Initialize email verification
+      const mg = req.mailgun;
+      const crypto = req.crypto;
+      const token = crypto.randomBytes(32).toString("hex");
+      console.log(token); // Uncomment to test
+
+      // Apply token to user and send verification email
+      await user.updateOne({ token: `${token}` });
+      let curTime = new Date().getMinutes();
+      await user.updateOne({ tkTime: curTime });
+      await sendVerification(mg, user.name, email, token, "forgot");
+    }
+
+    // TODO Note: Absolutely nothing is supposed to happen if user DNE or isn't email verified.
+    // They will have already been redirected to the landing page either way
+
+    res.json({ authorization: false, message: "" });
+  } catch (error) {
+    res.status(500).json({ authorization: false, message: `Server error : ${error}` });
+  }
+});
+
 // Verify route
 // path is /users/verify
-// Sole input is token from verification link acting as query
+// Inputs are token from verification link and verification type, both acting as query
 // a JSON with "authorization" and "message" is returned
 router.get("/verify", async (req, res) => {
-  const { token } = req.query;
+  const {token , type} = req.query;
   
   try { 
     // Compare tokens
     const user = await User.findOne({ token });
-    if (!user) {
-      res.status(401).json({ authorization: false, message: "Invalid token" });
-      // TODO Redirect to some failed verification page
+    if ( !user || (type == "forgot" && user.emailVerified == false) ) {
+      if (user) { console.log("Attempted forgot password with unverified email"); } // Uncomment to test
+      return res.status(401).json({ authorization: false, message: "Invalid token" });
+      // TODO Redirect to some 404 page
     }
-    
-    // All good, update the statuses of the newly created user.
-    await user.updateOne({ verified: true });
-    await user.updateOne({ token: ""});
-    
-    res.json({ authorization: true, message: "" });
-    // TODO
-    // Either redirect back to login (authorization is actually still false now)
-    // Instantly grab their info and save it to the session and take them to the home page
+
+    const curTime = new Date().getMinutes();
+    const tkTime = user.tkTime;
+
+    // Update token statuses of the user
+    await user.updateOne({ token: "" });
+    await user.updateOne({ tkTime: "" });
+
+    // Check if the token timed out (5 or more minutes)
+    if ( curTime - tkTime >= 5) {
+      console.log("Verification attempted with expired token"); // Uncomment to test
+      return res.status(401).json({ authorization: false, message: "Invalid token" });
+      // TODO Redirect to some 404 page
+    }
+
+    if (type == "register") {
+      await user.updateOne({ emailVerified: true });
+      return res.json({ authorization: true, message: "New user succcessfully verified." });
+      // TODO Grab user info, save it to the session, and redirect them to the home page
+    }
+
+    else if (type == "forgot") {
+      return res.json({ authorization: false, message: "Current user successfully verified." });
+      // TODO Redirect to change password page
+    }
     
   } catch (error) {
     res.status(500).json({ authorization: false, message: `Server error : ${error}` });
   }
 });
 
-// TODO: endpoint for user to fetch schedules
+// TODO Change password route
 
 module.exports = router;
