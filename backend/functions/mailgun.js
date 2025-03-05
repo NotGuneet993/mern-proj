@@ -5,7 +5,7 @@ async function sendVerification(mg, name, email, token, type) {
   // Token will be checked through single use /verify route
   const verifLink = `https://knightnav.net/api/users/verify?token=${token}&type=${type}`;
   
-  // Formulate email message based on verification type
+  // Generate email components based on verification type
   let [subject, text, html] = "";
 
   if (type == "register") {
@@ -45,6 +45,7 @@ ${verifLink}`;
 <p>${verifLink}</p>`;
   }
 
+  // Inject generated email components and send it
   try {
     const data = await mg.messages.create("knightnav.net", {
       from: "KnightNav Support <support@knightnav.net>",
