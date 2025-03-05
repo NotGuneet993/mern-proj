@@ -166,6 +166,6 @@ router.get("/verify", async (req, res) => {
   }
 });
 
-// TODO Change password route
+// TODO Make change password route
 
 module.exports = router;
