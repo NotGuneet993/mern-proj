@@ -6,7 +6,7 @@ const router = express.Router();
 //Add a new class endpoint
 // path is: /schedule/addClass
 // inputs are course_code, class_name, professor, meeting_type, type, building, class_schedule, building_prefix, room_number
-// a JSON with "message" is returned
+// a JSON with message is returned
 router.post("/addClass", async (req, res) => {
   const { course_code, class_name, professor, meeting_type, type, building, class_schedule, building_prefix, room_number } = req.body;
 
@@ -30,14 +30,58 @@ router.post("/addClass", async (req, res) => {
   }
 });
 
-//Edit an exisiting class endpoint
-
 //Delete a class endpoint
+//path is: /schedule/deleteClass
+//inputs are classID
+//a JSON with message is returned
+router.delete("/deleteClass", async (req, res) => {
+  const { classID } = req.body;
+
+  try {
+    const classData = await Schedule.findByIdAndDelete(classID);
+    if (classData) {
+      res.status(200).json({ message: "Class deleted successfully" });
+    } else {
+      res.status(404).json({ message: "Class not found" });
+    }
+  } catch (error) {
+    res.status(500).json({ message: `Server error: ${error}` });
+  }
+});
+
+//edit a class endpoint
+//path is: /schedule/editClass
+//inputs are classID (required), rest are optional: course_code, class_name, professor, meeting_type, type, building, class_schedule, building_prefix, room_number
+//a JSON with the newly updated info is returned
+router.put("/editClass", async (req, res) => {
+  const { classID, ...updateFields } = req.body;
+
+  try {
+    // Remove undefined or null values from updateFields
+    const filteredUpdateFields = Object.fromEntries(
+      Object.entries(updateFields).filter(([_, v]) => v !== undefined)
+    );
+
+    const classData = await Schedule.findByIdAndUpdate(
+      classID,
+      { $set: filteredUpdateFields },
+      { new: true } // Return the updated document
+    );
+
+    if (!classData) {
+      return res.status(404).json({ message: "Class not found" });
+    }
+
+    res.json(classData);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
 
 //return classID based on user input endpoint
 //path is: /schedule/getClass
-//refer to the addendpoint input
-//a JSON with "classID" is returned
+//refer to the addEndPoint input
+//a JSON with classID is returned
 router.get("/getClass", async (req, res) => {
   const { course_code, class_name, professor, meeting_type, type, building, class_schedule, building_prefix, room_number } = req.body;
 
