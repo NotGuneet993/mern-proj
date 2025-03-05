@@ -1,4 +1,5 @@
 import { ReactNode } from "react";
+import { useNavigate } from "react-router-dom";
 
 type GetStartedButtonProps = {
     buttonText: ReactNode;
@@ -7,8 +8,10 @@ type GetStartedButtonProps = {
 
 export default function GetStartedButton({ buttonText, behavior } : GetStartedButtonProps) {
 
+    const navigate = useNavigate();
+
     const defaultBehavior = () => {
-        alert(`The ${buttonText} button was pressed`)
+        navigate('/get-started')
     }
 
     return (
