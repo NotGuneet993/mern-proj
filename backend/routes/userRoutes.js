@@ -152,13 +152,13 @@ router.get("/verify", async (req, res) => {
     if (type == "register") {
       await user.updateOne({ emailVerified: true });
       return res.json({ authorization: true, message: "New user succcessfully verified." });
-      // TODO Grab user info, save it to the session, and redirect them to the home page
+      // TODO Grab user info, save it to the session, and redirect to home page
     }
     
     // Proceed to change password
     else if (type == "forgot") {
       return res.json({ authorization: true, message: "Current user successfully verified." });
-      // TODO Redirect to change password page
+      // TODO Grab user info, save it to the ssion, and redirect to change password page
     }
     
     // This should never happen
