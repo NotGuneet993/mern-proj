@@ -84,7 +84,7 @@ router.post("/register", async (req, res) => {
 
 // Forgot password route
 // path is /users/forgot
-// Sole input is the email entered in forgot password page
+// Sole input is email (that was entered in forgot password page)
 // a JSON with "authorization" and "message" is returned
 router.post("/forgot", async (req, res) => {
   const { email } = req.body;
@@ -117,7 +117,7 @@ router.post("/forgot", async (req, res) => {
 
 // Verify route
 // path is /users/verify
-// Inputs are token from verification link and verification type, both acting as query
+// Inputs are token and type (from verification link), both acting as query
 // a JSON with "authorization" and "message" is returned
 router.get("/verify", async (req, res) => {
   const {token , type} = req.query;
@@ -157,15 +157,48 @@ router.get("/verify", async (req, res) => {
     
     // Proceed to change password
     else if (type == "forgot") {
-      return res.json({ authorization: false, message: "Current user successfully verified." });
+      return res.json({ authorization: true, message: "Current user successfully verified." });
       // TODO Redirect to change password page
     }
     
+    // This should never happen
+    res.status(500).json({ authorization: false, 
+      message:`Extraneous /verify error: "type" was neither register nor forgot` });
   } catch (error) {
     res.status(500).json({ authorization: false, message: `Server error : ${error}` });
   }
 });
 
-// TODO Make change password route
+// Change password route
+// Path is /users/changepw
+// Inputs are username (that is stored in session) and newPassword
+// a JSON with "authorization" and "message" is returned
+router.post("/changepw", async (req, res) => {
+  const {username , newPassword} = req.body;
+  
+  // TODO Note: This route's logic assumes that a user was authorized to enter /changepw through /verify
+  try {
+    const user = await User.findOne({ username });
+    if (!user) {
+      // This should never happen
+      return res.status(500).json({ authorization: false, 
+        message: "Extraneous /changepw error: User stored in session does not exist" });
+    }
+
+    // Same password
+    if (newPassword == user.password) {
+      return res.status(400).json({ authorization: false, message: "Can't make new password current password"});
+      // TODO Print the error message, no redirect needed
+    }
+
+    // All good: update password
+    await user.updateOne({ password: `${newPassword}` });
+    // TODO Redirect user to login page
+
+    res.json({ authorization: false, message: "Password successfully changed" });
+  }catch (error) {
+    res.status(500).json({ authorization: false, message: `Server error : ${error}` });
+  }
+});
 
 module.exports = router;
