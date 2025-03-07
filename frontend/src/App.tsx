@@ -9,9 +9,8 @@ import StimPage from './pages/StimPage'
 
 function App() {
   return (
-    <div className="h-screen w-screen overflow-hidden">
+    <div className="App h-screen w-screen overflow-hidden">
       <Navbar />
-
       <Routes>
         <Route path='/' element={<LandingPage />} />
         <Route path="/get-started" element={<LoginPage />} />
