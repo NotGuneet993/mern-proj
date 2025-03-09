@@ -4,7 +4,7 @@ import GetStartedButton from "../components/GetStartedButton";
 export default function LandingPage() {
 
     return (        
-        <div className="flex h-screen overflow-hidden">
+        <div className="box-border flex h-screen">
 
             <div className="w-1/2 h-full">
                 <img 
