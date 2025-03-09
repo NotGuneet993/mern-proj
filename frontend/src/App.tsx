@@ -7,9 +7,6 @@ import LoginPage from './pages/LoginPage'
 import DashboardPage from './pages/DashboardPage'
 import StimPage from './pages/StimPage'
 
-
-// the navbar should be fixed and on top 
-
 function App() {
   return (
     <div className="App box-border h-screen w-screen">

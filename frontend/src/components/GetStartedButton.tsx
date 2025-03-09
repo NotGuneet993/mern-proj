@@ -16,8 +16,8 @@ export default function GetStartedButton({ buttonText, behavior } : GetStartedBu
 
     return (
        <button 
-            className="bg-yellow-300 hover:bg-amber-400 hover:cursor-pointer 
-            py-2 px-8 rounded-2xl font-bold border border-gray-300 hover:border-transparent"
+            className=" py-3 px-20 mt-5 bg-linear-70 from-yellow-300 to-amber-500 text-2xl text-stone-700 rounded-4xl
+            hover:bg-linear-70 hover:from-yellow-400 hover:to-amber-600 hover:cursor-pointer"
 
             onClick={behavior ?? defaultBehavior}
         >

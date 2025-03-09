@@ -14,7 +14,7 @@ export default function Navbar() {
 
     return (
         <nav 
-            className= "w-screen h-[60px] fixed flex justify-between items-center py-2 px-[20px] bg-gray-50 border-t border-b border-gray-300 "
+            className= "w-screen h-[60px] fixed flex justify-between items-center z-99 py-2 px-[20px] bg-gray-50 border-t border-b border-gray-300 "
         > 
 
             <NavLink to='/'><h1 className="flex items-center text-2xl cursor-pointer hover:text-yellow-400 duration-300 ease-in-out">
