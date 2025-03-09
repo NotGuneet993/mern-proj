@@ -9,7 +9,7 @@ import StimPage from './pages/StimPage'
 
 function App() {
   return (
-    <div className="App box-border h-screen w-screen">
+    <div className="App box-border h-screen w-screen bg-stone-900">
       <Navbar />
       <Routes>
         <Route path='/' element={<LandingPage />} />

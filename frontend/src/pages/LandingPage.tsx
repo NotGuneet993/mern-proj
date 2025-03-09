@@ -1,7 +1,7 @@
 import edgeMap from '../assets/edges.svg'
 import GetStartedButton from '../components/GetStartedButton';
 
-export default function TestPage() {
+export default function LandingPage() {
 
     return (
         <div className="bg-stone-900 flex h-screen">
