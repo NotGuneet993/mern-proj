@@ -1,103 +1,106 @@
 export default function DashboardPage() {
 
     return (
-        <div className="text-center">
-            <p>hi</p>
-            <p>hi</p>
-            <p>hi</p>
-            <p>hi</p>
-            <p>hi</p>
-            <p>hi</p>
-            <p>hi</p>
-            <p>hi</p>
-            <p>hi</p>
-            <p>hi</p>
-            <p>hi</p>
-            <p>hi</p>
-            <p>hi</p>
-            <p>hi</p>
-            <p>hi</p>
-            <p>hi</p>
-            <p>hi</p>
-            <p>hi</p>
-            <p>hi</p>
-            <p>hi</p>
-            <p>hi</p>
-            <p>hi</p>
-            <p>hi</p>
-            <p>hi</p>
-            <p>hi</p>
-            <p>hi</p>
-            <p>hi</p>
-            <p>hi</p>
-            <p>hi</p>
-            <p>hi</p>
-            <p>hi</p>
-            <p>hi</p>
-            <p>hi</p>
-            <p>hi</p>
-            <p>hi</p>
-            <p>hi</p>
-            <p>hi</p>
-            <p>hi</p>
-            <p>hi</p>
-            <p>hi</p>
-            <p>hi</p>
-            <p>hi</p>
-            <p>hi</p>
-            <p>hi</p>
-            <p>hi</p>
-            <p>hi</p>
-            <p>hi</p>
-            <p>hi</p>
-            <p>hi</p>
-            <p>hi</p>
-            <p>hi</p>
-            <p>hi</p>
-            <p>hi</p>
-            <p>hi</p>
-            <p>hi</p>
-            <p>hi</p>
-            <p>hi</p>
-            <p>hi</p>
-            <p>hi</p>
-            <p>hi</p>
-            <p>hi</p>
-            <p>hi</p>
-            <p>hi</p>
-            <p>hi</p>
-            <p>hi</p>
-            <p>hi</p>
-            <p>hi</p>
-            <p>hi</p>
-            <p>hi</p>
-            <p>hi</p>
-            <p>hi</p>
-            <p>hi</p>
-            <p>hi</p>
-            <p>hi</p>
-            <p>hi</p>
-            <p>hi</p>
-            <p>hi</p>
-            <p>hi</p>
-            <p>hi</p>
-            <p>hi</p>
-            <p>hi</p>
-            <p>hi</p>
-            <p>hi</p>
-            <p>hi</p>
-            <p>hi</p>
-            <p>hi</p>
-            <p>hi</p>
-            <p>hi</p>
-            <p>hi</p>
-            <p>hi</p>
-            <p>hi</p>
-            <p>hi</p>
-            <p>hi</p>
-            <p>hi</p>
-            <p>hi</p>
-            <p>hi</p>
+        <div className="text-center text-pink-400">
+            <p>ts pmo icl rs sybau</p>
+            <p>ts pmo icl rs sybau</p>
+            <p>ts pmo icl rs sybau</p>
+            <p>ts pmo icl rs sybau</p>
+            <p>ts pmo icl rs sybau</p>
+            <p>ts pmo icl rs sybau</p>
+            <p>ts pmo icl rs sybau</p>
+            <p>ts pmo icl rs sybau</p>
+            <p>ts pmo icl rs sybau</p>
+            <p>ts pmo icl rs sybau</p>
+            <p>ts pmo icl rs sybau</p>
+            <p>ts pmo icl rs sybau</p>
+            <p>ts pmo icl rs sybau</p>
+            <p>ts pmo icl rs sybau</p>
+            <p>ts pmo icl rs sybau</p>
+            <p>ts pmo icl rs sybau</p>
+            <p>ts pmo icl rs sybau</p>
+            <p>ts pmo icl rs sybau</p>
+            <p>ts pmo icl rs sybau</p>
+            <p>ts pmo icl rs sybau</p>
+            <p>ts pmo icl rs sybau</p>
+            <p>ts pmo icl rs sybau</p>
+            <p>ts pmo icl rs sybau</p>
+            <p>ts pmo icl rs sybau</p>
+            <p>ts pmo icl rs sybau</p>
+            <p>ts pmo icl rs sybau</p>
+            <p>ts pmo icl rs sybau</p>
+            <p>ts pmo icl rs sybau</p>
+            <p>ts pmo icl rs sybau</p>
+            <p>ts pmo icl rs sybau</p>
+            <p>ts pmo icl rs sybau</p>
+            <p>ts pmo icl rs sybau</p>
+            <p>ts pmo icl rs sybau</p>
+            <p>ts pmo icl rs sybau</p>
+            <p>ts pmo icl rs sybau</p>
+            <p>ts pmo icl rs sybau</p>
+            <p>ts pmo icl rs sybau</p>
+            <p>ts pmo icl rs sybau</p>
+            <p>ts pmo icl rs sybau</p>
+            <p>ts pmo icl rs sybau</p>
+            <p>ts pmo icl rs sybau</p>
+            <p>ts pmo icl rs sybau</p>
+            <p>ts pmo icl rs sybau</p>
+            <p>ts pmo icl rs sybau</p>
+            <p>ts pmo icl rs sybau</p>
+            <p>ts pmo icl rs sybau</p>
+            <p>ts pmo icl rs sybau</p>
+            <p>ts pmo icl rs sybau</p>
+            <p>ts pmo icl rs sybau</p>
+            <p>ts pmo icl rs sybau</p>
+            <p>ts pmo icl rs sybau</p>
+            <p>ts pmo icl rs sybau</p>
+            <p>ts pmo icl rs sybau</p>
+            <p>ts pmo icl rs sybau</p>
+            <p>ts pmo icl rs sybau</p>
+            <p>ts pmo icl rs sybau</p>
+            <p>ts pmo icl rs sybau</p>
+            <p>ts pmo icl rs sybau</p>
+            <p>ts pmo icl rs sybau</p>
+            <p>ts pmo icl rs sybau</p>
+            <p>ts pmo icl rs sybau</p>
+            <p>ts pmo icl rs sybau</p>
+            <p>ts pmo icl rs sybau</p>
+            <p>ts pmo icl rs sybau</p>
+            <p>ts pmo icl rs sybau</p>
+            <p>ts pmo icl rs sybau</p>
+            <p>ts pmo icl rs sybau</p>
+            <p>ts pmo icl rs sybau</p>
+            <p>ts pmo icl rs sybau</p>
+            <p>ts pmo icl rs sybau</p>
+            <p>ts pmo icl rs sybau</p>
+            <p>ts pmo icl rs sybau</p>
+            <p>ts pmo icl rs sybau</p>
+            <p>ts pmo icl rs sybau</p>
+            <p>ts pmo icl rs sybau</p>
+            <p>ts pmo icl rs sybau</p>
+            <p>ts pmo icl rs sybau</p>
+            <p>ts pmo icl rs sybau</p>
+            <p>ts pmo icl rs sybau</p>
+            <p>ts pmo icl rs sybau</p>
+            <p>ts pmo icl rs sybau</p>
+            <p>ts pmo icl rs sybau</p>
+            <p>ts pmo icl rs sybau</p>
+            <p>ts pmo icl rs sybau</p>
+            <p>ts pmo icl rs sybau</p>
+            <p>ts pmo icl rs sybau</p>
+            <p>ts pmo icl rs sybau</p>
+            <p>ts pmo icl rs sybau</p>
+            <p>ts pmo icl rs sybau</p>
+            <p>ts pmo icl rs sybau</p>
+            <p>ts pmo icl rs sybau</p>
+            <p>ts pmo icl rs sybau</p>
+            <p>ts pmo icl rs sybau</p>
+            <p>ts pmo icl rs sybau</p>
+            <p>ts pmo icl rs sybau</p>
+            <p>ts pmo icl rs sybau</p>
+            <p>ts pmo icl rs sybau</p>
+            <p>ts pmo icl rs sybau</p>
+            <p>ts pmo icl rs sybau</p>
         </div>
     );
 }
