@@ -1,6 +1,21 @@
-export default function LoginPage() {
+import LogInComps from "../components/LogInComps";
+
+type LoginPageProps = {
+    setAuth: (auth: boolean) => void;
+}
+
+export default function LoginPage({ setAuth } : LoginPageProps) {
     
     return (
-        <h1 className="text-9xl justify-center">hi</h1>
+        <div className="bg-stone-900 flex h-screen items-center justify-center">
+            <div className="flex w-3/5 h-1/2 bg-stone-50">
+                <div className="flex w-1/2 justify-between items-center p-4">
+                    <LogInComps setAuth={setAuth}/>
+                </div>
+                <div className="flex w-1/2 justify-between items-center p-4">
+                    sign up ts 
+                </div>
+            </div>
+        </div>
     );
 }

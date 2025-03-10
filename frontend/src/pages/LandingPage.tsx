@@ -1,28 +1,19 @@
-import nodemap from "../assets/nodemap.png"
-import GetStartedButton from "../components/GetStartedButton";
+import edgeMap from '../assets/edges.svg'
+import GetStartedButton from '../components/GetStartedButton';
 
 export default function LandingPage() {
 
-    return (        
-        <div className="flex h-screen overflow-hidden">
-
-            <div className="w-1/2 h-full">
-                <img 
-                    src={nodemap}
-                    alt="Map of UCF" 
-                    className="w-full h-full object-cover rotate-[-90]" 
-                />
+    return (
+        <div className="bg-stone-900 flex h-screen">
+            <div className="w-1/2 flex z-2 items-center justify-center">
+                <img src={edgeMap} alt='ucf edges' className='w-screen h-screen rotate-270'></img>
             </div>
- 
-            <div className="w-1/2 flex flex-col justify-center items-center h-auto bg-white">
-                <div className="bg-white text-center rounded-4xl border border-black pb-16 pt-16 pl-4 pr-4">
 
-                    <h1 className="text-4xl font-bold">KnightNav</h1>
-                    <h2 className="text-2xl text-gray-600">Find Your Way With Ease</h2>
-                    <p className="text-lg text-gray-500 max-w-md mt-4">
-                        Navigate UCF's campus effortlessly with our app, designed to help you get to your class on time.
-                    </p>
-                    <GetStartedButton buttonText="Get Started" />
+            <div className="w-1/2 flex items-center justify-center p-8 ">
+                <div className='flex flex-col items-center justify-center py-15 px-10'>
+                    <h1 className='text-stone-50 text-8xl'>KnightNav</h1>
+                    <h3 className="text-4xl text-stone-300 py-2">Find Your Way With Ease</h3>
+                    <GetStartedButton buttonText="Get Started"/>
                 </div>
             </div>
         </div>
