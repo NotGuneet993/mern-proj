@@ -1,76 +1,82 @@
-import { FormEvent, useState, useEffect } from "react";
-
+import { FormEvent, useState } from "react";
+import { useNavigate } from "react-router-dom";
 const API_URL = import.meta.env.VITE_API_URL;
 
-export default function LogInComps() {
+type LoginCompsProps = {
+    setAuth: (auth: boolean) => void;
+}
 
-    const [ user, setUser ] = useState('');
+export default function LogInComps({ setAuth } : LoginCompsProps) {
+
+    const [ email, setEmail ] = useState('');
     const [ password, setPassword ] = useState('');
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [errorMessage, setErrorMessage] = useState('');
 
-    const onSubmit = (e: FormEvent) => {
-        e.preventDefault();
+    const navigate = useNavigate();
+    
 
-        if (user && password) {
-            setIsSubmitting(true);
-        }
-    }
-
-    const loginRequest = async () => {
-        try {
-            const res = await fetch(`${API_URL}/users/login`, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({ user, password }),
-            });
-
-            if (!res.ok) {
-                throw new Error("Login failed");
-            }
-
-            const data = await res.json();
-            console.log("Login success:", data);
-
-        } catch (error) {
-            console.error("Error logging in:", error);
-        } finally {
-            setIsSubmitting(false);
-        }
-    };
-
-    useEffect(() => {
-        if (isSubmitting) return;
-        loginRequest();
-
-    }, [isSubmitting]);
-
-    const updateUser = ({ target: { value }} : React.ChangeEvent<HTMLInputElement>) => {
-        setUser(value);
+    // used for validation 
+    const updateEmail = ({ target: { value }} : React.ChangeEvent<HTMLInputElement>) => {
+        setEmail(value);
     }    
     
     const updatePassword = ({ target: { value }} : React.ChangeEvent<HTMLInputElement>) => {
         setPassword(value);
     }
 
+
+    // POST logic
+    const handleSubmit = async (event: FormEvent) => {
+        event.preventDefault();
+        setIsSubmitting(true);
+
+        try {            
+            const response = await fetch(`${API_URL}/users/login`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                }, 
+                body: JSON.stringify({ email, password }),
+                credentials: 'include'
+            });
+
+            const data = await response.json();
+            console.log(data);
+
+            if (!data.authorization) {
+                setErrorMessage(data.message);
+            } else {
+                setErrorMessage('');
+                setAuth(true);
+                navigate('/dashboard');
+            }
+            
+        } catch (error) {
+            console.log(`Error: ${error}`)
+        } finally {
+            setIsSubmitting(false);
+        }
+    }
+
+
+    // JSX for the page
     return (
-        <form> 
+        <form onSubmit={handleSubmit} method="POST"> 
             <h2 className="text-5xl m-1">Log In</h2>
 
             <label></label>
-            <input name='email' value={user} onChange={updateUser} autoComplete="off"
+            <input name='email' value={email} onChange={updateEmail} placeholder='Email' autoComplete="off"
             className="border-2 border-gray-400 m-1 rounded-3xl px-3 py-1 w-[20vw]"/>
 
-            <input name='password' type="password" value={password} onChange={updatePassword}
+            <input name='password' type="password" value={password} onChange={updatePassword} placeholder='Password' autoComplete="off"
             className="border-2 border-gray-400 m-1 rounded-3xl px-3 py-1 w-[20vw]"/>
 
             <br />
-
+            {errorMessage && <h3 className="text-red-500 mx-2">{errorMessage}</h3>}
             <button 
                 className='border-1 border-gray-300 px-2 cursor-pointer mmx-2 my-3 py-1 w-[20vw]'
-                type='submit'
-                onClick={onSubmit}
+                type='submit' 
             >{isSubmitting ? "Logging in..." : "Log In"}</button>
 
         </form>
