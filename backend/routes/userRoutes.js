@@ -9,17 +9,18 @@ const router = express.Router();
 // inputs are an email and password
 // a JSON with "authorization" and "message" is returned
 router.post("/login", async (req, res) => {
-  const { username, email, password } = req.body;
+  const { email, password } = req.body;
+  const username = email;
 
   try {
     const user = await User.findOne({$or: [{email:email}, {username: username}]}); 
     if (!user) {
-      return res.status(401).json({ authorization: false, message: "User not found" });
+      return res.status(404).json({ authorization: false, message: "User not found" });
     }
     
     // This if statement holds, we're checking a pw hashed through frontend against a hashed pw in DB
     if (password !== user.password) {
-      return res.status(401).json({ authorization: false, message: "Invalid credentials" });
+      return res.status(403).json({ authorization: false, message: "Incorrect password" });
     }
 
     res.json({ authorization: true, message: "Login Successfully" });
