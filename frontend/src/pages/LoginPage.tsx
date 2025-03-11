@@ -9,7 +9,7 @@ export default function LoginPage({ setAuth } : LoginPageProps) {
     
     return (
         <div className="bg-stone-900 flex h-screen items-center justify-center">
-            <div className="flex w-3/5 h-1/2 bg-stone-50">
+            <div className="flex w-3/5 h-2/3 bg-stone-50 rounded-4xl">
                 <div className="flex w-1/2 justify-between items-center p-4">
                     <LogInComps setAuth={setAuth}/>
                 </div>
