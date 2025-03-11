@@ -4,7 +4,7 @@ import GetStartedButton from '../components/GetStartedButton';
 export default function LandingPage() {
 
     return (
-        <div className="bg-stone-900 flex h-screen">
+        <div className="bg-stone-900 flex h-full">
             <div className="w-1/2 flex z-2 items-center justify-center">
                 <img src={edgeMap} alt='ucf edges' className='w-screen h-screen rotate-270'></img>
             </div>
