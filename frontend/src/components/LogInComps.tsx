@@ -65,7 +65,6 @@ export default function LogInComps({ setAuth } : LoginCompsProps) {
         <form onSubmit={handleSubmit} method="POST"> 
             <h2 className="text-5xl m-1">Log In</h2>
 
-            <label></label>
             <input name='email' value={email} onChange={updateEmail} placeholder='Email' autoComplete="off"
             className="border-2 border-gray-400 m-1 rounded-3xl px-3 py-1 w-[20vw]"/>
 

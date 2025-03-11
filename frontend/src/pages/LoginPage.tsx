@@ -1,4 +1,5 @@
 import LogInComps from "../components/LogInComps";
+import SignUpComps from "../components/SignUpComps";
 
 type LoginPageProps = {
     setAuth: (auth: boolean) => void;
@@ -13,7 +14,7 @@ export default function LoginPage({ setAuth } : LoginPageProps) {
                     <LogInComps setAuth={setAuth}/>
                 </div>
                 <div className="flex w-1/2 justify-between items-center p-4">
-                    sign up ts 
+                    <SignUpComps />
                 </div>
             </div>
         </div>
