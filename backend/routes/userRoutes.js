@@ -78,9 +78,6 @@ router.post("/register", async (req, res) => {
     // Send verification email
     await sendVerification(mg, name, email, token, "register");
 
-    // Send verification email
-    await sendVerification(mg, name, email, token, "register");
-
     res.json({ authorization: false, message: "" });
   } catch (error) {
     res.status(500).json({ authorization: false, message: `Server error : ${error}` });
