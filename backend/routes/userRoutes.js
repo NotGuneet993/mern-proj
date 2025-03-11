@@ -54,7 +54,9 @@ router.post("/register", async (req, res) => {
       username : username,
       password: password,
       emailVerified: false,
+      emailVerified: false,
       token : "",
+      tkTime : "",
       tkTime : "",
     });
 
@@ -71,6 +73,9 @@ router.post("/register", async (req, res) => {
     let curTime = new Date().getMinutes();
     newUser.tkTime = curTime;
     await newUser.save();
+
+    // Send verification email
+    await sendVerification(mg, name, email, token, "register");
 
     // Send verification email
     await sendVerification(mg, name, email, token, "register");

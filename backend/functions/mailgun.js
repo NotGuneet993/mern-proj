@@ -52,6 +52,9 @@ ${verifLink}`;
       subject: subject,
       text: text,
       html: html,
+      subject: subject,
+      text: text,
+      html: html,
     });
 
     console.log(data); // logs response data
