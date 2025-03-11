@@ -72,8 +72,6 @@ router.post("/register", async (req, res) => {
     newUser.token = `${token}`;
     let curTime = new Date().getMinutes();
     newUser.tkTime = curTime;
-    let curTime = new Date().getMinutes();
-    newUser.tkTime = curTime;
     await newUser.save();
 
     // Send verification email
@@ -127,7 +125,6 @@ router.post("/forgot", async (req, res) => {
 // Inputs are token and type (from verification link), both acting as query
 // a JSON with "authorization" and "message" is returned
 router.get("/verify", async (req, res) => {
-  const {token , type} = req.query;
   const {token , type} = req.query;
   
   try { 

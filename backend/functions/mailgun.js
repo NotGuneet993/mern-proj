@@ -1,6 +1,5 @@
 // Uses Mailgun to send a verification email to a new user's inbox.
 async function sendVerification(mg, name, email, token, type) {
-async function sendVerification(mg, name, email, token, type) {
   
   // Token will be checked through single use /verify route
   const verifLink = `https://knightnav.net/api/users/verify?token=${token}&type=${type}`;
