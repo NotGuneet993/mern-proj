@@ -42,7 +42,6 @@ export default function LogInComps({ setAuth } : LoginCompsProps) {
             });
 
             const data = await response.json();
-            console.log(data);
 
             if (!data.authorization) {
                 setErrorMessage(data.message);
@@ -75,7 +74,8 @@ export default function LogInComps({ setAuth } : LoginCompsProps) {
             {errorMessage && <h3 className="text-red-500 mx-2">{errorMessage}</h3>}
             <button 
                 className='border-1 border-gray-300 px-2 cursor-pointer mmx-2 my-3 py-1 w-[20vw]'
-                type='submit' 
+                type='submit'
+                disabled={isSubmitting} 
             >{isSubmitting ? "Logging in..." : "Log In"}</button>
 
         </form>
