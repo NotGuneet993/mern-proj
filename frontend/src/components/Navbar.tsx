@@ -30,7 +30,6 @@ export default function Navbar({ isAuth, setAuth } : NavbarProps) {
         <nav 
             className= "w-screen h-[60px] fixed flex justify-between items-center z-99 py-2 px-[20px] bg-gray-50 border-t border-b border-gray-300 "
         > 
-
             <NavLink to='/'><h1 className="flex items-center text-2xl cursor-pointer hover:text-yellow-400 duration-300 ease-in-out">
                 KnightNav <PiCompassRoseLight className="text-4xl m-1"/>
             </h1></NavLink>
@@ -47,7 +46,7 @@ export default function Navbar({ isAuth, setAuth } : NavbarProps) {
                 ) : (
                     <>
                         <li className="inline-block p-1.5"><button className={buttonStyle} onClick={goToSignUp}>Log In</button></li>
-                        <li className="inline-block p-1.5"><button className={buttonStyle} onClick={goToSignUp}>Sign Up</button></li>
+                        <li className="hidden sm:inline-block p-1.5"><button className={buttonStyle} onClick={goToSignUp}>Sign Up</button></li>
                     </>
                 )}
 
