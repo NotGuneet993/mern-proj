@@ -30,11 +30,6 @@ function DashboardPage() {
         </div>
       ))}
 
-      <AddModal
-        isOpen={modalOpen}
-        onClose={() => setModalOpen(false)}
-        onSave={handleAddClass}
-      />
     </div>
   );
 }
