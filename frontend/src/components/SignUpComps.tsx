@@ -1,15 +1,20 @@
 import { FormEvent, useState } from "react";
 import { IoIosWarning, IoIosCheckmarkCircle } from "react-icons/io";
 import { useNavigate } from "react-router-dom";
+import { PiCompassRoseLight } from "react-icons/pi";
+
 const API_URL = import.meta.env.VITE_API_URL;
 
 type LoginCompsProps = {
     setAuth: (auth: boolean) => void;
+    setIsLoginComp: (auth: boolean) => void;
 }
 
-export default function SignUpComps({ setAuth } : LoginCompsProps) {
+export default function SignUpComps({ setAuth, setIsLoginComp } : LoginCompsProps) {
 
     const navigate = useNavigate();
+
+    const pwRequirements = "Your password must contain 8-32 characters, a capital letter, a number, and a special character";
     
     // name and username 
     const [name, setName] = useState('');
@@ -72,6 +77,11 @@ export default function SignUpComps({ setAuth } : LoginCompsProps) {
             setPwMatch(() => password === value);
         }
     }
+    
+    // swap back to login
+    const handleSwap = () => {
+        setIsLoginComp(true);
+    }
 
     // POST to create a new account
     // inputs are name, email, username, and password
@@ -109,37 +119,70 @@ export default function SignUpComps({ setAuth } : LoginCompsProps) {
     };
 
     return (
-        <form onSubmit={handleSubmit} method="POST"> 
-        <h2 className="text-5xl m-1">Sign Up</h2>
+        <div className="flex flex-col items-center justify-center bg-stone-100 py-2 px-5 rounded-md">
+            <PiCompassRoseLight className="text-[6rem]"/>
+            <h2 className="text-5xl m-1">Sign Up</h2>
 
-        <input name='name' value={name} onChange={updateName} placeholder='Full Name' autoComplete="off"
-        className="border-2 border-gray-400 m-1 rounded-3xl px-3 py-1 w-[20vw]"/>
+            <form onSubmit={handleSubmit} method="POST" className="flex flex-col items-center justify-center"> 
 
-        <input name='username' value={username} onChange={updateUsername} placeholder='Username' autoComplete="off"
-        className="border-2 border-gray-400 m-1 rounded-3xl px-3 py-1 w-[20vw]"/>
+            <input name='name' value={name} onChange={updateName} placeholder='Full Name' autoComplete="off"
+            className="border-1 border-gray-400 m-1 px-3 py-1 w-[20vw]"/>
 
-        <input name='email' value={email} onChange={updateEmail} placeholder='Email' autoComplete="off"
-        className="border-2 border-gray-400 m-1 rounded-3xl px-3 py-1 w-[20vw]"/>
-        {validEmail ? <h6 className="flex text-green-600 items-center px-3"><IoIosCheckmarkCircle/> Email is valid</h6> : <h6 className="flex text-red-500 items-center px-3"><IoIosWarning/> Please enter a valid email</h6>}
+            <input name='username' value={username} onChange={updateUsername} placeholder='Username' autoComplete="off"
+            className="border-1 border-gray-400 m-1 px-3 py-1 w-[20vw]"/>
 
-        <input name='password' type="password" value={password} onChange={updatePassword} placeholder='Password' autoComplete="off"
-        className="border-2 border-gray-400 m-1 rounded-3xl px-3 py-1 w-[20vw]"/>
-        {pwLength ? <h6 className="flex text-green-600 items-center px-3"><IoIosCheckmarkCircle/> Password must be 8-32 characteres</h6> : <h6 className="flex text-red-500 items-center px-3"><IoIosWarning/> Password must be 8-32 characteres</h6>}
-        {pwCapitalLetter ? <h6 className="flex text-green-600 items-center px-3"><IoIosCheckmarkCircle/> Password must contain a capital letter</h6> : <h6 className="flex text-red-500 items-center px-3"><IoIosWarning/> Password must contain a capital letter</h6>}
-        {pwNum ? <h6 className="flex text-green-600 items-center px-3"><IoIosCheckmarkCircle/> Password must contain a number</h6> : <h6 className="flex text-red-500 items-center px-3"><IoIosWarning/> Password must contain a number</h6>}
-        {pwSpecChar ? <h6 className="flex text-green-600 items-center px-3"><IoIosCheckmarkCircle/> Password must contain a special character</h6> : <h6 className="flex text-red-500 items-center px-3"><IoIosWarning/> Password must contain a special character</h6>}
+            <input name='email' value={email} onChange={updateEmail} placeholder='Email' autoComplete="off"
+            className="border-1 border-gray-400 m-1 px-3 py-1 w-[20vw]"/>
+            {validEmail ? 
+                <h6 className="flex items-start gap-2 text-sm text-green-600 px-3 max-w-[20vw] break-words leading-snug">
+                    <span className="min-w-[1.25rem] mt-[2px]"><IoIosCheckmarkCircle /></span>
+                    <span>Email is valid</span>
+                </h6> 
+                : 
+                <h6 className="flex items-start gap-2 text-sm text-red-500 px-3 max-w-[20vw] break-words leading-snug">
+                    <span className="min-w-[1.25rem] mt-[2px]"><IoIosWarning /></span>
+                    <span>Please enter a valid email</span>
+                </h6>
+            }
 
-        <input name='confirmPassword' type="password" value={password2} onChange={updatePassword2} placeholder='Confirm Password' autoComplete="off"
-        className="border-2 border-gray-400 m-1 rounded-3xl px-3 py-1 w-[20vw]"/>
-        {pwMatch ? <h6 className="flex text-green-600 items-center px-3"><IoIosCheckmarkCircle/> Passwords match</h6> : <h6 className="flex text-red-500 items-center px-3"><IoIosWarning/> Passwords do not match</h6>}
+            <input name='password' type="password" value={password} onChange={updatePassword} placeholder='Password' autoComplete="off"
+            className="border-1 border-gray-400 m-1 px-3 py-1 w-[20vw]"/>
+            {(pwLength && pwCapitalLetter && pwNum && pwSpecChar) ? 
+                <h6 className="flex items-start gap-2 text-sm text-green-600 px-3 max-w-[20vw] break-words leading-snug">
+                    <span className="min-w-[1.25rem] mt-[2px]"><IoIosCheckmarkCircle /></span>
+                    <span>{pwRequirements}</span>
+                </h6>
+                :
+                <h6 className="flex items-start gap-2 text-sm text-red-500 px-3 max-w-[20vw] break-words leading-snug">
+                    <span className="min-w-[1.25rem] mt-[2px]"><IoIosWarning /></span>
+                    <span>{pwRequirements}</span>
+                </h6>
+            }
 
-        {errorMessage && <h3 className="text-red-500 mx-2">{errorMessage}</h3>}
-        <button 
-            className='border-1 border-gray-300 px-2 cursor-pointer mmx-2 my-1 py-1 w-[20vw]'
-            type='submit' 
-            disabled={isSubmitting}
-        >{isSubmitting ? "Creating Account..." : "Create Account"}</button>
+            <input name='confirmPassword' type="password" value={password2} onChange={updatePassword2} placeholder='Confirm Password' autoComplete="off"
+            className="border-1 border-gray-400 m-1 px-3 py-1 w-[20vw]"/>
+            {pwMatch ? 
+                <h6 className="flex items-start gap-2 text-sm text-green-600 px-3 max-w-[20vw] break-words leading-snug">
+                    <span className="min-w-[1.25rem] mt-[2px]"><IoIosCheckmarkCircle /></span>
+                    <span>Passwords match</span>
+                </h6>
+                :
+                <h6 className="flex items-start gap-2 text-sm text-red-500 px-3 max-w-[20vw] break-words leading-snug">
+                    <span className="min-w-[1.25rem] mt-[2px]"><IoIosWarning /></span> 
+                    <span>Passwords do not match</span>
+                </h6>
+            }
 
-    </form>
+            {errorMessage && <h3 className="text-red-500 mx-2">{errorMessage}</h3>}
+            <button 
+                className='border-2 border-gray-800  px-2 cursor-pointer mx-1 my-3 py-1 w-[20vw] bg-linear-70 from-yellow-300 to-amber-500
+                transition-all hover:bg-linear-70 hover:from-yellow-400 hover:to-amber-600 hover:cursor-pointer rounded-sm hover:rounded-4xl'
+                type='submit' 
+                disabled={isSubmitting}
+            >{isSubmitting ? "Creating Account..." : "Create Account"}</button>
+
+        </form>
+        <p className="text-black text-sm" onClick={handleSwap}>Already have an account? Click here!</p>
+    </div>
     );
 };

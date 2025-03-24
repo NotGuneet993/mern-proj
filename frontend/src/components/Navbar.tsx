@@ -4,9 +4,10 @@ import { PiCompassRoseLight } from "react-icons/pi";
 type NavbarProps = {
     isAuth: boolean;
     setAuth: (auth: boolean) => void;
+    setIsLoginComp: (auth: boolean) => void;
 }
 
-export default function Navbar({ isAuth, setAuth } : NavbarProps) {
+export default function Navbar({ isAuth, setAuth, setIsLoginComp } : NavbarProps) {
 
     const navigate = useNavigate();
 
@@ -14,6 +15,12 @@ export default function Navbar({ isAuth, setAuth } : NavbarProps) {
     // button handler functions
     const goToSignUp = () => {
         navigate('/get-started');
+        setIsLoginComp(false);
+    }
+
+    const goToLogin = () => {
+        navigate('/get-started');
+        setIsLoginComp(true);
     }
 
     const signOut = () => {
@@ -45,7 +52,7 @@ export default function Navbar({ isAuth, setAuth } : NavbarProps) {
                     </>
                 ) : (
                     <>
-                        <li className="inline-block p-1.5"><button className={buttonStyle} onClick={goToSignUp}>Log In</button></li>
+                        <li className="inline-block p-1.5"><button className={buttonStyle} onClick={goToLogin}>Log In</button></li>
                         <li className="hidden sm:inline-block p-1.5"><button className={buttonStyle} onClick={goToSignUp}>Sign Up</button></li>
                     </>
                 )}
