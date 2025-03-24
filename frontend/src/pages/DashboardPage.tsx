@@ -1,109 +1,44 @@
-import yurr from '../assets/yurr.png'
+import React, { useState } from 'react';
+import AddModal from '../temp_Modal/AddModal';
 
-export default function DashboardPage() {
+function DashboardPage() {
+  const [modalOpen, setModalOpen] = useState(false);
 
-    return (
-        <div className="text-center text-pink-400">
-            <img src={yurr} className="pt-25 w-[500px] h-[500px] mx-125"></img>
-            <p>ts pmo icl rs sybau</p>
-            <p>ts pmo icl rs sybau</p>
-            <p>ts pmo icl rs sybau</p>
-            <p>ts pmo icl rs sybau</p>
-            <p>ts pmo icl rs sybau</p>
-            <p>ts pmo icl rs sybau</p>
-            <p>ts pmo icl rs sybau</p>
-            <p>ts pmo icl rs sybau</p>
-            <p>ts pmo icl rs sybau</p>
-            <p>ts pmo icl rs sybau</p>
-            <p>ts pmo icl rs sybau</p>
-            <p>ts pmo icl rs sybau</p>
-            <p>ts pmo icl rs sybau</p>
-            <p>ts pmo icl rs sybau</p>
-            <p>ts pmo icl rs sybau</p>
-            <p>ts pmo icl rs sybau</p>
-            <p>ts pmo icl rs sybau</p>
-            <p>ts pmo icl rs sybau</p>
-            <p>ts pmo icl rs sybau</p>
-            <p>ts pmo icl rs sybau</p>
-            <p>ts pmo icl rs sybau</p>
-            <p>ts pmo icl rs sybau</p>
-            <p>ts pmo icl rs sybau</p>
-            <p>ts pmo icl rs sybau</p>
-            <p>ts pmo icl rs sybau</p>
-            <p>ts pmo icl rs sybau</p>
-            <p>ts pmo icl rs sybau</p>
-            <p>ts pmo icl rs sybau</p>
-            <p>ts pmo icl rs sybau</p>
-            <p>ts pmo icl rs sybau</p>
-            <p>ts pmo icl rs sybau</p>
-            <p>ts pmo icl rs sybau</p>
-            <p>ts pmo icl rs sybau</p>
-            <p>ts pmo icl rs sybau</p>
-            <p>ts pmo icl rs sybau</p>
-            <p>ts pmo icl rs sybau</p>
-            <p>ts pmo icl rs sybau</p>
-            <p>ts pmo icl rs sybau</p>
-            <p>ts pmo icl rs sybau</p>
-            <p>ts pmo icl rs sybau</p>
-            <p>ts pmo icl rs sybau</p>
-            <p>ts pmo icl rs sybau</p>
-            <p>ts pmo icl rs sybau</p>
-            <p>ts pmo icl rs sybau</p>
-            <p>ts pmo icl rs sybau</p>
-            <p>ts pmo icl rs sybau</p>
-            <p>ts pmo icl rs sybau</p>
-            <p>ts pmo icl rs sybau</p>
-            <p>ts pmo icl rs sybau</p>
-            <p>ts pmo icl rs sybau</p>
-            <p>ts pmo icl rs sybau</p>
-            <p>ts pmo icl rs sybau</p>
-            <p>ts pmo icl rs sybau</p>
-            <p>ts pmo icl rs sybau</p>
-            <p>ts pmo icl rs sybau</p>
-            <p>ts pmo icl rs sybau</p>
-            <p>ts pmo icl rs sybau</p>
-            <p>ts pmo icl rs sybau</p>
-            <p>ts pmo icl rs sybau</p>
-            <p>ts pmo icl rs sybau</p>
-            <p>ts pmo icl rs sybau</p>
-            <p>ts pmo icl rs sybau</p>
-            <p>ts pmo icl rs sybau</p>
-            <p>ts pmo icl rs sybau</p>
-            <p>ts pmo icl rs sybau</p>
-            <p>ts pmo icl rs sybau</p>
-            <p>ts pmo icl rs sybau</p>
-            <p>ts pmo icl rs sybau</p>
-            <p>ts pmo icl rs sybau</p>
-            <p>ts pmo icl rs sybau</p>
-            <p>ts pmo icl rs sybau</p>
-            <p>ts pmo icl rs sybau</p>
-            <p>ts pmo icl rs sybau</p>
-            <p>ts pmo icl rs sybau</p>
-            <p>ts pmo icl rs sybau</p>
-            <p>ts pmo icl rs sybau</p>
-            <p>ts pmo icl rs sybau</p>
-            <p>ts pmo icl rs sybau</p>
-            <p>ts pmo icl rs sybau</p>
-            <p>ts pmo icl rs sybau</p>
-            <p>ts pmo icl rs sybau</p>
-            <p>ts pmo icl rs sybau</p>
-            <p>ts pmo icl rs sybau</p>
-            <p>ts pmo icl rs sybau</p>
-            <p>ts pmo icl rs sybau</p>
-            <p>ts pmo icl rs sybau</p>
-            <p>ts pmo icl rs sybau</p>
-            <p>ts pmo icl rs sybau</p>
-            <p>ts pmo icl rs sybau</p>
-            <p>ts pmo icl rs sybau</p>
-            <p>ts pmo icl rs sybau</p>
-            <p>ts pmo icl rs sybau</p>
-            <p>ts pmo icl rs sybau</p>
-            <p>ts pmo icl rs sybau</p>
-            <p>ts pmo icl rs sybau</p>
-            <p>ts pmo icl rs sybau</p>
-            <p>ts pmo icl rs sybau</p>
-            <p>ts pmo icl rs sybau</p>
-            <p>ts pmo icl rs sybau</p>
+  // Suppose you keep a local list of classes:
+  const [classes, setClasses] = useState<ClassData[]>([]);
+
+  interface ClassData {
+    course_code: string;
+    class_name: string;
+    professor: string;
+  }
+
+  const handleAddClass = (newClassData: ClassData) => {
+    //it is curretly not saving the data to the database
+    //we can call the schedule addClass api to add the class
+    setClasses((prev) => [...prev, newClassData]);
+  };
+  return (
+    <div>
+      <button className='border-4 bg-gray-200' onClick={() => setModalOpen(true)}>Add Class</button>
+
+      {/* Display current classes */}
+      {classes.map((cls, index) => (
+        <div key={index}>
+          <h4>{cls.course_code} - {cls.class_name}</h4>
+          <p>Professor: {cls.professor}</p>
         </div>
-    );
+      ))}
+
+      <AddModal
+         isOpen={modalOpen}
+         onClose={() => setModalOpen(false)}
+         onSave={handleAddClass}
+       />
+
+    </div>
+    
+  );
 }
+
+export default DashboardPage;
