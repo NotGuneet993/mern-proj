@@ -1,12 +1,14 @@
 import { FormEvent, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { PiCompassRoseLight } from "react-icons/pi";
 const API_URL = import.meta.env.VITE_API_URL;
 
 type LoginCompsProps = {
     setAuth: (auth: boolean) => void;
+    setIsLoginComp: (auth: boolean) => void;
 }
 
-export default function LogInComps({ setAuth } : LoginCompsProps) {
+export default function LogInComps({ setAuth, setIsLoginComp } : LoginCompsProps) {
 
     const [ email, setEmail ] = useState('');
     const [ password, setPassword ] = useState('');
@@ -15,7 +17,6 @@ export default function LogInComps({ setAuth } : LoginCompsProps) {
 
     const navigate = useNavigate();
     
-
     // used for validation 
     const updateEmail = ({ target: { value }} : React.ChangeEvent<HTMLInputElement>) => {
         setEmail(value);
@@ -25,6 +26,10 @@ export default function LogInComps({ setAuth } : LoginCompsProps) {
         setPassword(value);
     }
 
+    // used to swap to registration 
+    const handleSwap = () => {
+        setIsLoginComp(false);
+    }
 
     // POST logic
     const handleSubmit = async (event: FormEvent) => {
@@ -61,23 +66,31 @@ export default function LogInComps({ setAuth } : LoginCompsProps) {
 
     // JSX for the page
     return (
-        <form onSubmit={handleSubmit} method="POST"> 
-            <h2 className="text-5xl m-1">Log In</h2>
+        <div className="flex flex-col items-center justify-center bg-stone-100 py-5 px-5 rounded-md">
+            <PiCompassRoseLight className="text-[6rem]"/>
+            <h2 className="text-5xl m-3">Log In</h2>
 
-            <input name='email' value={email} onChange={updateEmail} placeholder='Email' autoComplete="off"
-            className="border-2 border-gray-400 m-1 rounded-3xl px-3 py-1 w-[20vw]"/>
+            <form onSubmit={handleSubmit} method="POST" className="flex flex-col items-center justify-center"> 
 
-            <input name='password' type="password" value={password} onChange={updatePassword} placeholder='Password' autoComplete="off"
-            className="border-2 border-gray-400 m-1 rounded-3xl px-3 py-1 w-[20vw]"/>
+                <input name='email' value={email} onChange={updateEmail} placeholder='Email' autoComplete="off"
+                className="border-1 border-gray-400 m-2 px-3 py-1 w-[20vw]"/>
 
-            <br />
-            {errorMessage && <h3 className="text-red-500 mx-2">{errorMessage}</h3>}
-            <button 
-                className='border-1 border-gray-300 px-2 cursor-pointer mmx-2 my-3 py-1 w-[20vw]'
-                type='submit'
-                disabled={isSubmitting} 
-            >{isSubmitting ? "Logging in..." : "Log In"}</button>
+                <input name='password' type="password" value={password} onChange={updatePassword} placeholder='Password' autoComplete="off"
+                className="border-1 border-gray-400 m-2 px-3 py-1 w-[20vw]"/>
 
-        </form>
+                <Link to='' className="text-blue-500 text-sm m-1">Forgot password? </Link>
+
+                {errorMessage && <h3 className="text-red-500 mx-2">{errorMessage}</h3>}
+                <button 
+                    className='border-2 border-gray-800  px-2 cursor-pointer mx-1 my-3 py-1 w-[20vw] bg-linear-70 from-yellow-300 to-amber-500
+                    transition-all hover:bg-linear-70 hover:from-yellow-400 hover:to-amber-600 hover:cursor-pointer rounded-sm hover:rounded-4xl'
+                    type='submit'
+                    disabled={isSubmitting} 
+                >{isSubmitting ? "Logging in..." : "Log In"}</button>
+            </form>
+
+            <p className="text-black text-sm" onClick={handleSwap}>New to KnightNav? Click here!</p>
+
+        </div>
     );
 }

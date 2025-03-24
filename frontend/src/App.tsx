@@ -11,13 +11,14 @@ import ProtectedRoute from './components/ProtectedRoute'
 
 function App() {
   const [isAuth, setAuth] = useState(false);
+  const [isLoginComp, setIsLoginComp] = useState(true);
 
   return (
     <div className="App box-border h-screen w-screen bg-stone-900">
-      <Navbar isAuth={isAuth} setAuth={setAuth}/>
+      <Navbar isAuth={isAuth} setAuth={setAuth} setIsLoginComp={setIsLoginComp}/>
       <Routes>
         <Route path='/' element={<LandingPage />} />
-        <Route path="/get-started" element={<LoginPage setAuth={setAuth}/>} />
+        <Route path="/get-started" element={<LoginPage setAuth={setAuth} setIsLoginComp={setIsLoginComp} isLoginComp={isLoginComp}/>} />
         <Route element={<ProtectedRoute isAuth={isAuth}/>}>
           <Route path="/dashboard" element={<DashboardPage />} />
         </Route>
