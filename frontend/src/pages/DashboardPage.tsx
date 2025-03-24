@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import AddModal from '../temp_Modal/AddModal';
 
 function DashboardPage() {
@@ -18,24 +18,22 @@ function DashboardPage() {
     //we can call the schedule addClass api to add the class
     setClasses((prev) => [...prev, newClassData]);
   };
+
   return (
-    <div>
-      <button className='border-4 bg-gray-200' onClick={() => setModalOpen(true)}>Add Class</button>
-
-      {/* Display current classes */}
-      {classes.map((cls, index) => (
-        <div key={index}>
-          <h4>{cls.course_code} - {cls.class_name}</h4>
-          <p>Professor: {cls.professor}</p>
-        </div>
-      ))}
-
-      <AddModal
-         isOpen={modalOpen}
-         onClose={() => setModalOpen(false)}
-         onSave={handleAddClass}
-       />
-
+    <div className="h-screen flex items-center justify-center">
+      <button
+        className="bg-blue-500 text-white px-4 py-2 rounded"
+        onClick={() => setModalOpen(true)}
+      >
+        Add Class
+      </button>
+      {modalOpen && (
+        <AddModal
+          isOpen={modalOpen}
+          onClose={() => setModalOpen(false)}
+          onSave={handleAddClass}
+        />
+      )}
     </div>
     
   );
