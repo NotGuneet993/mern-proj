@@ -1,5 +1,6 @@
 import './App.css'
 import { Route, Routes } from 'react-router-dom'
+import { useState } from 'react'
 
 import Navbar from './components/Navbar'
 import LandingPage from './pages/LandingPage'
@@ -7,8 +8,9 @@ import LoginPage from './pages/LoginPage'
 import DashboardPage from './pages/DashboardPage'
 import StimPage from './pages/StimPage'
 import MailVerifyPage from './pages/MailVerifyPage'
+import ForgotPasswordPage from './pages/ForgotPasswordPage'
+
 import Redirect from './pages/Redirect'
-import { useState } from 'react'
 import ProtectedRoute from './components/ProtectedRoute'
 
 function App() {
@@ -27,7 +29,9 @@ function App() {
         </Route>
         <Route path="/stim" element={<StimPage />} />
         <Route path="/mailVerifyPage" element={<MailVerifyPage />} />
+        <Route path="/forgotPassword" element={<ForgotPasswordPage />} />
         <Route path="/verifyUser/:user" element={<Redirect />} />
+        {/* <Route path="/verifyPassword/:user" element={<Redirect />} /> */}
         <Route path="/*" element={<LandingPage />} />
       </Routes>
     </div>

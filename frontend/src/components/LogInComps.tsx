@@ -80,7 +80,7 @@ export default function LogInComps({ setAuth, setIsLoginComp, setGlobalUser } : 
                 <input name='password' type="password" value={password} onChange={updatePassword} placeholder='Password' autoComplete="off"
                 className="border-1 border-gray-400 m-2 px-3 py-1 w-[20vw]"/>
 
-                <Link to='' className="text-blue-500 text-sm m-1">Forgot password? </Link>
+                <Link to='/forgotPassword' className="text-blue-500 text-sm m-1">Forgot password? </Link>
 
                 {errorMessage && <h3 className="text-red-500 mx-2">{errorMessage}</h3>}
                 <button 
