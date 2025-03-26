@@ -160,6 +160,7 @@ router.get("/verify", async (req, res) => {
     
     // Proceed to change password
     else if (type == "forgot") {
+      // TODO Uncomment this: return res.redirect(`/verifyForgot/${user.username}`);
       return res.json({ type: "forgot", username: user.username, authorization: true, message: "Current user successfully verified." });
       // TODO Grab user info, save it to the ssion, and redirect to change password page
     }
@@ -169,6 +170,26 @@ router.get("/verify", async (req, res) => {
       message:`Extraneous /verify error: "type" was neither register nor forgot` });
   } catch (error) {
     res.status(500).json({ type: null, username: null, authorization: false, message: `Server error : ${error}` });
+  }
+});
+
+// Check user route
+// path is /users/checkemail
+// Input is username being checked
+// a JSON with "verified"
+router.post("/checkemail", async (req, res) => {
+  const { username } = req.body
+
+  try {
+    const user = await User.findOne(username);
+
+    if (!user) {
+      res.status(500).json({ verified: false, message: `No user found.`})
+    }
+
+    res.status(500).json({ verified: user.emailVerified, message: `Verified email found.`})
+  } catch (error) {
+    res.status(500).json({ verified: false, message: `Server error : ${error}` });
   }
 });
 
