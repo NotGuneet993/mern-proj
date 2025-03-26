@@ -17,6 +17,7 @@ function DashboardPage() {
     //it is curretly not saving the data to the database
     //we can call the schedule addClass api to add the class
     setClasses((prev) => [...prev, newClassData]);
+    classes;
   };
 
   return (
