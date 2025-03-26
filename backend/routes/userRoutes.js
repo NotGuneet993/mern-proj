@@ -121,7 +121,7 @@ router.post("/forgot", async (req, res) => {
 // Verify route
 // path is /users/verify
 // Inputs are token and type (from verification link), both acting as query
-// a JSON with "username", "authorization" and "message" is returned
+// a JSON with "type," "username", "authorization" and "message" is returned
 router.get("/verify", async (req, res) => {
   const {token , type} = req.query;
   
@@ -131,7 +131,7 @@ router.get("/verify", async (req, res) => {
     if ( !user || (type == "forgot" && user.emailVerified == false) ) {
       // Uncomment to test, make it a comment when pushing
       //if (user) { console.log("Attempted forgot password with unverified email"); } 
-      return res.status(401).json({ username: null, authorization: false, message: "Invalid token" });
+      return res.status(401).json({ type: null, username: null, authorization: false, message: "Invalid token" });
       // TODO Redirect to some 404 page
     }
 
@@ -147,28 +147,28 @@ router.get("/verify", async (req, res) => {
     if ( curTime - tkTime >= 5) {
       // Uncomment to test, make it a comment when pushing
       //console.log("Verification attempted with expired token");
-      return res.status(401).json({ username: null, authorization: false, message: "Invalid token" });
+      return res.status(401).json({ type: null, username: null, authorization: false, message: "Invalid token" });
       // TODO Redirect to some 404 page
     }
 
     // Successful registration
     if (type == "register") {
       await user.updateOne({ emailVerified: true });
-      return res.json({ username: user.username, authorization: true, message: "New user succcessfully verified." });
+      return res.json({ type: "reg", username: user.username, authorization: true, message: "New user succcessfully verified." });
       // TODO Grab user info, save it to the session, and redirect to home page
     }
     
     // Proceed to change password
     else if (type == "forgot") {
-      return res.json({ username: user.username, authorization: true, message: "Current user successfully verified." });
+      return res.json({ type: "forgot", username: user.username, authorization: true, message: "Current user successfully verified." });
       // TODO Grab user info, save it to the ssion, and redirect to change password page
     }
     
     // This should never happen
-    res.status(500).json({ username: null, authorization: false, 
+    res.status(500).json({ type: null, username: null, authorization: false, 
       message:`Extraneous /verify error: "type" was neither register nor forgot` });
   } catch (error) {
-    res.status(500).json({ username: null, authorization: false, message: `Server error : ${error}` });
+    res.status(500).json({ type: null, username: null, authorization: false, message: `Server error : ${error}` });
   }
 });
 
