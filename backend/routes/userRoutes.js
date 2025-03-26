@@ -184,7 +184,9 @@ router.post("/checkemail", async (req, res) => {
       res.status(404).json({ verified: false, message: `No user found.`})
     }
 
-    res.status(200).json({ verified: `${user.emailVerified}`, message: `Verified email found.`})
+    let verified = user.emailVerified;
+    console.log(verified);
+    res.status(200).json({ verified: verified, message: `Verified email found.`})
   } catch (error) {
     res.status(500).json({ verified: false, message: `Server error : ${error}` });
   }
