@@ -184,7 +184,7 @@ function AddModal({ isOpen, onClose, onSave }: AddModalProps) {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-gray-900/50 flex items-center justify-center z-50">
+    <div className="fixed inset-0 bg-gray-900/50 flex items-center justify-center z-50 pt-120 overflow-scroll">
       <div className="relative max-w-lg w-full bg-white p-6 rounded shadow-lg">
         <button
           type="button"
