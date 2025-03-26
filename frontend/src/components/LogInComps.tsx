@@ -6,9 +6,10 @@ const API_URL = import.meta.env.VITE_API_URL;
 type LoginCompsProps = {
     setAuth: (auth: boolean) => void;
     setIsLoginComp: (auth: boolean) => void;
+    setGlobalUser: (user: string) => void;
 }
 
-export default function LogInComps({ setAuth, setIsLoginComp } : LoginCompsProps) {
+export default function LogInComps({ setAuth, setIsLoginComp, setGlobalUser } : LoginCompsProps) {
 
     const [ email, setEmail ] = useState('');
     const [ password, setPassword ] = useState('');
@@ -53,7 +54,8 @@ export default function LogInComps({ setAuth, setIsLoginComp } : LoginCompsProps
             } else {
                 setErrorMessage('');
                 setAuth(true);
-                navigate('/dashboard');
+                setGlobalUser(data.username);
+                navigate(`/dashboard/:${data.username}`);
             }
             
         } catch (error) {

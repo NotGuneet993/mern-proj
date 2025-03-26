@@ -5,13 +5,14 @@ type LoginPageProps = {
     setAuth: (auth: boolean) => void;
     setIsLoginComp: (auth: boolean) => void;
     isLoginComp: boolean;
+    setGlobalUser: (user: string) => void;
 }
 
-export default function LoginPage({ setAuth, setIsLoginComp, isLoginComp } : LoginPageProps) {
+export default function LoginPage({ setAuth, setIsLoginComp, isLoginComp, setGlobalUser } : LoginPageProps) {
     
     return (
         <div className="bg-stone-900 flex h-full items-center justify-center">
-            {isLoginComp ? <LogInComps setAuth={setAuth} setIsLoginComp={setIsLoginComp}/> : <SignUpComps setAuth={setAuth} setIsLoginComp={setIsLoginComp}/>}
+            {isLoginComp ? <LogInComps setAuth={setAuth} setIsLoginComp={setIsLoginComp} setGlobalUser={setGlobalUser}/> : <SignUpComps setAuth={setAuth} setIsLoginComp={setIsLoginComp}/>}
         </div>
     );
 }
