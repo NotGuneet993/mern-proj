@@ -181,10 +181,10 @@ router.post("/checkemail", async (req, res) => {
     const user = await User.findOne({ username });
 
     if (!user) {
-      res.status(500).json({ verified: false, message: `No user found.`})
+      res.status(404).json({ verified: false, message: `No user found.`})
     }
 
-    res.status(500).json({ verified: user.emailVerified, message: `Verified email found.`})
+    res.status(200).json({ verified: `${user.emailVerified}`, message: `Verified email found.`})
   } catch (error) {
     res.status(500).json({ verified: false, message: `Server error : ${error}` });
   }
