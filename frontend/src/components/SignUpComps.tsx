@@ -10,7 +10,7 @@ type LoginCompsProps = {
     setIsLoginComp: (auth: boolean) => void;
 }
 
-export default function SignUpComps({ setAuth, setIsLoginComp } : LoginCompsProps) {
+export default function SignUpComps({ setIsLoginComp } : LoginCompsProps) {
 
     const navigate = useNavigate();
 
@@ -106,9 +106,7 @@ export default function SignUpComps({ setAuth, setIsLoginComp } : LoginCompsProp
                 setErrorMessage(data.message);
             } else {
                 setErrorMessage('');
-                setAuth(true);
-                navigate('/dashboard');
-                console.log("Test");
+                navigate('/mailVerifyPage');
             }
 
         } catch (error) {

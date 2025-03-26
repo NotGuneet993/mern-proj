@@ -5,9 +5,10 @@ type NavbarProps = {
     isAuth: boolean;
     setAuth: (auth: boolean) => void;
     setIsLoginComp: (auth: boolean) => void;
+    globalUser: String;
 }
 
-export default function Navbar({ isAuth, setAuth, setIsLoginComp } : NavbarProps) {
+export default function Navbar({ isAuth, setAuth, setIsLoginComp, globalUser } : NavbarProps) {
 
     const navigate = useNavigate();
 
@@ -43,7 +44,7 @@ export default function Navbar({ isAuth, setAuth, setIsLoginComp } : NavbarProps
 
             <ul className="list-none ">
                 <li className={liTextStyle}><NavLink to='/' className='no-underline'>Home</NavLink></li>
-                {isAuth && <li className={liTextStyle}><NavLink to='/dashboard' className='no-underline'>Dashboard</NavLink></li>}
+                {isAuth && <li className={liTextStyle}><NavLink to={`/dashboard/${globalUser}`} className='no-underline'>Dashboard</NavLink></li>}
                 <li className={liTextStyle}><NavLink to='/stim' className='no-underline'>Stim</NavLink></li>
 
                 {isAuth ? (

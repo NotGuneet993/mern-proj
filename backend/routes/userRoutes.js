@@ -154,7 +154,7 @@ router.get("/verify", async (req, res) => {
     // Successful registration
     if (type == "register") {
       await user.updateOne({ emailVerified: true });
-      return res.json({ type: "reg", username: user.username, authorization: true, message: "New user succcessfully verified." });
+      return res.redirect(`/verifyUser/${user.username}`);
       // TODO Grab user info, save it to the session, and redirect to home page
     }
     

@@ -1,8 +1,12 @@
 import { useState } from 'react';
+import { useParams } from 'react-router-dom';
 import AddModal from '../temp_Modal/AddModal';
 
 function DashboardPage() {
   const [modalOpen, setModalOpen] = useState(false);
+
+  // extract username from the top url 
+  const { user } = useParams();
 
   // Suppose you keep a local list of classes:
   const [classes, setClasses] = useState<ClassData[]>([]);
@@ -17,6 +21,7 @@ function DashboardPage() {
     //it is curretly not saving the data to the database
     //we can call the schedule addClass api to add the class
     setClasses((prev) => [...prev, newClassData]);
+    classes;
   };
 
   return (
@@ -34,6 +39,7 @@ function DashboardPage() {
           onSave={handleAddClass}
         />
       )}
+      <h2>hi {user}</h2>
     </div>
     
   );
