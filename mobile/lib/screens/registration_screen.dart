@@ -15,8 +15,37 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
   final emailController = TextEditingController();
   final usernameController = TextEditingController();
   final passwordController = TextEditingController();
+  final confirmPasswordController = TextEditingController();
 
-  // Function to display a dialog with the given title and message.
+  // Regular expressions for validation.
+  final RegExp emailRegExp =
+      RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$'); // Basic email pattern.
+  final RegExp passwordRegExp =
+      RegExp(r'^(?=.*[A-Z])(?=.*[!@#\$%^&*]).+$'); // At least one uppercase and one special character.
+
+  // Holds error messages for display.
+  String _errorMessage = '';
+
+  @override
+  void initState() {
+    super.initState();
+    // Listen to changes and validate in real time.
+    emailController.addListener(_checkValidations);
+    passwordController.addListener(_checkValidations);
+    confirmPasswordController.addListener(_checkValidations);
+  }
+
+  @override
+  void dispose() {
+    nameController.dispose();
+    emailController.dispose();
+    usernameController.dispose();
+    passwordController.dispose();
+    confirmPasswordController.dispose();
+    super.dispose();
+  }
+
+  // Displays a dialog with the provided title and message.
   void _showMessageDialog(String title, String message) {
     showDialog(
       context: context,
@@ -33,15 +62,47 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
     );
   }
 
-  // Function to handle registration logic using an HTTP POST
+  // Checks all validations and updates the error message.
+  void _checkValidations() {
+    String message = '';
+    final email = emailController.text;
+    final password = passwordController.text;
+    final confirmPassword = confirmPasswordController.text;
+
+    if (email.isNotEmpty && !emailRegExp.hasMatch(email)) {
+      message += 'Invalid email address. ';
+    }
+    if (password.isNotEmpty && !passwordRegExp.hasMatch(password)) {
+      message += 'Password must include at least one uppercase letter and one special character. ';
+    }
+    if (password.isNotEmpty &&
+        confirmPassword.isNotEmpty &&
+        password != confirmPassword) {
+      message += 'Passwords do not match.';
+    }
+
+    setState(() {
+      _errorMessage = message;
+    });
+  }
+
+  // Handles the registration process with an HTTP POST.
   Future<void> handleRegistration() async {
+    // Final check before submission.
+    if (_errorMessage.isNotEmpty) {
+      _showMessageDialog(
+          "Validation Error", "Please fix the errors before registering.");
+      return;
+    }
+
     final name = nameController.text;
     final email = emailController.text;
     final username = usernameController.text;
     final password = passwordController.text;
     final url = '${widget.API_URL}/api/users/register';
 
-    print("Registering with Name: $name, Email: $email, Username: $username, Password: $password");
+    print(
+        "Registering with Name: $name, Email: $email, Username: $username, Password: $password");
 
     try {
       final response = await http.post(
@@ -57,8 +118,13 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
 
       if (response.statusCode == 200) {
         _showMessageDialog("Success", "Registration successful!");
-      } else {
-        _showMessageDialog("Error", "Registration failed with status code: ${response.statusCode}");
+      } 
+      else if (response.statusCode == 409){
+        _showMessageDialog("Error", "Email already associated with an account!");
+      }
+      else {
+        _showMessageDialog(
+            "Error", "Registration failed with status code: ${response.statusCode}");
       }
     } catch (error) {
       print("Error during registration: $error");
@@ -68,6 +134,13 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // Check if form is valid.
+    bool isFormValid = emailRegExp.hasMatch(emailController.text) &&
+        passwordRegExp.hasMatch(passwordController.text) &&
+        (passwordController.text == confirmPasswordController.text) &&
+        emailController.text.isNotEmpty &&
+        passwordController.text.isNotEmpty;
+
     return Scaffold(
       backgroundColor: Colors.grey[100],
       appBar: AppBar(
@@ -85,8 +158,8 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                 style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 32),
-              
-              // Name Input Field
+
+              // Name Input Field.
               TextField(
                 controller: nameController,
                 decoration: const InputDecoration(
@@ -95,18 +168,19 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                 ),
               ),
               const SizedBox(height: 16),
-              
-              // Email Input Field
+
+              // Email Input Field.
               TextField(
                 controller: emailController,
                 decoration: const InputDecoration(
                   labelText: "Email",
                   border: OutlineInputBorder(),
                 ),
+                keyboardType: TextInputType.emailAddress,
               ),
               const SizedBox(height: 16),
-              
-              // Username Input Field
+
+              // Username Input Field.
               TextField(
                 controller: usernameController,
                 decoration: const InputDecoration(
@@ -115,8 +189,8 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                 ),
               ),
               const SizedBox(height: 16),
-              
-              // Password Input Field
+
+              // Password Input Field.
               TextField(
                 controller: passwordController,
                 obscureText: true,
@@ -125,14 +199,34 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                   border: OutlineInputBorder(),
                 ),
               ),
+              const SizedBox(height: 16),
+
+              // Confirm Password Input Field.
+              TextField(
+                controller: confirmPasswordController,
+                obscureText: true,
+                decoration: const InputDecoration(
+                  labelText: "Confirm Password",
+                  border: OutlineInputBorder(),
+                ),
+              ),
+              const SizedBox(height: 16),
+
+              // Red error message text, shown if validations fail.
+              if (_errorMessage.isNotEmpty)
+                Text(
+                  _errorMessage,
+                  style: const TextStyle(color: Colors.red),
+                ),
               const SizedBox(height: 24),
-              
-              // Registration Button
+
+              // Registration Button.
               ElevatedButton(
-                onPressed: handleRegistration,
+                onPressed: isFormValid ? handleRegistration : null,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color.fromARGB(255, 236, 220, 39),
-                  padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 14),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 40, vertical: 14),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(8),
                   ),
