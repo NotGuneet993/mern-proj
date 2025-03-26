@@ -155,14 +155,11 @@ router.get("/verify", async (req, res) => {
     if (type == "register") {
       await user.updateOne({ emailVerified: true });
       return res.redirect(`/verifyUser/${user.username}`);
-      // TODO Grab user info, save it to the session, and redirect to home page
     }
     
     // Proceed to change password
     else if (type == "forgot") {
-      // TODO Uncomment this: return res.redirect(`/verifyForgot/${user.username}`);
-      return res.json({ type: "forgot", username: user.username, authorization: true, message: "Current user successfully verified." });
-      // TODO Grab user info, save it to the ssion, and redirect to change password page
+      return res.redirect(`/verifyForgot/${user.username}`);
     }
     
     // This should never happen
@@ -212,7 +209,6 @@ router.post("/changepw", async (req, res) => {
     // Same password
     if (newPassword == user.password) {
       return res.status(400).json({ authorization: false, message: "Can't make new password current password"});
-      // TODO Print the error message, no redirect needed
     }
 
     // All good: update password
