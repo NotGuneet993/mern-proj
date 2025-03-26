@@ -1,8 +1,12 @@
 import { useState } from 'react';
+import { useParams } from 'react-router-dom';
 import AddModal from '../temp_Modal/AddModal';
 
 function DashboardPage() {
   const [modalOpen, setModalOpen] = useState(false);
+
+  // extract username from the top url 
+  const { user } = useParams();
 
   // Suppose you keep a local list of classes:
   const [classes, setClasses] = useState<ClassData[]>([]);
@@ -35,6 +39,7 @@ function DashboardPage() {
           onSave={handleAddClass}
         />
       )}
+      <h2>hi {user}</h2>
     </div>
     
   );

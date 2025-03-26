@@ -20,7 +20,7 @@ function App() {
         <Route path='/' element={<LandingPage />} />
         <Route path="/get-started" element={<LoginPage setAuth={setAuth} setIsLoginComp={setIsLoginComp} isLoginComp={isLoginComp}/>} />
         <Route element={<ProtectedRoute isAuth={isAuth}/>}>
-          <Route path="/dashboard" element={<DashboardPage />} />
+          <Route path="/dashboard/:user" element={<DashboardPage />} />
         </Route>
         <Route path="/stim" element={<StimPage />} />
         <Route path="/*" element={<LandingPage />} />
