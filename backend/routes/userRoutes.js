@@ -181,7 +181,7 @@ router.post("/checkemail", async (req, res) => {
     const user = await User.findOne({ username });
 
     if (!user) {
-      res.status(404).json({ verified: false, message: `No user found.`})
+      return res.status(404).json({ verified: false, message: `No user found.`})
     }
 
     res.status(200).json({ verified: user.emailVerified, message: `Verified email found.`})
