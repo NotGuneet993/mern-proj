@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import 'registration_screen.dart'; // Import your registration file
-import 'dashboard.dart';    // Import your dashboard screen
+import 'registration_screen.dart';
+import 'dashboard.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class LoginScreen extends StatefulWidget {
-  const LoginScreen({super.key});
-  final API_URL = "https://knightnav.net";
+  LoginScreen({super.key});
+  final API_URL = dotenv.env['VITE_API_URL'];
 
   @override
   State<LoginScreen> createState() => _LoginScreenState();
@@ -16,7 +17,6 @@ class _LoginScreenState extends State<LoginScreen> {
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
 
-  // Function to handle login logic using an HTTP POST
   Future<void> handleLogin() async {
     final email = emailController.text;
     final password = passwordController.text;
@@ -33,17 +33,14 @@ class _LoginScreenState extends State<LoginScreen> {
       );
 
       if (response.statusCode == 200) {
-        // Login was successful, so show a success notification
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Login successful!')),
         );
-        // Navigate to the dashboard screen and replace the login screen
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => const DashboardScreen()),
+          MaterialPageRoute(builder: (context) => DashboardScreen()),
         );
       } else {
-        // Login failed, so show an error notification
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Login failed: ${response.body}')),
         );
@@ -56,11 +53,10 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
-  // Function to navigate to the registration screen
   void navigateToRegistration() {
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => const RegistrationScreen()),
+      MaterialPageRoute(builder: (context) => RegistrationScreen()),
     );
   }
 
@@ -79,7 +75,6 @@ class _LoginScreenState extends State<LoginScreen> {
                 style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 32),
-              // Email Field
               TextField(
                 controller: emailController,
                 decoration: const InputDecoration(
@@ -88,7 +83,6 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
               ),
               const SizedBox(height: 16),
-              // Password Field
               TextField(
                 controller: passwordController,
                 obscureText: true,
@@ -98,7 +92,6 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
               ),
               const SizedBox(height: 24),
-              // Login Button
               ElevatedButton(
                 onPressed: handleLogin,
                 style: ElevatedButton.styleFrom(
@@ -114,7 +107,6 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
               ),
               const SizedBox(height: 16),
-              // Registration Button
               TextButton(
                 onPressed: navigateToRegistration,
                 child: const Text(

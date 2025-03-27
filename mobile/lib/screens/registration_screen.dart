@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class RegistrationScreen extends StatefulWidget {
-  const RegistrationScreen({super.key});
-  final API_URL = "https://knightnav.net";
+  RegistrationScreen({super.key});
+  final API_URL = dotenv.env['VITE_API_URL'];
 
   @override
   State<RegistrationScreen> createState() => _RegistrationScreenState();
@@ -17,19 +18,17 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
   final passwordController = TextEditingController();
   final confirmPasswordController = TextEditingController();
 
-  // Regular expressions for validation.
+  // Updated regex to enforce 8-32 characters plus at least one uppercase letter and one special character.
   final RegExp emailRegExp =
-      RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$'); // Basic email pattern.
+      RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
   final RegExp passwordRegExp =
-      RegExp(r'^(?=.*[A-Z])(?=.*[!@#\$%^&*]).+$'); // At least one uppercase and one special character.
+      RegExp(r'^(?=.*[A-Z])(?=.*[!@#\$%^&*]).{8,32}$');
 
-  // Holds error messages for display.
   String _errorMessage = '';
 
   @override
   void initState() {
     super.initState();
-    // Listen to changes and validate in real time.
     emailController.addListener(_checkValidations);
     passwordController.addListener(_checkValidations);
     confirmPasswordController.addListener(_checkValidations);
@@ -45,7 +44,6 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
     super.dispose();
   }
 
-  // Displays a dialog with the provided title and message.
   void _showMessageDialog(String title, String message) {
     showDialog(
       context: context,
@@ -62,7 +60,6 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
     );
   }
 
-  // Checks all validations and updates the error message.
   void _checkValidations() {
     String message = '';
     final email = emailController.text;
@@ -73,7 +70,8 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
       message += 'Invalid email address. ';
     }
     if (password.isNotEmpty && !passwordRegExp.hasMatch(password)) {
-      message += 'Password must include at least one uppercase letter and one special character. ';
+      message +=
+          'Password must be 8-32 characters long, include at least one uppercase letter and one special character. ';
     }
     if (password.isNotEmpty &&
         confirmPassword.isNotEmpty &&
@@ -86,9 +84,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
     });
   }
 
-  // Handles the registration process with an HTTP POST.
   Future<void> handleRegistration() async {
-    // Final check before submission.
     if (_errorMessage.isNotEmpty) {
       _showMessageDialog(
           "Validation Error", "Please fix the errors before registering.");
@@ -118,11 +114,10 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
 
       if (response.statusCode == 200) {
         _showMessageDialog("Success", "Registration successful!");
-      } 
-      else if (response.statusCode == 409){
-        _showMessageDialog("Error", "Email already associated with an account!");
-      }
-      else {
+      } else if (response.statusCode == 409) {
+        _showMessageDialog(
+            "Error", "Email already associated with an account!");
+      } else {
         _showMessageDialog(
             "Error", "Registration failed with status code: ${response.statusCode}");
       }
@@ -134,7 +129,6 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // Check if form is valid.
     bool isFormValid = emailRegExp.hasMatch(emailController.text) &&
         passwordRegExp.hasMatch(passwordController.text) &&
         (passwordController.text == confirmPasswordController.text) &&
@@ -158,8 +152,6 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                 style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 32),
-
-              // Name Input Field.
               TextField(
                 controller: nameController,
                 decoration: const InputDecoration(
@@ -168,8 +160,6 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                 ),
               ),
               const SizedBox(height: 16),
-
-              // Email Input Field.
               TextField(
                 controller: emailController,
                 decoration: const InputDecoration(
@@ -179,8 +169,6 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                 keyboardType: TextInputType.emailAddress,
               ),
               const SizedBox(height: 16),
-
-              // Username Input Field.
               TextField(
                 controller: usernameController,
                 decoration: const InputDecoration(
@@ -189,8 +177,6 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                 ),
               ),
               const SizedBox(height: 16),
-
-              // Password Input Field.
               TextField(
                 controller: passwordController,
                 obscureText: true,
@@ -200,8 +186,6 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                 ),
               ),
               const SizedBox(height: 16),
-
-              // Confirm Password Input Field.
               TextField(
                 controller: confirmPasswordController,
                 obscureText: true,
@@ -211,16 +195,12 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                 ),
               ),
               const SizedBox(height: 16),
-
-              // Red error message text, shown if validations fail.
               if (_errorMessage.isNotEmpty)
                 Text(
                   _errorMessage,
                   style: const TextStyle(color: Colors.red),
                 ),
               const SizedBox(height: 24),
-
-              // Registration Button.
               ElevatedButton(
                 onPressed: isFormValid ? handleRegistration : null,
                 style: ElevatedButton.styleFrom(
