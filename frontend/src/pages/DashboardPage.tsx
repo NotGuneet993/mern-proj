@@ -9,9 +9,6 @@ function DashboardPage() {
   // extract username from the top url 
   const { user } = useParams();
 
-  // Suppose you keep a local list of classes:
-  const [classes, setClasses] = useState<ClassData[]>([]);
-
   interface ClassData {
     course_code: string;
     class_name: string;
