@@ -30,7 +30,7 @@ function App() {
         <Route path="/stim" element={<StimPage />} />
         <Route path="/mailVerifyPage" element={<MailVerifyPage />} />
         <Route path="/forgotPassword" element={<ForgotPasswordPage />} />
-        <Route path="/verifyUser/:user" element={<Redirect />} />
+        <Route path="/verifyUser/:username" element={<Redirect setAuth={setAuth} setGlobalUser={setGlobalUser} />} />
         {/* <Route path="/verifyPassword/:user" element={<Redirect />} /> */}
         <Route path="/*" element={<LandingPage />} />
       </Routes>
