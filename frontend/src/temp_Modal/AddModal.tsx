@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { AiOutlineCloseCircle } from 'react-icons/ai';
+const API_URL = import.meta.env.VITE_API_URL;
 
 interface AddModalProps {
   isOpen: boolean;
@@ -18,40 +19,50 @@ function AddModal({ isOpen, onClose, onSave }: AddModalProps) {
   const [buildingPrefix, setBuildingPrefix] = useState('');
   const [roomNumber, setRoomNumber] = useState('');
 
-  // related states
+  // Autocomplete states (unchanged)
   const [searchCount, setSearchCount] = useState(0);
   const [matchedCourseCodes, setMatchedCourseCodes] = useState<string[]>([]);
   const [matchedClassNames, setMatchedClassNames] = useState<string[]>([]);
   const [matchedProfessors, setMatchedProfessors] = useState<string[]>([]);
   const [focusedField, setFocusedField] = useState<'courseCode' | 'className' | 'professor' | null>(null);
 
-  // 1) Days of the week
+  // Days of the week
   const daysOfWeek = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 
-  // 2) Define the type for each day’s schedule
+  // We'll store each day's schedule object, including whether it's enabled.
   interface ScheduleDay {
     day: string;
-    startTime: string; // 'HH:MM'
-    endTime: string;   // 'HH:MM'
+    enabled: boolean;       // checked or not
+    startHour: string;      // '1'...'12'
+    startMinute: string;    // '00','15','30','45','... or '00'..'59'
+    startAMPM: string;      // 'AM' or 'PM'
+    endHour: string;
+    endMinute: string;
+    endAMPM: string;
   }
 
-  // 3) Initialize schedule array with empty times
+  // Initialize schedule array with "disabled" for each day
   const [schedule, setSchedule] = useState<ScheduleDay[]>(
     daysOfWeek.map((day) => ({
       day,
-      startTime: '',
-      endTime: '',
+      enabled: false,
+      startHour: '8',
+      startMinute: '00',
+      startAMPM: 'AM',
+      endHour: '9',
+      endMinute: '00',
+      endAMPM: 'AM',
     }))
   );
 
   /***************************************************************
-   * Autocomplete for courseCode
+   * Autocomplete calls (unchanged)
    ***************************************************************/
   useEffect(() => {
     if (focusedField === 'courseCode' && courseCode.trim() && searchCount < 50) {
       setSearchCount((prev) => prev + 1);
       const params = new URLSearchParams({ courseCode });
-      fetch(`${import.meta.env.VITE_URL}/schedule/search?${params.toString()}`)
+      fetch(`${API_URL}/schedule/search?${params.toString()}`)
         .then((res) => res.json())
         .then((data) => {
           const codes = data.map((cls: any) => cls.course_code);
@@ -63,14 +74,11 @@ function AddModal({ isOpen, onClose, onSave }: AddModalProps) {
     }
   }, [courseCode, focusedField]);
 
-  /***************************************************************
-   * Autocomplete for className
-   ***************************************************************/
   useEffect(() => {
     if (focusedField === 'className' && className.trim() && searchCount < 50) {
       setSearchCount((prev) => prev + 1);
       const params = new URLSearchParams({ className });
-      fetch(`${import.meta.env.VITE_URL}/schedule/search?${params.toString()}`)
+      fetch(`${API_URL}/schedule/search?${params.toString()}`)
         .then((res) => res.json())
         .then((data) => {
           const names = data.map((cls: any) => cls.class_name);
@@ -82,14 +90,11 @@ function AddModal({ isOpen, onClose, onSave }: AddModalProps) {
     }
   }, [className, focusedField]);
 
-  /***************************************************************
-   * Autocomplete for professor
-   ***************************************************************/
   useEffect(() => {
     if (focusedField === 'professor' && professor.trim() && searchCount < 50) {
       setSearchCount((prev) => prev + 1);
       const params = new URLSearchParams({ professor });
-      fetch(`${import.meta.env.VITE_URL}/schedule/search?${params.toString()}`)
+      fetch(`${API_URL}/schedule/search?${params.toString()}`)
         .then((res) => res.json())
         .then((data) => {
           const profs = data.map((cls: any) => cls.professor);
@@ -118,13 +123,29 @@ function AddModal({ isOpen, onClose, onSave }: AddModalProps) {
   };
 
   /***************************************************************
-   * Time Change Handler for each day
+   * Toggle day enabled
    ***************************************************************/
-  const handleTimeChange = (day: string, field: 'startTime' | 'endTime', value: string) => {
+  const handleToggleDay = (index: number) => {
     setSchedule((prev) =>
-      prev.map((entry) =>
-        entry.day === day ? { ...entry, [field]: value } : entry
+      prev.map((entry, i) =>
+        i === index ? { ...entry, enabled: !entry.enabled } : entry
       )
+    );
+  };
+
+  /***************************************************************
+   * Handle changes to start/end time selects
+   ***************************************************************/
+  const handleTimeChange = (
+    index: number,
+    field: keyof ScheduleDay, // e.g. 'startHour', 'endAMPM'
+    value: string
+  ) => {
+    setSchedule((prev) =>
+      prev.map((entry, i) => {
+        if (i !== index) return entry;
+        return { ...entry, [field]: value };
+      })
     );
   };
 
@@ -134,15 +155,15 @@ function AddModal({ isOpen, onClose, onSave }: AddModalProps) {
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    // 4) Transform each day into { day, time: "HH:MM-HH:MM" } or "None"
+    // Convert each day's picks into "HH:MM AM/PM-HH:MM AM/PM" if enabled, else "None"
     const class_schedule = schedule.map((entry) => {
-      const { day, startTime, endTime } = entry;
-      if (!startTime && !endTime) {
-        // No times selected => "None"
-        return { day, time: 'None' };
+      if (!entry.enabled) {
+        return { day: entry.day, time: 'None' };
       } else {
-        // Format e.g. "10:30-11:45"
-        return { day, time: `${startTime}-${endTime}` };
+        // e.g. "8:00 AM-9:00 AM"
+        const start = `${entry.startHour}:${entry.startMinute} ${entry.startAMPM}`;
+        const end = `${entry.endHour}:${entry.endMinute} ${entry.endAMPM}`;
+        return { day: entry.day, time: `${start}-${end}` };
       }
     });
 
@@ -171,21 +192,34 @@ function AddModal({ isOpen, onClose, onSave }: AddModalProps) {
     setBuilding('');
     setBuildingPrefix('');
     setRoomNumber('');
+    setSearchCount(0);
+    setMatchedCourseCodes([]);
+    setMatchedClassNames([]);
+    setMatchedProfessors([]);
+
+    // Reset schedule
     setSchedule(
-      daysOfWeek.map((day) => ({ day, startTime: '', endTime: '' }))
+      daysOfWeek.map((day) => ({
+        day,
+        enabled: false,
+        startHour: '8',
+        startMinute: '00',
+        startAMPM: 'AM',
+        endHour: '9',
+        endMinute: '00',
+        endAMPM: 'AM',
+      }))
     );
 
     onClose();
   };
 
-  /***************************************************************
-   * Render
-   ***************************************************************/
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-gray-900/50 flex items-center justify-center z-50 pt-120 overflow-scroll">
-      <div className="relative max-w-lg w-full bg-white p-6 rounded shadow-lg">
+    <div className="fixed inset-0 bg-gray-900/50 flex items-center justify-center z-50 pt-20 overflow-scroll">
+      <div className="relative max-w-5xl w-full bg-white p-6 rounded shadow-lg">
+        {/* Close Button */}
         <button
           type="button"
           onClick={onClose}
@@ -193,209 +227,277 @@ function AddModal({ isOpen, onClose, onSave }: AddModalProps) {
         >
           <AiOutlineCloseCircle />
         </button>
+
         <h2 className="text-xl font-semibold mb-4">Add Class</h2>
 
-        <form onSubmit={handleSubmit}>
-          {/* COURSE CODE */}
-          <label htmlFor="courseCode" className="block mb-1">
-            Course Code
-          </label>
-          <input
-            id="courseCode"
-            type="text"
-            value={courseCode}
-            onFocus={() => setFocusedField('courseCode')}
-            onBlur={() => {
-              setTimeout(() => {
-                setMatchedCourseCodes([]);
-                setFocusedField(null);
-              }, 150);
-            }}
-            onChange={(e) => setCourseCode(e.target.value)}
-            className="border p-1 w-full mb-2"
-          />
-          {focusedField === 'courseCode' && matchedCourseCodes.length > 0 && (
-            <ul className="border bg-white mb-2 max-h-40 overflow-y-auto">
-              {matchedCourseCodes.map((code, idx) => (
-                <li
-                  key={`${code}-${idx}`}
-                  onMouseDown={() => selectCourseCode(code)}
-                  className="px-2 py-1 cursor-pointer hover:bg-blue-100"
-                >
-                  {code}
-                </li>
-              ))}
-            </ul>
-          )}
+        <form onSubmit={handleSubmit} className="flex flex-col md:flex-row gap-8">
+          {/* LEFT COLUMN */}
+          <div className="md:w-1/2">
+            {/* COURSE CODE */}
+            <label htmlFor="courseCode" className="block mb-1">
+              Course Code
+            </label>
+            <input
+              id="courseCode"
+              type="text"
+              value={courseCode}
+              onFocus={() => setFocusedField('courseCode')}
+              onBlur={() => {
+                setTimeout(() => {
+                  setMatchedCourseCodes([]);
+                  setFocusedField(null);
+                }, 150);
+              }}
+              onChange={(e) => setCourseCode(e.target.value)}
+              className="border p-1 w-full mb-2"
+            />
+            {focusedField === 'courseCode' && matchedCourseCodes.length > 0 && (
+              <ul className="border bg-white mb-2 max-h-40 overflow-y-auto">
+                {matchedCourseCodes.map((code, idx) => (
+                  <li
+                    key={`${code}-${idx}`}
+                    onMouseDown={() => selectCourseCode(code)}
+                    className="px-2 py-1 cursor-pointer hover:bg-blue-100"
+                  >
+                    {code}
+                  </li>
+                ))}
+              </ul>
+            )}
 
-          {/* CLASS NAME */}
-          <label htmlFor="className" className="block mb-1">
-            Class Name
-          </label>
-          <input
-            id="className"
-            type="text"
-            value={className}
-            onFocus={() => setFocusedField('className')}
-            onBlur={() => {
-              setTimeout(() => {
-                setMatchedClassNames([]);
-                setFocusedField(null);
-              }, 150);
-            }}
-            onChange={(e) => setClassName(e.target.value)}
-            className="border p-1 w-full mb-2"
-          />
-          {focusedField === 'className' && matchedClassNames.length > 0 && (
-            <ul className="border bg-white mb-2 max-h-40 overflow-y-auto">
-              {matchedClassNames.map((name, idx) => (
-                <li
-                  key={`${name}-${idx}`}
-                  onMouseDown={() => selectClassName(name)}
-                  className="px-2 py-1 cursor-pointer hover:bg-blue-100"
-                >
-                  {name}
-                </li>
-              ))}
-            </ul>
-          )}
+            {/* CLASS NAME */}
+            <label htmlFor="className" className="block mb-1">
+              Class Name
+            </label>
+            <input
+              id="className"
+              type="text"
+              value={className}
+              onFocus={() => setFocusedField('className')}
+              onBlur={() => {
+                setTimeout(() => {
+                  setMatchedClassNames([]);
+                  setFocusedField(null);
+                }, 150);
+              }}
+              onChange={(e) => setClassName(e.target.value)}
+              className="border p-1 w-full mb-2"
+            />
+            {focusedField === 'className' && matchedClassNames.length > 0 && (
+              <ul className="border bg-white mb-2 max-h-40 overflow-y-auto">
+                {matchedClassNames.map((name, idx) => (
+                  <li
+                    key={`${name}-${idx}`}
+                    onMouseDown={() => selectClassName(name)}
+                    className="px-2 py-1 cursor-pointer hover:bg-blue-100"
+                  >
+                    {name}
+                  </li>
+                ))}
+              </ul>
+            )}
 
-          {/* PROFESSOR */}
-          <label htmlFor="professor" className="block mb-1">
-            Professor
-          </label>
-          <input
-            id="professor"
-            type="text"
-            value={professor}
-            onFocus={() => setFocusedField('professor')}
-            onBlur={() => {
-              setTimeout(() => {
-                setMatchedProfessors([]);
-                setFocusedField(null);
-              }, 150);
-            }}
-            onChange={(e) => setProfessor(e.target.value)}
-            className="border p-1 w-full mb-2"
-          />
-          {focusedField === 'professor' && matchedProfessors.length > 0 && (
-            <ul className="border bg-white mb-2 max-h-40 overflow-y-auto">
-              {matchedProfessors.map((prof, idx) => (
-                <li
-                  key={`${prof}-${idx}`}
-                  onMouseDown={() => selectProfessor(prof)}
-                  className="px-2 py-1 cursor-pointer hover:bg-blue-100"
-                >
-                  {prof}
-                </li>
-              ))}
-            </ul>
-          )}
+            {/* PROFESSOR */}
+            <label htmlFor="professor" className="block mb-1">
+              Professor
+            </label>
+            <input
+              id="professor"
+              type="text"
+              value={professor}
+              onFocus={() => setFocusedField('professor')}
+              onBlur={() => {
+                setTimeout(() => {
+                  setMatchedProfessors([]);
+                  setFocusedField(null);
+                }, 150);
+              }}
+              onChange={(e) => setProfessor(e.target.value)}
+              className="border p-1 w-full mb-2"
+            />
+            {focusedField === 'professor' && matchedProfessors.length > 0 && (
+              <ul className="border bg-white mb-2 max-h-40 overflow-y-auto">
+                {matchedProfessors.map((prof, idx) => (
+                  <li
+                    key={`${prof}-${idx}`}
+                    onMouseDown={() => selectProfessor(prof)}
+                    className="px-2 py-1 cursor-pointer hover:bg-blue-100"
+                  >
+                    {prof}
+                  </li>
+                ))}
+              </ul>
+            )}
 
-          {/* MEETING TYPE */}
-          <label htmlFor="meetingType" className="block mb-1">
-            Meeting Type
-          </label>
-          <select
-            id="meetingType"
-            value={meetingType}
-            onChange={(e) => setMeetingType(e.target.value)}
-            className="border p-1 w-full mb-2"
-          >
-            <option value="">Select a meeting type</option>
-            <option value="in-person">In person</option>
-            <option value="mixed-mode">Mixed mode</option>
-            <option value="online">Online</option>
-          </select>
+            {/* MEETING TYPE */}
+            <label htmlFor="meetingType" className="block mb-1">
+              Meeting Type
+            </label>
+            <select
+              id="meetingType"
+              value={meetingType}
+              onChange={(e) => setMeetingType(e.target.value)}
+              className="border p-1 w-full mb-2"
+            >
+              <option value="">Select a meeting type</option>
+              <option value="in-person">In person</option>
+              <option value="mixed-mode">Mixed mode</option>
+              <option value="online">Online</option>
+            </select>
 
-          {/* TYPE */}
-          <label htmlFor="type" className="block mb-1">
-            Type
-          </label>
-          <select
-            id="type"
-            value={type}
-            onChange={(e) => setType(e.target.value)}
-            className="border p-1 w-full mb-4"
-          >
-            <option value="">Select a type</option>
-            <option value="lecture">Lecture</option>
-            <option value="lab">Lab</option>
-            <option value="discussion">Discussion</option>
-          </select>
+            {/* TYPE */}
+            <label htmlFor="type" className="block mb-1">
+              Type
+            </label>
+            <select
+              id="type"
+              value={type}
+              onChange={(e) => setType(e.target.value)}
+              className="border p-1 w-full mb-4"
+            >
+              <option value="">Select a type</option>
+              <option value="lecture">Lecture</option>
+              <option value="lab">Lab</option>
+              <option value="discussion">Discussion</option>
+            </select>
 
-          {/* BUILDING */}
-          <label htmlFor="building" className="block mb-1">
-            Building (Required)
-          </label>
-          <input
-            id="building"
-            type="text"
-            value={building}
-            onChange={(e) => setBuilding(e.target.value)}
-            className="border p-1 w-full mb-2"
-            required
-          />
+            {/* BUILDING */}
+            <label htmlFor="building" className="block mb-1">
+              Building (Required)
+            </label>
+            <input
+              id="building"
+              type="text"
+              value={building}
+              onChange={(e) => setBuilding(e.target.value)}
+              className="border p-1 w-full mb-2"
+              required
+            />
 
-          {/* BUILDING PREFIX */}
-          <label htmlFor="buildingPrefix" className="block mb-1">
-            Building Prefix (Optional)
-          </label>
-          <input
-            id="buildingPrefix"
-            type="text"
-            value={buildingPrefix}
-            onChange={(e) => setBuildingPrefix(e.target.value)}
-            className="border p-1 w-full mb-2"
-          />
+            {/* BUILDING PREFIX */}
+            <label htmlFor="buildingPrefix" className="block mb-1">
+              Building Prefix (Optional)
+            </label>
+            <input
+              id="buildingPrefix"
+              type="text"
+              value={buildingPrefix}
+              onChange={(e) => setBuildingPrefix(e.target.value)}
+              className="border p-1 w-full mb-2"
+            />
 
-          {/* ROOM NUMBER */}
-          <label htmlFor="roomNumber" className="block mb-1">
-            Room Number (Required)
-          </label>
-          <input
-            id="roomNumber"
-            type="text"
-            value={roomNumber}
-            onChange={(e) => setRoomNumber(e.target.value)}
-            className="border p-1 w-full mb-2"
-            required
-          />
-
-          {/* CLASS SCHEDULE */}
-          <h3 className="text-lg font-semibold mb-2 mt-4">Class Schedule</h3>
-          <p className="text-sm text-gray-600 mb-2">
-            Select start/end times for each day. If blank, “None” will be stored.
-          </p>
-
-          <div className="grid grid-cols-1 gap-2">
-            {schedule.map((entry) => (
-              <div key={entry.day} className="flex items-center gap-2">
-                <span className="w-24">{entry.day}:</span>
-                {/* Start Time */}
-                <input
-                  type="time"
-                  value={entry.startTime}
-                  onChange={(e) => handleTimeChange(entry.day, 'startTime', e.target.value)}
-                  className="border p-1"
-                />
-                {/* End Time */}
-                <input
-                  type="time"
-                  value={entry.endTime}
-                  onChange={(e) => handleTimeChange(entry.day, 'endTime', e.target.value)}
-                  className="border p-1"
-                />
-              </div>
-            ))}
+            {/* ROOM NUMBER */}
+            <label htmlFor="roomNumber" className="block mb-1">
+              Room Number (Required)
+            </label>
+            <input
+              id="roomNumber"
+              type="text"
+              value={roomNumber}
+              onChange={(e) => setRoomNumber(e.target.value)}
+              className="border p-1 w-full mb-2"
+              required
+            />
           </div>
 
-          <button
-            type="submit"
-            className="mt-4 bg-yellow-400 text-white px-4 py-2 rounded hover:bg-yellow-500"
-          >
-            Add Class
-          </button>
+          {/* RIGHT COLUMN: AM/PM schedule picker */}
+          <div className="md:w-1/2">
+            <h3 className="text-lg font-semibold mb-2 mt-4">Class Schedule</h3>
+            <p className="text-sm text-gray-600 mb-2">
+              Check days + select start/end times (AM/PM). Unchecked days = "None".
+            </p>
+
+            <div className="grid grid-cols-1 gap-4">
+              {schedule.map((entry, index) => (
+                <div key={entry.day} className="border p-2 rounded">
+                  <label className="flex items-center mb-2">
+                    <input
+                      type="checkbox"
+                      checked={entry.enabled}
+                      onChange={() => handleToggleDay(index)}
+                      className="mr-2"
+                    />
+                    <span className="font-medium">{entry.day}</span>
+                  </label>
+
+                  {entry.enabled && (
+                    <div className="flex flex-wrap gap-2">
+                      {/* Start Time */}
+                      <div className="flex items-center">
+                        <span className="mr-1">Start:</span>
+                        <select
+                          value={entry.startHour}
+                          onChange={(e) => handleTimeChange(index, 'startHour', e.target.value)}
+                          className="border p-1 mr-1"
+                        >
+                          {Array.from({ length: 12 }, (_, i) => i + 1).map((h) => (
+                            <option key={h} value={h.toString()}>{h}</option>
+                          ))}
+                        </select>
+                        <select
+                          value={entry.startMinute}
+                          onChange={(e) => handleTimeChange(index, 'startMinute', e.target.value)}
+                          className="border p-1 mr-1"
+                        >
+                          {/* You can do increments of 5 or 1 */}
+                          {['00','15','30','45'].map((m) => (
+                            <option key={m} value={m}>{m}</option>
+                          ))}
+                        </select>
+                        <select
+                          value={entry.startAMPM}
+                          onChange={(e) => handleTimeChange(index, 'startAMPM', e.target.value)}
+                          className="border p-1"
+                        >
+                          <option value="AM">AM</option>
+                          <option value="PM">PM</option>
+                        </select>
+                      </div>
+
+                      {/* End Time */}
+                      <div className="flex items-center">
+                        <span className="mr-1">End:</span>
+                        <select
+                          value={entry.endHour}
+                          onChange={(e) => handleTimeChange(index, 'endHour', e.target.value)}
+                          className="border p-1 mr-1"
+                        >
+                          {Array.from({ length: 12 }, (_, i) => i + 1).map((h) => (
+                            <option key={h} value={h.toString()}>{h}</option>
+                          ))}
+                        </select>
+                        <select
+                          value={entry.endMinute}
+                          onChange={(e) => handleTimeChange(index, 'endMinute', e.target.value)}
+                          className="border p-1 mr-1"
+                        >
+                          {['00','15','30','45'].map((m) => (
+                            <option key={m} value={m}>{m}</option>
+                          ))}
+                        </select>
+                        <select
+                          value={entry.endAMPM}
+                          onChange={(e) => handleTimeChange(index, 'endAMPM', e.target.value)}
+                          className="border p-1"
+                        >
+                          <option value="AM">AM</option>
+                          <option value="PM">PM</option>
+                        </select>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+
+            {/* Submit button in the schedule column (or you can move it outside) */}
+            <button
+              type="submit"
+              className="mt-4 bg-yellow-400 text-white px-4 py-2 rounded hover:bg-yellow-500"
+            >
+              Add Class
+            </button>
+          </div>
         </form>
       </div>
     </div>
