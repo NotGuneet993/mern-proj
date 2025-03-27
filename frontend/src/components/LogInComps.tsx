@@ -55,7 +55,7 @@ export default function LogInComps({ setAuth, setIsLoginComp, setGlobalUser } : 
                 setErrorMessage('');
                 setAuth(true);
                 setGlobalUser(data.username);
-                navigate(`/dashboard/:${data.username}`);
+                navigate(`/dashboard/${data.username}`);
             }
             
         } catch (error) {
