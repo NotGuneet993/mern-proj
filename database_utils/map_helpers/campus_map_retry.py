@@ -2,6 +2,8 @@
 Overpass API query: 
     Link: https://overpass-turbo.eu/
 
+Query:
+
 [out:xml];
 area[name="University of Central Florida"]->.searchArea;
 (
@@ -12,12 +14,28 @@ area[name="University of Central Florida"]->.searchArea;
 out body;
 '''
 
+from math import radians, sin, cos, sqrt, atan2
+
+def haversine_miles(lat1, lon1, lat2, lon2):
+    R = 3958.8  # Earth's radius in miles
+
+    # Convert degrees to radians
+    lat1, lon1, lat2, lon2 = map(radians, [lat1, lon1, lat2, lon2])
+
+    # Compute differences
+    dlat = lat2 - lat1
+    dlon = lon2 - lon1
+
+    # Apply Haversine formula
+    a = sin(dlat / 2)**2 + cos(lat1) * cos(lat2) * sin(dlon / 2)**2
+    c = 2 * atan2(sqrt(a), sqrt(1 - a))
+
+    return R * c  # Distance in miles
+
 # Path to your .osm file
 import xml.etree.ElementTree as ET
 import networkx as nx
 import matplotlib.pyplot as plt
-
-import xml.etree.ElementTree as ET
 
 osm_file = "database_utils/map_helpers/map_data/campus_base_map.osm"
 
@@ -111,13 +129,19 @@ for way in root.findall('way'):
         if u in nodes and v in nodes:
             valid_edges.append((u, v, {"highway": highway_type, "name": name}))
     
-    if is_building and len(building_nodes) > 2:
+    # Set the "close distance" threshold (in miles)
+    CLOSE_DISTANCE_THRESHOLD_MILES = 0.025  # Example threshold of 0.1 miles (about 160 meters)
+
+    if is_building and name and len(building_nodes) > 2:
+        # Compute centroid of the building
         lat_mean = sum(nodes[n]["lat"] for n in building_nodes) / len(building_nodes)
         lon_mean = sum(nodes[n]["lon"] for n in building_nodes) / len(building_nodes)
-        centroid_id = max(nodes.keys()) + 1
-        nodes[centroid_id] = {"lat": lat_mean, "lon": lon_mean, "name": None, "highway": "highway"}
+        centroid_id = max(nodes.keys()) + 1  # Assign new node ID
+        building_name = name + "_centroid" if name else "centroid"
+        nodes[centroid_id] = {"lat": lat_mean, "lon": lon_mean, "name": building_name, "highway": "highway"}
         building_centroids[building_id] = centroid_id
-        
+
+        # Identify entrances
         entrances = []
         for nd in way.findall('nd'):
             node_id = nd.attrib['ref']
@@ -126,10 +150,39 @@ for way in root.findall('way'):
                     if tag.attrib['k'] == "entrance" and tag.attrib['v'] in ["yes", "main"]:
                         entrance_id = int(node.attrib['id'])
                         entrances.append(entrance_id)
-                        valid_edges.append((entrance_id, centroid_id, {"highway": "entrance"}))
-        
+
         if entrances:
             building_entrances[building_id] = entrances
+        
+        # Find all path nodes within the close distance threshold
+        for path_node in nodes:
+            if path_node == centroid_id:
+                continue
+            #if "highway" in nodes[path_node] and nodes[path_node]["highway"] != "building":
+            # Compute the Haversine distance to the centroid using your haversine_miles function
+            dist = haversine_miles(lat_mean, lon_mean, nodes[path_node]["lat"], nodes[path_node]["lon"])
+            
+            # If the node is within the threshold, connect it to the centroid
+            if dist <= CLOSE_DISTANCE_THRESHOLD_MILES:
+                valid_edges.append((centroid_id, path_node, {"highway": "footway"}))
+
+        # Connect centroid to entrances
+        for entrance in entrances:
+            valid_edges.append((centroid_id, entrance, {"highway": "entrance"}))
+
+
+        building_nodes.append(centroid_id)
+        # Remove original building edges
+        for i in range(len(building_nodes)):
+            for j in range(i + 1, len(building_nodes)):
+                edge = (building_nodes[i], building_nodes[j])
+                
+                # Ensure the edge is in the correct format: (u, v) and remove it from valid_edges
+                if (building_nodes[i], building_nodes[j]) in valid_edges:
+                    valid_edges.remove((building_nodes[i], building_nodes[j]))
+                elif (building_nodes[j], building_nodes[i]) in valid_edges:
+                    valid_edges.remove((building_nodes[j], building_nodes[i]))
+
 
 # Remove unwanted power-related relations (except substations, plants, generators)
 for relation in root.findall('relation'):
@@ -147,6 +200,8 @@ for relation in root.findall('relation'):
     if remove_relation:
         root.remove(relation)
 
+
+
 print(f'Graph processing complete. Nodes: {len(nodes)}, Edges: {len(valid_edges)}')
 
 # Create graph and add nodes
@@ -158,24 +213,6 @@ for node_id, attr in nodes.items():
 
 # Add valid edges
 G.add_edges_from(valid_edges)
-
-from math import radians, sin, cos, sqrt, atan2
-
-def haversine_miles(lat1, lon1, lat2, lon2):
-    R = 3958.8  # Earth's radius in miles
-
-    # Convert degrees to radians
-    lat1, lon1, lat2, lon2 = map(radians, [lat1, lon1, lat2, lon2])
-
-    # Compute differences
-    dlat = lat2 - lat1
-    dlon = lon2 - lon1
-
-    # Apply Haversine formula
-    a = sin(dlat / 2)**2 + cos(lat1) * cos(lat2) * sin(dlon / 2)**2
-    c = 2 * atan2(sqrt(a), sqrt(1 - a))
-
-    return R * c  # Distance in miles
 
 
 
@@ -197,8 +234,17 @@ pos = {node: (G.nodes[node]['lon'], G.nodes[node]['lat']) for node in G.nodes}
 plt.figure(figsize=(12, 15), facecolor='black')
 nx.draw(G, pos, node_size=1, node_color='white', edge_color=None, with_labels=False)
 plt.savefig('assets/map_img_base.png', facecolor='black')
+nx.draw(G, pos, node_size=1, node_color='white', edge_color='green', with_labels=False)
+plt.savefig('assets/map_img_base_green.png', transparent=True)
+
+lons = [G.nodes[node]['lon'] for node in G.nodes]
+lats = [G.nodes[node]['lat'] for node in G.nodes]
+
+# Plot nodes
+plt.figure(figsize=(12, 15), facecolor='black')
+plt.axis('off')
+plt.scatter(lons, lats, s=1, c='white', marker='o')  # Adjust size and color as neededplt.savefig('assets/map_img_base_transparent.png', transparent=True)
 plt.savefig('assets/map_img_base_transparent.png', transparent=True)
-plt.show()
 
 
 # Save the graph as a json, then send to mongodb

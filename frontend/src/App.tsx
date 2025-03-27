@@ -5,6 +5,7 @@ import Navbar from './components/Navbar'
 import LandingPage from './pages/LandingPage'
 import LoginPage from './pages/LoginPage'
 import DashboardPage from './pages/DashboardPage'
+import NavigationPage from './pages/NavigationPage'
 import StimPage from './pages/StimPage'
 import { useState } from 'react'
 import ProtectedRoute from './components/ProtectedRoute'
@@ -21,6 +22,7 @@ function App() {
         <Route element={<ProtectedRoute isAuth={isAuth}/>}>
           <Route path="/dashboard" element={<DashboardPage />} />
         </Route>
+        <Route path="/navigate" element={<NavigationPage />} />
         <Route path="/stim" element={<StimPage />} />
         <Route path="/*" element={<LandingPage />} />
       </Routes>
