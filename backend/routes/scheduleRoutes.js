@@ -24,7 +24,10 @@ router.post("/addClass", async (req, res) => {
     });
 
     await newClass.save();
-    res.status(201).json({ message: "Class added successfully" });
+    res.status(201).json({ 
+      classID: newClass._id,
+      message: "Class added successfully" 
+    });
   } catch (error) {
     res.status(500).json({ message: `Server error: ${error}` });
   }
@@ -119,6 +122,7 @@ router.get("/getClass", async (req, res) => {
 }
 );
 
+//search endpoints for partial search
 router.get('/search', async (req, res) => {
   try {
     const { courseCode, professor, className } = req.query;

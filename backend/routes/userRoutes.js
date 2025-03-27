@@ -61,6 +61,7 @@ router.post("/register", async (req, res) => {
       token : "",
       tkTime : "",
       tkTime : "",
+      classes: null
     });
 
 
@@ -220,6 +221,32 @@ router.post("/changepw", async (req, res) => {
     res.json({ authorization: false, message: "Password successfully changed" });
   }catch (error) {
     res.status(500).json({ authorization: false, message: `Server error : ${error}` });
+  }
+});
+
+// Classes related endpoints
+router.put("/addClassToUser", async (req, res) => {
+  try {
+    const { username, classId } = req.body;
+
+    // Find & update user, pushing the classId into their classes array
+    const updatedUser = await User.findOneAndUpdate(
+      {username},
+      { $push: { classes: classId } },
+      { new: true } // return the updated user doc
+    );
+
+    if (!updatedUser) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // Return the updated user or just a message
+    return res.status(200).json({
+      message: "Class assigned to user successfully",
+      user: updatedUser,
+    });
+  } catch (error) {
+    res.status(500).json({ message: `Server error: ${error}` });
   }
 });
 

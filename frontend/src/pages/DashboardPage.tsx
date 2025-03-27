@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useParams } from 'react-router-dom';
 import AddModal from '../temp_Modal/AddModal';
+const API_URL = import.meta.env.VITE_API_URL;
 
 function DashboardPage() {
   const [modalOpen, setModalOpen] = useState(false);
@@ -18,10 +19,36 @@ function DashboardPage() {
   }
 
   const handleAddClass = (newClassData: ClassData) => {
-    //it is curretly not saving the data to the database
-    //we can call the schedule addClass api to add the class
-    setClasses((prev) => [...prev, newClassData]);
-    classes;
+    fetch(`${API_URL}/schedule/addClass`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(newClassData)
+    })
+      .then((response) => response.json())
+      .then((addClassResult) => {
+        // classID being returned from the add class endpoints
+        const classID = addClassResult.classID;
+        console.log('New Class ID:', classID);
+  
+        // Now call the endpoint to add this class to the user's array
+        return fetch(`${API_URL}/users/addClassToUser`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ username: user, classId: classID })
+        });
+      })
+      .then((response) => response.json())
+      .then((addToUserResult) => {
+        // Here you can see the updated user or a success message
+        console.log('Added class to user:', addToUserResult);
+      })
+      .catch((error) => {
+        console.error('Error in adding class or updating user:', error);
+      });
   };
 
   return (
