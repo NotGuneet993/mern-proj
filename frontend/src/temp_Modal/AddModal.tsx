@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { AiOutlineCloseCircle } from 'react-icons/ai';
+const API_URL = import.meta.env.VITE_API_URL;
 
 interface AddModalProps {
   isOpen: boolean;
@@ -61,7 +62,7 @@ function AddModal({ isOpen, onClose, onSave }: AddModalProps) {
     if (focusedField === 'courseCode' && courseCode.trim() && searchCount < 50) {
       setSearchCount((prev) => prev + 1);
       const params = new URLSearchParams({ courseCode });
-      fetch(`${import.meta.env.VITE_API_URL}/schedule/search?${params.toString()}`)
+      fetch(`${API_URL}/schedule/search?${params.toString()}`)
         .then((res) => res.json())
         .then((data) => {
           const codes = data.map((cls: any) => cls.course_code);
@@ -77,7 +78,7 @@ function AddModal({ isOpen, onClose, onSave }: AddModalProps) {
     if (focusedField === 'className' && className.trim() && searchCount < 50) {
       setSearchCount((prev) => prev + 1);
       const params = new URLSearchParams({ className });
-      fetch(`${import.meta.env.VITE_API_URL}/schedule/search?${params.toString()}`)
+      fetch(`${API_URL}/schedule/search?${params.toString()}`)
         .then((res) => res.json())
         .then((data) => {
           const names = data.map((cls: any) => cls.class_name);
@@ -93,7 +94,7 @@ function AddModal({ isOpen, onClose, onSave }: AddModalProps) {
     if (focusedField === 'professor' && professor.trim() && searchCount < 50) {
       setSearchCount((prev) => prev + 1);
       const params = new URLSearchParams({ professor });
-      fetch(`${import.meta.env.VITE_API_URL}/schedule/search?${params.toString()}`)
+      fetch(`${API_URL}/schedule/search?${params.toString()}`)
         .then((res) => res.json())
         .then((data) => {
           const profs = data.map((cls: any) => cls.professor);
