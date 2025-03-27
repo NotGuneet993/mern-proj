@@ -85,7 +85,7 @@ router.post("/register", async (req, res) => {
 
 });
 
-// Forgot password route
+// P password route
 // path is /users/forgot
 // Sole input is email (that was entered in forgot password page)
 // a JSON with "authorization" and "message" is returned

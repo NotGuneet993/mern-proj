@@ -34,7 +34,7 @@ export default function Redirect({ setAuth, setGlobalUser } : Redirect) {
             if (data.verified) {
                 setAuth(true);
                 setGlobalUser(`${username}`);
-                navigate(`/dashboard/:${username}`);
+                navigate(`/dashboard/${username}`);
             } else {
                 console.log(data.message);
                 navigate('/');
