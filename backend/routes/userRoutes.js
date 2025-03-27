@@ -23,6 +23,8 @@ router.post("/login", async (req, res) => {
       return res.status(403).json({ username: null, authorization: false, message: "Incorrect password" });
     }
 
+    //TODO add if statement to check for verified email and handle result accordingly
+
     res.json({ username: user.username, authorization: true, message: "Login Successfully" });
   } catch (error) {
     res.status(500).json({ username: null, authorization: false, message: `Server error : ${error}` });
