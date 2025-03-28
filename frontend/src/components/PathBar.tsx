@@ -1,11 +1,13 @@
 import { FaSearch } from "react-icons/fa";
+import geojsonData from "../../../backend/data/campus_map.json";  // Direct import
+
 
 type PathBarProps = {
     username: string;
 }
 
 export default function PathBar({ username } : PathBarProps) {
-    const locations = ['MSB', 'HEC', 'BA1', 'ENG2', 'Your moms house'];
+    const locations: string[] = (geojsonData as any).locations;
 
     return (
         <div className="z-1 flex flex-wrap w-[90vw] h-[55px] bg-white justify-center items-center mt-[10px] border-stone-400 rounded-full drop-shadow-lg">
