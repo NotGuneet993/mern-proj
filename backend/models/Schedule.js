@@ -9,7 +9,7 @@ const ScheduleSchema = new mongoose.Schema({
   type:{ type: String, required: true },
   building: { type: String, required: true },
   class_schedule:{type: Array, default: [], required: false},
-  building_prefix: { type: String, required: false },
+  building_prefix: { type: String, required: false, default: ""},
   room_number: { type: String, required: true },
 }, { timestamps: true, collection: "Classes" }); // Explicit collection name
 

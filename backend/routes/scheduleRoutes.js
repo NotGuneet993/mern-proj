@@ -24,7 +24,10 @@ router.post("/addClass", async (req, res) => {
     });
 
     await newClass.save();
-    res.status(201).json({ message: "Class added successfully" });
+    res.status(201).json({ 
+      classID: newClass._id,
+      message: "Class added successfully" 
+    });
   } catch (error) {
     res.status(500).json({ message: `Server error: ${error}` });
   }
@@ -118,6 +121,31 @@ router.get("/getClass", async (req, res) => {
   }
 }
 );
+
+//search endpoints for partial search
+router.get('/search', async (req, res) => {
+  try {
+    const { courseCode, professor, className } = req.query;
+    const searchFilters = {};
+
+    // Only add the filters that are provided
+    if (courseCode) {
+      searchFilters.course_code = { $regex: courseCode, $options: 'i' }; // case-insensitive
+    }
+    if (professor) {
+      searchFilters.professor = { $regex: professor, $options: 'i' };
+    }
+    if (className) {
+      searchFilters.class_name = { $regex: className, $options: 'i' };
+    }
+
+    const matchedClasses = await Schedule.find(searchFilters).limit(10);
+    res.json(matchedClasses);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
 
 
 module.exports = router;

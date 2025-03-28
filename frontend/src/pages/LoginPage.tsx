@@ -3,20 +3,16 @@ import SignUpComps from "../components/SignUpComps";
 
 type LoginPageProps = {
     setAuth: (auth: boolean) => void;
+    setIsLoginComp: (auth: boolean) => void;
+    isLoginComp: boolean;
+    setGlobalUser: (user: string) => void;
 }
 
-export default function LoginPage({ setAuth } : LoginPageProps) {
+export default function LoginPage({ setAuth, setIsLoginComp, isLoginComp, setGlobalUser } : LoginPageProps) {
     
     return (
-        <div className="bg-stone-900 flex h-screen items-center justify-center">
-            <div className="flex w-3/5 h-1/2 bg-stone-50">
-                <div className="flex w-1/2 justify-between items-center p-4">
-                    <LogInComps setAuth={setAuth}/>
-                </div>
-                <div className="flex w-1/2 justify-between items-center p-4">
-                    <SignUpComps />
-                </div>
-            </div>
+        <div className="bg-stone-900 flex h-full items-center justify-center">
+            {isLoginComp ? <LogInComps setAuth={setAuth} setIsLoginComp={setIsLoginComp} setGlobalUser={setGlobalUser}/> : <SignUpComps setAuth={setAuth} setIsLoginComp={setIsLoginComp}/>}
         </div>
     );
 }

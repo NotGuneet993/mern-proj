@@ -7,7 +7,7 @@ const router = express.Router();
 // Login Route
 // path is: /users/login
 // inputs are an email and password
-// a JSON with "authorization" and "message" is returned
+// a JSON with "username", "authorization" and "message" is returned
 router.post("/login", async (req, res) => {
   const { email, password } = req.body;
   const username = email;
@@ -15,24 +15,26 @@ router.post("/login", async (req, res) => {
   try {
     const user = await User.findOne({$or: [{email:email}, {username: username}]}); 
     if (!user) {
-      return res.status(404).json({ authorization: false, message: "User not found" });
+      return res.status(404).json({ username: null, authorization: false, message: "User not found" });
     }
     
     // This if statement holds, we're checking a pw hashed through frontend against a hashed pw in DB
     if (password !== user.password) {
-      return res.status(403).json({ authorization: false, message: "Incorrect password" });
+      return res.status(403).json({ username: null, authorization: false, message: "Incorrect password" });
     }
 
-    res.json({ authorization: true, message: "Login Successfully" });
+    //TODO add if statement to check for verified email and handle result accordingly
+
+    res.json({ username: user.username, authorization: true, message: "Login Successfully" });
   } catch (error) {
-    res.status(500).json({ authorization: false, message: `Server error : ${error}` });
+    res.status(500).json({ username: null, authorization: false, message: `Server error : ${error}` });
   }
 });
 
 // Register route
 // path is /users/register
 // inputs are name, email, username, and password
-// a JSON with "authorization" and "message" is returned
+// a JSON with "username", "authorization" and "message" is returned
 router.post("/register", async (req, res) => {
   const {name, email, username, password} = req.body;
 
@@ -40,12 +42,12 @@ router.post("/register", async (req, res) => {
     // Check for duplicate emails / usernames
     const em = await User.findOne({ email });
     if (em) {
-      return res.status(409).json({ authorization: false, message: `Email already in use` });
+      return res.status(409).json({ username: null, authorization: false, message: `Email already in use` });
     }
 
     const user = await User.findOne({ username });
     if (user) {
-      return res.status(409).json({ authorization: false, message: `User already exists` });
+      return res.status(409).json({ username: null, authorization: false, message: `User already exists` });
     }
 
     // No conflicts: create a new user
@@ -59,6 +61,7 @@ router.post("/register", async (req, res) => {
       token : "",
       tkTime : "",
       tkTime : "",
+      classes: null
     });
 
 
@@ -78,14 +81,14 @@ router.post("/register", async (req, res) => {
     // Send verification email
     await sendVerification(mg, name, email, token, "register");
 
-    res.json({ authorization: false, message: "" });
+    res.json({ username: username, authorization: false, message: "" });
   } catch (error) {
-    res.status(500).json({ authorization: false, message: `Server error : ${error}` });
+    res.status(500).json({ username: null, authorization: false, message: `Server error : ${error}` });
   }
 
 });
 
-// Forgot password route
+// P password route
 // path is /users/forgot
 // Sole input is email (that was entered in forgot password page)
 // a JSON with "authorization" and "message" is returned
@@ -121,7 +124,7 @@ router.post("/forgot", async (req, res) => {
 // Verify route
 // path is /users/verify
 // Inputs are token and type (from verification link), both acting as query
-// a JSON with "authorization" and "message" is returned
+// a JSON with "type," "username", "authorization" and "message" is returned
 router.get("/verify", async (req, res) => {
   const {token , type} = req.query;
   
@@ -131,7 +134,7 @@ router.get("/verify", async (req, res) => {
     if ( !user || (type == "forgot" && user.emailVerified == false) ) {
       // Uncomment to test, make it a comment when pushing
       //if (user) { console.log("Attempted forgot password with unverified email"); } 
-      return res.status(401).json({ authorization: false, message: "Invalid token" });
+      return res.status(401).json({ type: null, username: null, authorization: false, message: "Invalid token" });
       // TODO Redirect to some 404 page
     }
 
@@ -147,28 +150,46 @@ router.get("/verify", async (req, res) => {
     if ( curTime - tkTime >= 5) {
       // Uncomment to test, make it a comment when pushing
       //console.log("Verification attempted with expired token");
-      return res.status(401).json({ authorization: false, message: "Invalid token" });
+      return res.status(401).json({ type: null, username: null, authorization: false, message: "Invalid token" });
       // TODO Redirect to some 404 page
     }
 
     // Successful registration
     if (type == "register") {
       await user.updateOne({ emailVerified: true });
-      return res.json({ authorization: true, message: "New user succcessfully verified." });
-      // TODO Grab user info, save it to the session, and redirect to home page
+      return res.redirect(`/verifyUser/${user.username}`);
     }
     
     // Proceed to change password
     else if (type == "forgot") {
-      return res.json({ authorization: true, message: "Current user successfully verified." });
-      // TODO Grab user info, save it to the ssion, and redirect to change password page
+      return res.redirect(`/verifyForgot/${user.username}`);
     }
     
     // This should never happen
-    res.status(500).json({ authorization: false, 
+    res.status(500).json({ type: null, username: null, authorization: false, 
       message:`Extraneous /verify error: "type" was neither register nor forgot` });
   } catch (error) {
-    res.status(500).json({ authorization: false, message: `Server error : ${error}` });
+    res.status(500).json({ type: null, username: null, authorization: false, message: `Server error : ${error}` });
+  }
+});
+
+// Check user route
+// path is /users/checkemail
+// Input is username being checked
+// a JSON with "verified"
+router.post("/checkemail", async (req, res) => {
+  const { username } = req.body
+
+  try {
+    const user = await User.findOne({ username });
+
+    if (!user) {
+      return res.status(404).json({ verified: false, message: `No user found.`})
+    }
+
+    res.status(200).json({ verified: user.emailVerified, message: `Verified email found.`})
+  } catch (error) {
+    res.status(500).json({ verified: false, message: `Server error : ${error}` });
   }
 });
 
@@ -191,7 +212,6 @@ router.post("/changepw", async (req, res) => {
     // Same password
     if (newPassword == user.password) {
       return res.status(400).json({ authorization: false, message: "Can't make new password current password"});
-      // TODO Print the error message, no redirect needed
     }
 
     // All good: update password
@@ -201,6 +221,32 @@ router.post("/changepw", async (req, res) => {
     res.json({ authorization: false, message: "Password successfully changed" });
   }catch (error) {
     res.status(500).json({ authorization: false, message: `Server error : ${error}` });
+  }
+});
+
+// Classes related endpoints
+router.put("/addClassToUser", async (req, res) => {
+  try {
+    const { username, classId } = req.body;
+
+    // Find & update user, pushing the classId into their classes array
+    const updatedUser = await User.findOneAndUpdate(
+      {username},
+      { $push: { classes: classId } },
+      { new: true } // return the updated user doc
+    );
+
+    if (!updatedUser) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // Return the updated user or just a message
+    return res.status(200).json({
+      message: "Class assigned to user successfully",
+      user: updatedUser,
+    });
+  } catch (error) {
+    res.status(500).json({ message: `Server error: ${error}` });
   }
 });
 
