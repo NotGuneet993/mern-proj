@@ -1,7 +1,11 @@
 import { useState } from "react";
 import { FaSearch } from "react-icons/fa";
 import geojsonData from "../../../backend/data/campus_map.json";  // Direct import
+import id_map from "../../../backend/data/id_map.json";
 
+interface IdMap {
+    [key: string]: number; // Assuming the value is a string (node ID)
+  }
 
 type PathBarProps = {
     username: string;
@@ -13,23 +17,19 @@ export default function PathBar({ username, onSearch } : PathBarProps) {
     const [startLocation, setStartLocation] = useState<string>(locations[0]);
     const [endLocation, setEndLocation] = useState<string>(locations[1]);
 
-    // Temp Mapping from location names to node IDs (Example: Adjust based on actual data structure)
-    const locationToNodeId: { [key: string]: any } = {
-        "Jimmy John's": 7855050884,
-        "Qdoba": 3456763127,
-        "Einstein Bagels": 3456763134
-        // Add other locations and their corresponding node IDs
-    };
-
     // Handle generating the path on the graph
     // NEED TO UPDATE THIS TO CALL API TO GET DIJKSTRA PATH
     const handleSearch = () => {
-        const startNode = locationToNodeId[startLocation];
-        const endNode = locationToNodeId[endLocation];
+        const startNode = (id_map as IdMap)[startLocation];
+        const endNode = (id_map as IdMap)[endLocation];
 
         if (startNode && endNode) {
             // Update this to send the actual path, not just the two nodes
             onSearch([startNode, endNode]);  // Send valid node IDs to the parent component
+        }
+        // Debug REMOVE LATER
+        else{
+            console.log('MISSING A NODE');
         }
     };
 
