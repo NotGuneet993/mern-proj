@@ -149,24 +149,37 @@ router.get("/verify", async (req, res) => {
     // Check for existing token
     const user = await User.findOne({ token });
     if (!user) {
-      return res.status(401).json({ type: null, username: null, authorization: false, message: "Invalid token" });
-      // TODO Redirect to some 404 page
+      return res.redirect(`/`);
+      // TODO redirect to a verification failed page
     }
 
     // Save current time and time of token creation
     const curTime = new Date().getMinutes();
-    const tkTime = user.tkTime;
+    const diff = curTime - user.tkTime;
 
     // Update token statuses of the user
     await user.updateOne({ token: "" });
     await user.updateOne({ tkTime: "" });
 
     // Check if the token timed out (5 or more minutes)
-    if ( curTime - tkTime >= 5) {
+    if (diff >= 5) {
       // Uncomment to test, make it a comment when pushing
       //console.log("Verification attempted with expired token");
-      return res.status(401).json({ type: null, username: null, authorization: false, message: "Invalid token" });
-      // TODO Redirect to some 404 page
+
+      if (type == "register") {
+        const res = await User.deleteOne({username: username});
+        if (res.ok == 1) {
+          return res.redirect(`/`);
+          // TODO redirect to a verification failed page
+        }
+        // This should never happen
+        else {
+          return res.status(500).json({ username: null, authorization: false, message: `Extraneous DB error : Failed to delete user ${username}` });
+        }
+      }
+
+      return res.redirect(`/`)
+      // TODO redirect to a verification failed page
     }
 
     // Successful registration
