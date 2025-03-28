@@ -55,11 +55,11 @@ function DashboardPage() {
 
   return (
     <div className="flex flex-col w-screen h-screen pt-[60px]">
-      <div className="flex relative box-border w-screen h-[80px] justify-center z-1">
-        <PathBar username={user ?? 'Plaeholder'} onSearch={setValidNodes}/>
-      </div>
+      <div className='flex flex-col justify-center items-center h-[calc(100vh-60px)]'>
 
-      <div className='flex flex-col justify-center items-center h-[calc(100vh-140px)]'>
+        <div className="fixed flex top-[70px] box-border w-screen h-[80px] justify-center z-1">
+          <PathBar username={user ?? 'Plaeholder'} onSearch={setValidNodes}/>
+        </div>
           
         <GeoJSONMap validNodes={validNodes}/>
 
