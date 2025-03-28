@@ -25,7 +25,7 @@ router.post("/login", async (req, res) => {
 
     // Registration timeout logic
     let curTime = new Date().getMinutes();
-    const diff = curTime - user.tkTime;
+    let diff = curTime - user.tkTime;
     diff = diff < 0 ? 6 : diff;
     const timeout = diff >= 5 ? true : false;
     if (!user.emailVerified) {
@@ -33,12 +33,12 @@ router.post("/login", async (req, res) => {
         return res.status(403).json({ username: null, authorization: false, message: `Account not verified! Check your email or register again in ${5-diff} minute(s).` });
       }
       else {
-        const del = await User.deleteOne({username: username});
-        if (del == 1) {
+        try {
+          await User.deleteOne({username: username});
           return res.status(403).json({ username: null, authorization: false, message: `Verification email timed out! Please register for KnightNav again.` });
         }
         // This shouldn't happen
-        else {
+        catch(error) {
           return res.status(500).json({ username: null, authorization: false, message: `Extraneous DB error : Failed to delete user ${username}` });
         }
       }
@@ -157,25 +157,26 @@ router.get("/verify", async (req, res) => {
 
     // Save current time and time of token creation
     const curTime = new Date().getMinutes();
-    const diff = curTime - user.tkTime;
+    let diff = curTime - user.tkTime;
+    diff = diff < 0 ? 6 : diff;
+    const timeout = diff >= 5 ? true : false;
 
     // Update token statuses of the user
     await user.updateOne({ token: "" });
     await user.updateOne({ tkTime: "" });
 
     // Check if the token timed out (5 or more minutes)
-    if (diff >= 5) {
+    if (timeout) {
       // Uncomment to test, make it a comment when pushing
       //console.log("Verification attempted with expired token");
 
       if (type == "register") {
-        const res = await User.deleteOne({username: username});
-        if (res.ok == 1) {
+        try {
+          await User.deleteOne({username: username});
           return res.redirect(`/`);
-          // TODO redirect to a verification failed page
         }
         // This should never happen
-        else {
+        catch(error) {
           return res.status(500).json({ type: null, username: null, authorization: false, message: `Extraneous DB error : Failed to delete user ${username}` });
         }
       }
