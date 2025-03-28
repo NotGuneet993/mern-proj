@@ -60,13 +60,7 @@ function DashboardPage() {
       </div>
 
       <div className='flex flex-col justify-center items-center h-[calc(100vh-140px)]'>
-        <button
-          className="bg-blue-500 text-white px-4 py-2 rounded"
-          onClick={() => setModalOpen(true)}
-          >
-            Add Class
-          </button>
-
+    
           {modalOpen && (
             <AddModal
             isOpen={modalOpen}
@@ -74,10 +68,11 @@ function DashboardPage() {
             onSave={handleAddClass}
             />
           )}
-          <br />
+
           <div className='fixed bottom-[5%] left-[5%] z-10'>
-            <PlusButtonMenu />
+            <PlusButtonMenu setModalOpen={setModalOpen}/>
           </div>
+          
       </div>
     </div>
   );
