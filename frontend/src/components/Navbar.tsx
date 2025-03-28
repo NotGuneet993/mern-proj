@@ -45,6 +45,7 @@ export default function Navbar({ isAuth, setAuth, setIsLoginComp, globalUser } :
             <ul className="list-none ">
                 <li className={liTextStyle}><NavLink to='/' className='no-underline'>Home</NavLink></li>
                 {isAuth && <li className={liTextStyle}><NavLink to={`/dashboard/${globalUser}`} className='no-underline'>Dashboard</NavLink></li>}
+                {isAuth && <li className={liTextStyle}><NavLink to={`/schedule/${globalUser}`} className='no-underline'>Schedule</NavLink></li>}
                 <li className={liTextStyle}><NavLink to='/stim' className='no-underline'>Stim</NavLink></li>
 
                 {isAuth ? (

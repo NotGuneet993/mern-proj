@@ -11,6 +11,7 @@ import StimPage from './pages/StimPage'
 import MailVerifyPage from './pages/MailVerifyPage'
 import ForgotPasswordPage from './pages/ForgotPasswordPage'
 import VerifyForgot from './pages/VerifyForgot'
+import SchedulePage from './pages/SchedulePage'
 
 import Redirect from './pages/Redirect'
 import ProtectedRoute from './components/ProtectedRoute'
@@ -33,6 +34,7 @@ function App() {
         <Route path="/stim" element={<StimPage />} />
         <Route path="/mailVerifyPage" element={<MailVerifyPage />} />
         <Route path="/forgotPassword" element={<ForgotPasswordPage />} />
+        <Route path="/schedule/:user" element={<SchedulePage />} />
         <Route path="/verifyUser/:username" element={<Redirect setAuth={setAuth} setGlobalUser={setGlobalUser} />} />
         <Route path="/verifyForgot/:username" element={<VerifyForgot />} />
         <Route path="/*" element={<LandingPage />} />
