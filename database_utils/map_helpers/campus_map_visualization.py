@@ -274,6 +274,8 @@ geojson = {
     "features": []
 }
 
+location_list = set()
+
 # Extract nodes and convert to GeoJSON Points
 for node in graph_data["nodes"]:
     if "lat" in node and "lon" in node:  # Ensure coordinates exist
@@ -288,6 +290,8 @@ for node in graph_data["nodes"]:
                 "name": node.get("name")
             }
         }
+        if feature["properties"]["name"] not in location_list and feature["properties"]["name"] is not None and feature["properties"]["name"] != "null":
+            location_list.add(feature["properties"]["name"])
         geojson["features"].append(feature)
 
 # Extract edges and convert to GeoJSON LineStrings
@@ -312,7 +316,14 @@ for link in graph_data["links"]:
                 "target": link["target"]
             }
         }
+        if feature["properties"]["name"] not in location_list and feature["properties"]["name"] is not None and feature["properties"]["name"] != "null":
+            location_list.add(feature["properties"]["name"])
+        
         geojson["features"].append(feature)
+
+
+
+geojson["locations"] = list(location_list)
 
 # Save the GeoJSON file
 geojson_path = "database_utils/map_helpers/map_data/map.geojson"
