@@ -48,6 +48,13 @@ export default function GeoJSONMap({ validNodes } : GeoJSONMapProps) {
       return featureId && validNodes.includes(featureId); // Keep node if its ID is in validNodes
     });
 
+    // For when you want all nodes:
+    // Get valid node features to display (only nodes whose IDs are in validNodeIds)
+    // const nodeFeatures = source.getFeatures().filter((feature: any) => {
+    //   const featureId = feature.get('id'); // Access the 'id' property from the 'properties' object
+    //   return featureId; // Keep all nodes, no filtering based on validNodes
+    // });
+
     // Define the style for the node (point) features
     const nodeStyle = new Style({
       image: new Circle({
