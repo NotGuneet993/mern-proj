@@ -12,6 +12,9 @@ import MailVerifyPage from './pages/MailVerifyPage'
 import ForgotPasswordPage from './pages/ForgotPasswordPage'
 import VerifyForgot from './pages/VerifyForgot'
 
+//remove
+import SizeTest from './pages/SizeTest'
+
 import Redirect from './pages/Redirect'
 import ProtectedRoute from './components/ProtectedRoute'
 
@@ -35,6 +38,10 @@ function App() {
         <Route path="/forgotPassword" element={<ForgotPasswordPage />} />
         <Route path="/verifyUser/:username" element={<Redirect setAuth={setAuth} setGlobalUser={setGlobalUser} />} />
         <Route path="/verifyForgot/:username" element={<VerifyForgot />} />
+
+        //remove me 
+        <Route path="/sizetest" element={<SizeTest />} />
+
         <Route path="/*" element={<LandingPage />} />
       </Routes>
     </div>

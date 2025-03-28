@@ -1,4 +1,3 @@
-import React from "react";
 import GeoJSONMap from "./../components/Graph.tsx";
 
 export default function NavigationPage(){
