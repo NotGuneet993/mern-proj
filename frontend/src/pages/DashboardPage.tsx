@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useParams } from 'react-router-dom';
 import AddModal from '../temp_Modal/AddModal';
 import PathBar from '../components/PathBar';
+import PlusButtonMenu from '../components/PlusButtonMenu';
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -58,7 +59,7 @@ function DashboardPage() {
         <PathBar username={user ?? 'Plaeholder'}/>
       </div>
 
-      <div className='flex justify-center items-center h-[calc(100vh-140px)]'>
+      <div className='flex flex-col justify-center items-center h-[calc(100vh-140px)]'>
         <button
           className="bg-blue-500 text-white px-4 py-2 rounded"
           onClick={() => setModalOpen(true)}
@@ -73,6 +74,10 @@ function DashboardPage() {
             onSave={handleAddClass}
             />
           )}
+          <br />
+          <div className='fixed bottom-[5%] left-[5%] z-10'>
+            <PlusButtonMenu />
+          </div>
       </div>
     </div>
   );
