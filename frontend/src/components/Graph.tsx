@@ -7,7 +7,7 @@ import VectorLayer from "ol/layer/Vector";
 import VectorSource from "ol/source/Vector";
 import { GeoJSON } from "ol/format";
 import OSM from "ol/source/OSM"; // OpenStreetMap tiles as base layer
-import geojsonData from "../data/campus_map.json"; // Direct import
+import geojsonData from "../../../backend/data/campus_map.json"; // Direct import
 import Style from "ol/style/Style";
 import Stroke from "ol/style/Stroke";
 import Circle from "ol/style/Circle";
