@@ -79,6 +79,7 @@ print(f'Removing {len(nodes_to_remove)} nodes from the graph')
 
 # Create a list of all nodes (id -> node)
 nodes = {}
+
 for node in root.findall('node'):
     node_id = int(node.attrib['id'])
     if node_id not in nodes_to_remove:
@@ -129,6 +130,53 @@ for way in root.findall('way'):
         u, v = way_nodes[i], way_nodes[i + 1]
         if u in nodes and v in nodes:
             valid_edges.append((u, v, {"highway": highway_type, "name": name}))
+    
+    # Set the "close distance" threshold (in miles)
+    CLOSE_DISTANCE_THRESHOLD_MILES = 0.015  # Example threshold of 0.1 miles (about 160 meters)
+
+    if is_building and name and len(building_nodes) > 2:
+        # Compute centroid of the building
+        lat_mean = sum(nodes[n]["lat"] for n in building_nodes) / len(building_nodes)
+        lon_mean = sum(nodes[n]["lon"] for n in building_nodes) / len(building_nodes)
+        centroid_id = max(nodes.keys()) + 1  # Assign new node ID
+        building_name = name if name else "centroid"
+        nodes[centroid_id] = {"lat": lat_mean, "lon": lon_mean, "name": building_name, "highway": "highway"}
+        building_centroids[building_id] = centroid_id
+
+        # Identify entrances
+        entrances = []
+        for nd in way.findall('nd'):
+            node_id = nd.attrib['ref']
+            for node in root.findall(f"node[@id='{node_id}']"):
+                for tag in node.findall('tag'):
+                    if tag.attrib['k'] == "entrance" and tag.attrib['v'] in ["yes", "main"]:
+                        entrance_id = int(node.attrib['id'])
+                        entrances.append(entrance_id)
+
+        if entrances:
+            building_entrances[building_id] = entrances
+        
+        # Find all path nodes within the close distance threshold
+        for path_node in nodes:
+            if path_node == centroid_id:
+                continue
+            # Compute the Haversine distance to the centroid using your haversine_miles function
+            dist = haversine_miles(lat_mean, lon_mean, nodes[path_node]["lat"], nodes[path_node]["lon"])
+            
+            # If the node is within the threshold, connect it to the centroid
+            if dist <= CLOSE_DISTANCE_THRESHOLD_MILES:
+                valid_edges.append((centroid_id, path_node, {"highway": "footway"}))
+
+        # Connect centroid to entrances
+        for entrance in entrances:
+            valid_edges.append((centroid_id, entrance, {"highway": "entrance"}))
+
+        building_nodes.append(centroid_id)
+        
+        # Remove the name attribute from the building nodes, but keep the edges intact
+        for building_node in building_nodes:
+            if building_node in nodes:
+                nodes[building_node]['name'] = None  # Remove the 'name' attribute
 
 
 # Remove unwanted power-related relations (except substations, plants, generators)
@@ -153,10 +201,13 @@ print(f'Graph processing complete. Nodes: {len(nodes)}, Edges: {len(valid_edges)
 
 # Create graph and add nodes
 G = nx.Graph()
+location_map = {}  # A map of named locations to their numerical id
 
 # Add nodes with lat/lon/name
 for node_id, attr in nodes.items():
-    G.add_node(node_id, lat=attr["lat"], lon=attr["lon"], name=attr["name"])
+    G.add_node(node_id, lat=attr["lat"], lon=attr["lon"], name=attr.get("name", None))
+    if attr.get("name", None) and attr["name"] not in location_map.keys():
+        location_map[attr["name"]] = node_id
 
 # Add valid edges
 G.add_edges_from(valid_edges)
@@ -265,6 +316,9 @@ graph_data = json_graph.node_link_data(G)
 with open("database_utils/map_helpers/map_data/map.json", "w") as f:
     json.dump(graph_data, f, indent=4)
 
+with open("database_utils/map_helpers/map_data/id_map.json", "w") as f:
+    json.dump(location_map, f, indent=4)
+
 print("Graph saved as graph.json")
 
 
@@ -290,8 +344,11 @@ for node in graph_data["nodes"]:
                 "name": node.get("name")
             }
         }
-        if feature["properties"]["name"] not in location_list and feature["properties"]["name"] is not None and feature["properties"]["name"] != "null":
-            location_list.add(feature["properties"]["name"])
+        if feature["properties"]["name"] is not None and feature["properties"]["name"] != "null":
+            if feature["properties"]["name"] not in location_list:
+                location_list.add(feature["properties"]["name"])
+            else:
+                print(f'DUPLICATE NAME: {feature["properties"]["name"]}')
         geojson["features"].append(feature)
 
 # Extract edges and convert to GeoJSON LineStrings
@@ -316,8 +373,14 @@ for link in graph_data["links"]:
                 "target": link["target"]
             }
         }
-        if feature["properties"]["name"] not in location_list and feature["properties"]["name"] is not None and feature["properties"]["name"] != "null":
-            location_list.add(feature["properties"]["name"])
+
+        if feature["properties"]["name"] is not None and feature["properties"]["name"] != "null":
+            if feature["properties"]["name"] not in location_list:
+                location_list.add(feature["properties"]["name"])
+            else:
+                print(f'DUPLICATE NAME: {feature["properties"]["name"]}')
+                print(feature["properties"])
+
         
         geojson["features"].append(feature)
 
