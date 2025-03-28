@@ -1,0 +1,30 @@
+{
+    "name": "@types/ol",
+    "version": "6.5.3",
+    "description": "TypeScript definitions for ol",
+    "homepage": "https://github.com/DefinitelyTyped/DefinitelyTyped/tree/master/types/ol",
+    "license": "MIT",
+    "contributors": [
+        {
+            "name": "Rifa'i M. Hanif",
+            "url": "https://github.com/hanreev",
+            "githubUsername": "hanreev"
+        }
+    ],
+    "main": "",
+    "types": "index.d.ts",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/DefinitelyTyped/DefinitelyTyped.git",
+        "directory": "types/ol"
+    },
+    "scripts": {},
+    "dependencies": {
+        "@types/arcgis-rest-api": "*",
+        "@types/geojson": "*",
+        "@types/rbush": "*",
+        "@types/topojson-specification": "*"
+    },
+    "typesPublisherContentHash": "b5c521895df6c3cd3b2ad0160901a8402db2c949db1ddc17e3d1fcd4bd015b41",
+    "typeScriptVersion": "3.6"
+}
