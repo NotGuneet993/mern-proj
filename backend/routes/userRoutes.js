@@ -23,9 +23,26 @@ router.post("/login", async (req, res) => {
       return res.status(403).json({ username: null, authorization: false, message: "Incorrect password" });
     }
 
-    //TODO add if statement to check for verified email and handle result accordingly
+    let curTime = new Date().getMinutes();
+    const diff = curTime - user.tkTime;
+    const timeout = diff >= 5 ? true : false;
+    if (!user.emailVerified) {
+      if (!timeout) {
+        return res.status(403).json({ username: null, authorization: false, message: `Account not verified! Check your email or register again in ${5-diff} minutes.` });
+      }
+      else {
+        const res = await User.deleteOne({username: username});
+        if (res == 1) {
+          return res.status(403).json({ username: null, authorization: false, message: `Verification email timed out! Please register for KnightNav again.` });
+        }
+        // This shouldn't happen
+        else {
+          return res.status(500).json({ username: null, authorization: false, message: `Extraneous DB error : Failed to delete user ${username}` });
+        }
+      }
+    }
 
-    res.json({ username: user.username, authorization: true, message: "Login Successfully" });
+    res.json({ username: user.username, authorization: true, message: "Logged in successfully" });
   } catch (error) {
     res.status(500).json({ username: null, authorization: false, message: `Server error : ${error}` });
   }
@@ -88,7 +105,7 @@ router.post("/register", async (req, res) => {
 
 });
 
-// P password route
+// Forgot password route
 // path is /users/forgot
 // Sole input is email (that was entered in forgot password page)
 // a JSON with "authorization" and "message" is returned
@@ -97,7 +114,7 @@ router.post("/forgot", async (req, res) => {
 
   try {
     const user = await User.findOne({ email });
-    if (user) {
+    if (user && user.emailVerified) {
       // Initialize email verification
       const mg = req.mailgun;
       const crypto = req.crypto;
@@ -129,11 +146,9 @@ router.get("/verify", async (req, res) => {
   const {token , type} = req.query;
   
   try { 
-    // Check for existing token and if the found user is email verified
+    // Check for existing token
     const user = await User.findOne({ token });
-    if ( !user || (type == "forgot" && user.emailVerified == false) ) {
-      // Uncomment to test, make it a comment when pushing
-      //if (user) { console.log("Attempted forgot password with unverified email"); } 
+    if (!user) {
       return res.status(401).json({ type: null, username: null, authorization: false, message: "Invalid token" });
       // TODO Redirect to some 404 page
     }
@@ -173,10 +188,10 @@ router.get("/verify", async (req, res) => {
   }
 });
 
-// Check user route
+// Check email route
 // path is /users/checkemail
 // Input is username being checked
-// a JSON with "verified"
+// a JSON with "verified" and "message" is returned
 router.post("/checkemail", async (req, res) => {
   const { username } = req.body
 
@@ -187,7 +202,7 @@ router.post("/checkemail", async (req, res) => {
       return res.status(404).json({ verified: false, message: `No user found.`})
     }
 
-    res.status(200).json({ verified: user.emailVerified, message: `Verified email found.`})
+    res.status(200).json({ verified: user.emailVerified, message: `Verified user found.`})
   } catch (error) {
     res.status(500).json({ verified: false, message: `Server error : ${error}` });
   }
