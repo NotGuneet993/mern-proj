@@ -1,11 +1,15 @@
 import { FaSearch } from "react-icons/fa";
 
-export default function PathBar() {
-    const locations = ['MSB', 'HEC', 'BA1', 'ENG2'];
+type PathBarProps = {
+    username: string;
+}
+
+export default function PathBar({ username } : PathBarProps) {
+    const locations = ['MSB', 'HEC', 'BA1', 'ENG2', 'Your moms house'];
 
     return (
-        <div className="flex flex-wrap w-[90vw] h-[55px] bg-white justify-center items-center mt-[10px] border-stone-400 rounded-full drop-shadow-lg">
-            <p className="text-stone-700 mx-1">Hello, USERNAME! Find the path from</p>
+        <div className="z-1 flex flex-wrap w-[90vw] h-[55px] bg-white justify-center items-center mt-[10px] border-stone-400 rounded-full drop-shadow-lg">
+            <p className="text-stone-700 mx-1">Hello, {username}! Find the path from</p>
 
             <select className="border border-stone-400 rounded px-2 mx-1">
                 {locations.map((loc, index) => (

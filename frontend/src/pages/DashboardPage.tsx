@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { useParams } from 'react-router-dom';
 import AddModal from '../temp_Modal/AddModal';
+import PathBar from '../components/PathBar';
+
 const API_URL = import.meta.env.VITE_API_URL;
 
 function DashboardPage() {
@@ -49,23 +51,30 @@ function DashboardPage() {
   };
 
   return (
-    <div className="h-screen flex items-center justify-center">
-      <button
-        className="bg-blue-500 text-white px-4 py-2 rounded"
-        onClick={() => setModalOpen(true)}
+    <div className="flex flex-col w-screen h-screen pt-[60px]">
+      <div
+        className="flex box-border w-screen h-[80px] justify-center"
       >
-        Add Class
-      </button>
-      {modalOpen && (
-        <AddModal
-          isOpen={modalOpen}
-          onClose={() => setModalOpen(false)}
-          onSave={handleAddClass}
-        />
-      )}
-      <h2>hi {user}</h2>
+        <PathBar username={user ?? 'Plaeholder'}/>
+      </div>
+
+      <div className='flex justify-center items-center h-[calc(100vh-140px)]'>
+        <button
+          className="bg-blue-500 text-white px-4 py-2 rounded"
+          onClick={() => setModalOpen(true)}
+          >
+            Add Class
+          </button>
+
+          {modalOpen && (
+            <AddModal
+            isOpen={modalOpen}
+            onClose={() => setModalOpen(false)}
+            onSave={handleAddClass}
+            />
+          )}
+      </div>
     </div>
-    
   );
 }
 

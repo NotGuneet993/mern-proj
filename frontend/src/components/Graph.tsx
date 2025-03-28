@@ -13,20 +13,23 @@ import Stroke from "ol/style/Stroke";
 import Circle from "ol/style/Circle";
 import Fill from "ol/style/Fill";
 
-interface GeoJSONFeatureCollection {
-  type: "FeatureCollection";
-  features: any[];
-  locations: string[];
-  uniqueFeatres: any[];
-}
+// interface GeoJSONFeatureCollection {  // blocking deplyment
+//   type: "FeatureCollection";
+//   features: any[];
+//   locations: string[];
+//   uniqueFeatres: any[];
+// }
 
 export default function GeoJSONMap() {
   const [map, setMap] = useState<any>(null);
   const mapRef = useRef<HTMLDivElement>(null);
-  const locations = (geojsonData as any).locations;
+  // const locations = (geojsonData as any).locations; //commenting out since its block deployment 
   const validNodes = [367822128];  // Make this a prop eventually
 
   useEffect(() => {
+
+    map;  // map needs to be called atleast once somewhere. This shouldnt do anything. Remove when map is being used fr
+
     // Parse the GeoJSON data and read it as OpenLayers features
     const vectorSource = new VectorSource({
       features: new GeoJSON().readFeatures(geojsonData, {
