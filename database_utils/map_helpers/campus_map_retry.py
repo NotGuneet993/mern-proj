@@ -139,6 +139,7 @@ for way in root.findall('way'):
         centroid_id = max(nodes.keys()) + 1  # Assign new node ID
         building_name = name + "_centroid" if name else "centroid"
         nodes[centroid_id] = {"lat": lat_mean, "lon": lon_mean, "name": building_name, "highway": "highway"}
+        print(nodes[centroid_id])
         building_centroids[building_id] = centroid_id
 
         # Identify entrances
@@ -201,7 +202,6 @@ for relation in root.findall('relation'):
         root.remove(relation)
 
 
-
 print(f'Graph processing complete. Nodes: {len(nodes)}, Edges: {len(valid_edges)}')
 
 # Create graph and add nodes
@@ -213,7 +213,6 @@ for node_id, attr in nodes.items():
 
 # Add valid edges
 G.add_edges_from(valid_edges)
-
 
 
 for u, v in G.edges():
@@ -233,9 +232,9 @@ pos = {node: (G.nodes[node]['lon'], G.nodes[node]['lat']) for node in G.nodes}
 
 plt.figure(figsize=(12, 15), facecolor='black')
 nx.draw(G, pos, node_size=1, node_color='white', edge_color=None, with_labels=False)
-plt.savefig('assets/map_img_base.png', facecolor='black')
+plt.savefig('database_utils/assets/map_img_base.png', facecolor='black')
 nx.draw(G, pos, node_size=1, node_color='white', edge_color='green', with_labels=False)
-plt.savefig('assets/map_img_base_green.png', transparent=True)
+plt.savefig('database_utils/assets/map_img_base_green.png', transparent=True)
 
 lons = [G.nodes[node]['lon'] for node in G.nodes]
 lats = [G.nodes[node]['lat'] for node in G.nodes]
@@ -244,7 +243,7 @@ lats = [G.nodes[node]['lat'] for node in G.nodes]
 plt.figure(figsize=(12, 15), facecolor='black')
 plt.axis('off')
 plt.scatter(lons, lats, s=1, c='white', marker='o')  # Adjust size and color as neededplt.savefig('assets/map_img_base_transparent.png', transparent=True)
-plt.savefig('assets/map_img_base_transparent.png', transparent=True)
+plt.savefig('database_utils/assets/map_img_base_transparent.png', transparent=True)
 
 
 # Save the graph as a json, then send to mongodb
@@ -259,4 +258,4 @@ graph_data = json_graph.node_link_data(G)
 with open("database_utils/map_helpers/map_data/map.json", "w") as f:
     json.dump(graph_data, f, indent=4)
 
-print("Graph saved as graph.json")
+print("Graph saved as map.json")

@@ -96,12 +96,13 @@ for node in root.findall('node'):
 valid_edges = []
 building_centroids = {}
 building_entrances = {}
+location_map = {}
 for way in root.findall('way'):
     is_power_line = False
     highway_type = None
     name = None
     building_nodes = []
-    building_id = way.attrib['id']
+    building_id = way.attrib['id']  # this might need to be generated
     is_building = False
     
     for tag in way.findall('tag'):
@@ -141,6 +142,9 @@ for way in root.findall('way'):
         centroid_id = max(nodes.keys()) + 1  # Assign new node ID
         building_name = name if name else "centroid"
         nodes[centroid_id] = {"lat": lat_mean, "lon": lon_mean, "name": building_name, "highway": "highway"}
+        # print(nodes[centroid_id])
+        location_map[building_name] = centroid_id
+
         building_centroids[building_id] = centroid_id
 
         # Identify entrances
@@ -173,10 +177,10 @@ for way in root.findall('way'):
 
         building_nodes.append(centroid_id)
         
-        # Remove the name attribute from the building nodes, but keep the edges intact
-        for building_node in building_nodes:
-            if building_node in nodes:
-                nodes[building_node]['name'] = None  # Remove the 'name' attribute
+        # # Remove the name attribute from the building nodes, but keep the edges intact
+        # for building_node in building_nodes:
+        #     if building_node in nodes:
+        #         nodes[building_node]['name'] = None  # Remove the 'name' attribute
 
 
 # Remove unwanted power-related relations (except substations, plants, generators)
@@ -196,12 +200,10 @@ for relation in root.findall('relation'):
         root.remove(relation)
 
 
-
 print(f'Graph processing complete. Nodes: {len(nodes)}, Edges: {len(valid_edges)}')
 
 # Create graph and add nodes
 G = nx.Graph()
-location_map = {}  # A map of named locations to their numerical id
 
 # Add nodes with lat/lon/name
 for node_id, attr in nodes.items():
