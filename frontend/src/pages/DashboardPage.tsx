@@ -3,11 +3,13 @@ import { useParams } from 'react-router-dom';
 import AddModal from '../temp_Modal/AddModal';
 import PathBar from '../components/PathBar';
 import PlusButtonMenu from '../components/PlusButtonMenu';
+import GeoJSONMap from '../components/Graph';
 
 const API_URL = import.meta.env.VITE_API_URL;
 
 function DashboardPage() {
   const [modalOpen, setModalOpen] = useState(false);
+  const [validNodes, setValidNodes] = useState<any[]>([]);
 
   // extract username from the top url 
   const { user } = useParams();
@@ -53,26 +55,25 @@ function DashboardPage() {
 
   return (
     <div className="flex flex-col w-screen h-screen pt-[60px]">
-      <div
-        className="flex box-border w-screen h-[80px] justify-center"
-      >
-        <PathBar username={user ?? 'Plaeholder'}/>
+      <div className="flex relative box-border w-screen h-[80px] justify-center z-1">
+        <PathBar username={user ?? 'Plaeholder'} onSearch={setValidNodes}/>
       </div>
 
       <div className='flex flex-col justify-center items-center h-[calc(100vh-140px)]'>
-    
-          {modalOpen && (
-            <AddModal
-            isOpen={modalOpen}
-            onClose={() => setModalOpen(false)}
-            onSave={handleAddClass}
-            />
-          )}
-
-          <div className='fixed bottom-[5%] left-[5%] z-10'>
-            <PlusButtonMenu setModalOpen={setModalOpen}/>
-          </div>
           
+        <GeoJSONMap validNodes={validNodes}/>
+
+        {modalOpen && (
+          <AddModal
+          isOpen={modalOpen}
+          onClose={() => setModalOpen(false)}
+          onSave={handleAddClass}
+          />
+        )}
+
+        <div className='fixed bottom-[5%] left-[5%] z-50'>
+          <PlusButtonMenu setModalOpen={setModalOpen}/>
+        </div>
       </div>
     </div>
   );

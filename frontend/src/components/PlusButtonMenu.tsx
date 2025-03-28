@@ -10,9 +10,11 @@ export default function PlusButtonMenu({ setModalOpen } : PlusButtonMenuProps) {
     const [rotated, setRotated] = useState(false);
 
     return (
-        <div
-            className={`w-[${rotated? 150 : 50}px] h-[${rotated? 200 : 50}px] bg-stone-100 border-1 border-amber-500 
-                        rounded-3xl transition-all duration-350 ease-in-out pt-[15px]`}
+        <div style={{
+            width: rotated ? 150 : 52,
+            height: rotated ? 200 : 52,
+        }}
+        className="bg-stone-50 border border-amber-500 rounded-3xl transition-all duration-300 ease-in-out pt-[15px] drop-shadow-2xl z-50 relative"
         >
             {rotated && (
                 <div className="flex flex-col items-center">
