@@ -174,7 +174,7 @@ router.get("/verify", async (req, res) => {
         }
         // This should never happen
         else {
-          return res.status(500).json({ username: null, authorization: false, message: `Extraneous DB error : Failed to delete user ${username}` });
+          return res.status(500).json({ type: null, username: null, authorization: false, message: `Extraneous DB error : Failed to delete user ${username}` });
         }
       }
 
