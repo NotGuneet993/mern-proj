@@ -23,8 +23,10 @@ router.post("/login", async (req, res) => {
       return res.status(403).json({ username: null, authorization: false, message: "Incorrect password" });
     }
 
+    // Registration timeout logic
     let curTime = new Date().getMinutes();
     const diff = curTime - user.tkTime;
+    diff = diff < 0 ? 6 : diff;
     const timeout = diff >= 5 ? true : false;
     if (!user.emailVerified) {
       if (!timeout) {
@@ -32,7 +34,7 @@ router.post("/login", async (req, res) => {
       }
       else {
         const del = await User.deleteOne({username: username});
-        if (del.ok == 1) {
+        if (del == 1) {
           return res.status(403).json({ username: null, authorization: false, message: `Verification email timed out! Please register for KnightNav again.` });
         }
         // This shouldn't happen
