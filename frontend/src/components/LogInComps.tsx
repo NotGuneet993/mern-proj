@@ -74,7 +74,7 @@ export default function LogInComps({ setAuth, setIsLoginComp, setGlobalUser } : 
 
             <form onSubmit={handleSubmit} method="POST" className="flex flex-col items-center justify-center"> 
 
-                <input name='email' value={email} onChange={updateEmail} placeholder='Email' autoComplete="off"
+                <input name='email' value={email} onChange={updateEmail} placeholder='Email / Username' autoComplete="off"
                 className="border-1 border-gray-400 m-2 px-3 py-1 w-[20vw]"/>
 
                 <input name='password' type="password" value={password} onChange={updatePassword} placeholder='Password' autoComplete="off"

@@ -113,7 +113,7 @@ export default function VerifyForgot() {
                         className='border-2 border-gray-800  px-2 cursor-pointer mx-1 my-3 py-1 w-[20vw] bg-linear-70 from-yellow-300 to-amber-500
                         transition-all hover:bg-linear-70 hover:from-yellow-400 hover:to-amber-600 hover:cursor-pointer rounded-sm hover:rounded-4xl'
                         type='submit'
-                        disabled={isSubmitting || !pwMatch} 
+                        disabled={isSubmitting || !pwMatch || !pwLength || !pwCapitalLetter || !pwNum || !pwSpecChar}  
                     >{isSubmitting ? "Loading..." : "Change password"}</button>
                 </form>
             </div>
