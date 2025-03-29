@@ -5,6 +5,7 @@ import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import interactionPlugin from '@fullcalendar/interaction';
 import AddModal from '../temp_Modal/AddModal'; 
+import { AiFillEdit, AiFillDelete } from 'react-icons/ai';
 const API_URL = import.meta.env.VITE_API_URL;
 
 interface ClassSchedule {
@@ -228,13 +229,13 @@ const SchedulePage = ({ globalUser }: SchedulePageProps) => {
                   className="px-3 py-1 bg-yellow-300 text-gray-800 rounded hover:bg-blue-600"
                   onClick={() => handleEditClass(cls)}
                 >
-                  Edit
+                  <AiFillEdit className="inline-block mr-1" />
                 </button>
                 <button 
                   className="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600"
                   onClick={() => handleDeleteClass(cls._id)}
                 >
-                  Delete
+                  <AiFillDelete className="inline-block mr-1" />
                 </button>
               </div>
             </div>
