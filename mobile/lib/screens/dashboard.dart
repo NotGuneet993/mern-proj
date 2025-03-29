@@ -33,7 +33,6 @@ class Node {
         'id': id,
         'latlng': {'lat': latlng.latitude, 'lng': latlng.longitude},
         'label': label,
-        // Store color as a string based on the label (red if a label exists, blue otherwise)
         'color': label.isNotEmpty ? 'red' : 'blue',
       };
 
@@ -84,6 +83,7 @@ class GraphMap extends StatefulWidget {
 class _GraphMapState extends State<GraphMap> {
   List<Node> nodes = [];
   List<Edge> edges = [];
+  // Mode is kept in case you want to add interactions later.
   String mode = "none"; // "addNode", "connectNodes", "delete", or "none"
   List<Node> selectedNodes = [];
   String nodeLabel = "";
@@ -107,7 +107,7 @@ class _GraphMapState extends State<GraphMap> {
     }
   }
 
-  // When a node is tapped, either start/connect nodes or delete.
+  // When a node is tapped.
   void handleNodeTap(Node node) {
     if (mode == "connectNodes") {
       if (selectedNodes.isEmpty) {
@@ -212,163 +212,83 @@ class _GraphMapState extends State<GraphMap> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
+    return FlutterMap(
+      mapController: mapController,
+      options: MapOptions(
+        center: LatLng(28.6024, -81.2001),
+        zoom: 15.0,
+        onTap: (tapPosition, latlng) {
+          handleMapTap(latlng);
+        },
+      ),
       children: [
-        // Control buttons and text field.
-        Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Wrap(
-            spacing: 8,
-            runSpacing: 4,
-            children: [
-              ElevatedButton(
-                onPressed: () {
-                  setState(() {
-                    mode = "addNode";
-                  });
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor:
-                      mode == "addNode" ? Colors.lightBlue : null,
-                ),
-                child: Text("Add Node"),
-              ),
-              ElevatedButton(
-                onPressed: () {
-                  setState(() {
-                    mode = "connectNodes";
-                  });
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor:
-                      mode == "connectNodes" ? Colors.lightBlue : null,
-                ),
-                child: Text("Connect Nodes"),
-              ),
-              ElevatedButton(
-                onPressed: () {
-                  setState(() {
-                    mode = "delete";
-                  });
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor:
-                      mode == "delete" ? Colors.lightBlue : null,
-                ),
-                child: Text("Delete"),
-              ),
-              ElevatedButton(
-                onPressed: saveGraphToFile,
-                child: Text("Save"),
-              ),
-              ElevatedButton(
-                onPressed: loadGraphFromFile,
-                child: Text("Load"),
-              ),
-              SizedBox(
-                width: 200,
-                child: TextField(
-                  controller: nodeLabelController,
-                  decoration: InputDecoration(
-                    labelText: "Enter node label",
-                  ),
-                  onChanged: (value) {
-                    setState(() {
-                      nodeLabel = value;
-                    });
-                  },
-                ),
-              ),
-            ],
-          ),
+        TileLayer(
+          urlTemplate: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+          subdomains: ['a', 'b', 'c'],
         ),
-        // The map widget.
-        Expanded(
-          child: FlutterMap(
-            mapController: mapController,
-            options: MapOptions(
-              center: LatLng(28.6024, -81.2001),
-              zoom: 15.0,
-              onTap: (tapPosition, latlng) {
-                handleMapTap(latlng);
-              },
-            ),
-            children: [
-              TileLayer(
-                urlTemplate:
-                    "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
-                subdomains: ['a', 'b', 'c'],
+        // Draw edges as polylines.
+        PolylineLayer(
+          polylines: edges.map((edge) {
+            Node? node1 = nodes.firstWhereOrNull((n) => n.id == edge.node1);
+            Node? node2 = nodes.firstWhereOrNull((n) => n.id == edge.node2);
+            if (node1 == null || node2 == null) return null;
+            return Polyline(
+              points: [node1.latlng, node2.latlng],
+              strokeWidth: 3.0,
+              color: Colors.black,
+            );
+          }).whereType<Polyline>().toList(),
+        ),
+        // Overlay a transparent marker at each edge's midpoint for deletion.
+        MarkerLayer(
+          markers: edges.map((edge) {
+            Node? node1 = nodes.firstWhereOrNull((n) => n.id == edge.node1);
+            Node? node2 = nodes.firstWhereOrNull((n) => n.id == edge.node2);
+            if (node1 == null || node2 == null) return null;
+            LatLng mid = LatLng(
+              (node1.latlng.latitude + node2.latlng.latitude) / 2,
+              (node1.latlng.longitude + node2.latlng.longitude) / 2,
+            );
+            return Marker(
+              point: mid,
+              width: 20,
+              height: 20,
+              builder: (ctx) => GestureDetector(
+                onTap: () {
+                  if (mode == "delete") {
+                    deleteEdge(edge.id);
+                  }
+                },
+                child: Container(
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: Colors.transparent,
+                  ),
+                ),
               ),
-              // Draw edges as polylines.
-              PolylineLayer(
-                polylines: edges.map((edge) {
-                  Node? node1 =
-                      nodes.firstWhereOrNull((n) => n.id == edge.node1);
-                  Node? node2 =
-                      nodes.firstWhereOrNull((n) => n.id == edge.node2);
-                  if (node1 == null || node2 == null) return null;
-                  return Polyline(
-                    points: [node1.latlng, node2.latlng],
-                    strokeWidth: 3.0,
-                    color: Colors.black,
-                  );
-                }).whereType<Polyline>().toList(),
+            );
+          }).whereType<Marker>().toList(),
+        ),
+        // Draw nodes as markers.
+        MarkerLayer(
+          markers: nodes.map((node) {
+            return Marker(
+              point: node.latlng,
+              width: 20,
+              height: 20,
+              builder: (ctx) => GestureDetector(
+                onTap: () {
+                  handleNodeTap(node);
+                },
+                child: Container(
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: node.color,
+                  ),
+                ),
               ),
-              // Overlay a transparent marker at each edge's midpoint for deletion.
-              MarkerLayer(
-                markers: edges.map((edge) {
-                  Node? node1 =
-                      nodes.firstWhereOrNull((n) => n.id == edge.node1);
-                  Node? node2 =
-                      nodes.firstWhereOrNull((n) => n.id == edge.node2);
-                  if (node1 == null || node2 == null) return null;
-                  LatLng mid = LatLng(
-                    (node1.latlng.latitude + node2.latlng.latitude) / 2,
-                    (node1.latlng.longitude + node2.latlng.longitude) / 2,
-                  );
-                  return Marker(
-                    point: mid,
-                    width: 20,
-                    height: 20,
-                    builder: (ctx) => GestureDetector(
-                      onTap: () {
-                        if (mode == "delete") {
-                          deleteEdge(edge.id);
-                        }
-                      },
-                      child: Container(
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: Colors.transparent,
-                        ),
-                      ),
-                    ),
-                  );
-                }).whereType<Marker>().toList(),
-              ),
-              // Draw nodes as markers.
-              MarkerLayer(
-                markers: nodes.map((node) {
-                  return Marker(
-                    point: node.latlng,
-                    width: 20,
-                    height: 20,
-                    builder: (ctx) => GestureDetector(
-                      onTap: () {
-                        handleNodeTap(node);
-                      },
-                      child: Container(
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: node.color,
-                        ),
-                      ),
-                    ),
-                  );
-                }).toList(),
-              ),
-            ],
-          ),
+            );
+          }).toList(),
         ),
       ],
     );
@@ -378,7 +298,7 @@ class _GraphMapState extends State<GraphMap> {
 // ----------------------- Dashboard Code -----------------------
 
 class DashboardScreen extends StatefulWidget {
-  const DashboardScreen({super.key});
+  const DashboardScreen({Key? key}) : super(key: key);
 
   @override
   _DashboardScreenState createState() => _DashboardScreenState();
@@ -395,11 +315,17 @@ class _DashboardScreenState extends State<DashboardScreen>
   }
 
   @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Dashboard'),
-        backgroundColor: Color.fromARGB(255, 236, 220, 39),
+        backgroundColor: const Color.fromARGB(255, 236, 220, 39),
         bottom: TabBar(
           controller: _tabController,
           tabs: const [
@@ -411,9 +337,9 @@ class _DashboardScreenState extends State<DashboardScreen>
       body: TabBarView(
         controller: _tabController,
         children: [
-          // Your original dashboard content.
+          // Blank dashboard screen.
           Center(child: Text("Dashboard Content")),
-          // The GraphMap widget integrated as a tab.
+          // Map screen.
           GraphMap(),
         ],
       ),
