@@ -113,7 +113,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
       );
 
       if (response.statusCode == 200) {
-        _showMessageDialog("Success", "Registration successful!");
+        _showMessageDialog("Success", "Registration successful, please check your email to verify your ");
       } else if (response.statusCode == 409) {
         _showMessageDialog(
             "Error", "Email already associated with an account!");
