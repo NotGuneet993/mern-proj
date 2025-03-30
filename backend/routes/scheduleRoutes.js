@@ -85,14 +85,17 @@ router.put("/editClass", async (req, res) => {
 //path is: /schedule/getClass
 //refer to the addEndPoint input
 //a JSON with classID is returned
-router.get("/getClass", async (req, res) => {
+router.post("/getClass", async (req, res) => {
   const { course_code, class_name, professor, meeting_type, type, building, class_schedule, building_prefix, room_number } = req.body;
 
   try {
     const classData = await Schedule.findOne({
       course_code,
       class_name,
-      professor
+      professor,
+      meeting_type,
+      building_prefix,
+      room_number
     });
 
     //if the class exists, return the classID

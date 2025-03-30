@@ -142,21 +142,22 @@ const SchedulePage = ({ globalUser }: SchedulePageProps) => {
   }, [classes]);
 
   // Handler for deleting a class
-  const handleDeleteClass = (classId?: string) => {
-    if (!classId) return;
-    fetch(`${API_URL}/schedule/deleteClass`, {
-      method: 'DELETE',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ classID: classId }),
+// Updated handler for deleting a class from a user
+const handleDeleteClass = (classId?: string) => {
+  if (!classId) return;
+  fetch(`${API_URL}/users/removeClassFromUser`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ username: username, classId: classId }),
+  })
+    .then((res) => res.json())
+    .then((result) => {
+      console.log("Delete result:", result);
+      // After removal, re-fetch the updated classes
+      loadClasses();
     })
-      .then((res) => res.json())
-      .then((result) => {
-        console.log("Delete result:", result);
-        // Remove the deleted class from state
-        setClasses(prev => prev.filter(cls => cls._id !== classId));
-      })
-      .catch((err) => console.error("Error deleting class:", err));
-  };
+    .catch((err) => console.error("Error deleting class:", err));
+};
 
   // Handler for editing a class (placeholder)
   const handleEditClass = (classToEdit: ClassData) => {
@@ -166,15 +167,14 @@ const SchedulePage = ({ globalUser }: SchedulePageProps) => {
 
   // Handler for adding a class (passed to AddModal)
   const handleAddClass = (newClassData: ClassData) => {
-    fetch(`${API_URL}/schedule/addClass`, {
+    fetch(`${API_URL}/schedule/getClass`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(newClassData)
     })
       .then((response) => response.json())
-      .then((addClassResult) => {
-        const classID = addClassResult.classID;
-        console.log('New Class ID:', classID);
+      .then((getClassResult) => {
+        const classID = getClassResult.classID;
         // Now call the endpoint to add this class to the user's array
         return fetch(`${API_URL}/users/addClassToUser`, {
           method: 'PUT',

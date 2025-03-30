@@ -255,6 +255,7 @@ router.post("/changepw", async (req, res) => {
   }
 });
 
+//------------------------------------------------------------------------------------------------------------
 // Classes related endpoints
 router.put("/addClassToUser", async (req, res) => {
   try {
@@ -298,6 +299,30 @@ router.get("/classes", async (req, res) => {
   } catch (error) {
     console.error("Error fetching user classes:", error);
     return res.status(500).json({ message: "Server error" });
+  }
+});
+
+router.put("/removeClassFromUser", async (req, res) => {
+  try {
+    const { username, classId } = req.body;
+
+    // Update the user document by pulling the classId from the classes array
+    const updatedUser = await User.findOneAndUpdate(
+      { username: username },
+      { $pull: { classes: classId } },
+      { new: true } // Return the updated document
+    );
+
+    if (!updatedUser) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    res.status(200).json({
+      message: "Class removed from user successfully",
+      user: updatedUser
+    });
+  } catch (error) {
+    res.status(500).json({ message: `Server error: ${error}` });
   }
 });
 
