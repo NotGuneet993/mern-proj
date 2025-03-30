@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { FaSearch } from "react-icons/fa";
-import geojsonData from "../../../backend/data/campus_map.json";  // Direct import
-import id_map from "../../../backend/data/id_map.json";
+import geojsonData from "../../data/campus_map.json";  // Direct import
+import id_map from "../../data/id_map.json";
 
 interface IdMap {
     [key: string]: number; // Assuming the value is a string (node ID)
