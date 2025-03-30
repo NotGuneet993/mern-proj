@@ -8656,7 +8656,7 @@
     <tag k="brand" v="Starbucks"/>
     <tag k="brand:wikidata" v="Q37158"/>
     <tag k="cuisine" v="coffee_shop"/>
-    <tag k="name" v="Starbucks"/>
+    <tag k="name" v="Starbucks HS"/>
     <tag k="official_name" v="Starbucks Coffee"/>
     <tag k="phone" v="+1 407-823-4100"/>
     <tag k="ref" v="1006641"/>
@@ -8697,7 +8697,7 @@
     <tag k="drive_through" v="no"/>
     <tag k="indoor_seating" v="no"/>
     <tag k="internet_access" v="wlan"/>
-    <tag k="name" v="Chick-fil-A"/>
+    <tag k="name" v="Chick-fil-A BW"/>
     <tag k="opening_hours" v="Mo-Th 07:30-20:00; Fr 07:30-17:00; Sa 11:00-16:00; Su off"/>
     <tag k="phone" v="+1 407-823-2238"/>
     <tag k="ref" v="80246"/>
@@ -8713,7 +8713,7 @@
     <tag k="brand" v="Smoothie King"/>
     <tag k="brand:wikidata" v="Q5491421"/>
     <tag k="cuisine" v="juice"/>
-    <tag k="name" v="Smoothie King"/>
+    <tag k="name" v="Smoothie King SU"/>
     <tag k="takeaway" v="yes"/>
   </node>
   <node id="3456763131" lat="28.6001263" lon="-81.2014219">
@@ -8756,7 +8756,7 @@
     <tag k="brand" v="Smoothie King"/>
     <tag k="brand:wikidata" v="Q5491421"/>
     <tag k="cuisine" v="juice"/>
-    <tag k="name" v="Smoothie King"/>
+    <tag k="name" v="Smoothie King RWC"/>
     <tag k="takeaway" v="yes"/>
   </node>
   <node id="3456766460" lat="28.6011038" lon="-81.2019066">
@@ -8970,7 +8970,7 @@
     <tag k="cuisine" v="pizza"/>
     <tag k="delivery" v="no"/>
     <tag k="drive_through" v="no"/>
-    <tag k="name" v="Domino's"/>
+    <tag k="name" v="Domino's BW"/>
     <tag k="opening_hours" v="Mo-Th 11:00-15:00; Fr-Su 11:00-14:00"/>
     <tag k="phone" v="+1 407-882-2010"/>
     <tag k="ref" v="8637"/>
@@ -14241,7 +14241,7 @@
     <tag k="brand" v="Domino's"/>
     <tag k="brand:wikidata" v="Q839466"/>
     <tag k="cuisine" v="pizza"/>
-    <tag k="name" v="Domino's"/>
+    <tag k="name" v="Domino's Plaza"/>
     <tag k="opening_hours" v="10:30-01:00"/>
     <tag k="phone" v="+1 407-882-1010"/>
     <tag k="ref" v="8620"/>
@@ -15925,7 +15925,7 @@
     <tag k="brand" v="Starbucks"/>
     <tag k="brand:wikidata" v="Q37158"/>
     <tag k="cuisine" v="coffee_shop"/>
-    <tag k="name" v="Starbucks"/>
+    <tag k="name" v="Starbucks SU"/>
     <tag k="official_name" v="Starbucks Coffee"/>
     <tag k="phone" v="+1 407-823-4100"/>
     <tag k="ref" v="1028614"/>
@@ -22650,6 +22650,8 @@
     <nd ref="1672331562"/>
     <nd ref="1672331746"/>
     <nd ref="1672332047"/>
+    <tag k="building" v="yes"/>
+    <tag k="name" v="Knight's Pantry"/>
   </way>
   <way id="154740105">
     <nd ref="1672329122"/>
@@ -23621,7 +23623,7 @@
     <nd ref="1719808773"/>
     <tag k="amenity" v="social_centre"/>
     <tag k="building" v="residential"/>
-    <tag k="name" v="ΑΔΠ"/>
+    <tag k="name" v="Alpha Delta Pi"/>
     <tag k="residential" v="university"/>
     <tag k="wikidata" v="Q4735022"/>
     <tag k="wikipedia" v="en:Alpha Delta Pi"/>
@@ -23642,7 +23644,7 @@
     <nd ref="1719809209"/>
     <tag k="amenity" v="social_centre"/>
     <tag k="building" v="residential"/>
-    <tag k="name" v="ΘΧ"/>
+    <tag k="name" v="Theta Chi"/>
     <tag k="residential" v="university"/>
     <tag k="wikidata" v="Q7783523"/>
     <tag k="wikipedia" v="en:Theta Chi"/>
@@ -23663,7 +23665,7 @@
     <nd ref="1719809354"/>
     <tag k="amenity" v="social_centre"/>
     <tag k="building" v="residential"/>
-    <tag k="name" v="ΣΧ"/>
+    <tag k="name" v="Sigma Chi"/>
     <tag k="residential" v="university"/>
     <tag k="wikidata" v="Q768929"/>
     <tag k="wikipedia" v="en:Sigma Chi"/>
@@ -23686,7 +23688,7 @@
     <nd ref="1719808968"/>
     <tag k="amenity" v="social_centre"/>
     <tag k="building" v="residential"/>
-    <tag k="name" v="ΚΔ"/>
+    <tag k="name" v="Kappa Delta"/>
     <tag k="residential" v="university"/>
     <tag k="wikidata" v="Q16237806"/>
     <tag k="wikipedia" v="en:Kappa Delta"/>
@@ -23777,7 +23779,7 @@
     <nd ref="1719808914"/>
     <nd ref="1719808888"/>
     <tag k="building" v="residential"/>
-    <tag k="name" v="ΖΤΑ"/>
+    <tag k="name" v="Zeta Tau Alpha"/>
     <tag k="residential" v="university"/>
     <tag k="wikidata" v="Q8069727"/>
     <tag k="wikipedia" v="en:Zeta Tau Alpha"/>
@@ -23802,7 +23804,7 @@
     <nd ref="1719809106"/>
     <tag k="amenity" v="social_centre"/>
     <tag k="building" v="residential"/>
-    <tag k="name" v="ΔΔΔ"/>
+    <tag k="name" v="Delta Delta Delta"/>
     <tag k="residential" v="university"/>
     <tag k="wikidata" v="Q1184880"/>
     <tag k="wikipedia" v="en:Delta Delta Delta"/>
@@ -24109,7 +24111,7 @@
     <nd ref="1719809303"/>
     <tag k="amenity" v="social_centre"/>
     <tag k="building" v="residential"/>
-    <tag k="name" v="ΚΣ"/>
+    <tag k="name" v="Kappa Sigma"/>
     <tag k="residential" v="university"/>
     <tag k="wikidata" v="Q6367086"/>
     <tag k="wikipedia" v="en:Kappa Sigma"/>
@@ -24130,7 +24132,7 @@
     <nd ref="1719809292"/>
     <tag k="amenity" v="social_centre"/>
     <tag k="building" v="residential"/>
-    <tag k="name" v="ΚΑΘ"/>
+    <tag k="name" v="Kappa Alpha Theta"/>
     <tag k="residential" v="university"/>
     <tag k="wikidata" v="Q2333441"/>
     <tag k="wikipedia" v="en:Kappa Alpha Theta"/>
@@ -24170,7 +24172,7 @@
     <nd ref="1719809322"/>
     <tag k="amenity" v="social_centre"/>
     <tag k="building" v="residential"/>
-    <tag k="name" v="ΑΤΩ"/>
+    <tag k="name" v="Alpha Tau Omega"/>
     <tag k="residential" v="university"/>
     <tag k="wikidata" v="Q4735131"/>
     <tag k="wikipedia" v="en:Alpha Tau Omega"/>
@@ -24266,7 +24268,7 @@
     <nd ref="1719809241"/>
     <tag k="amenity" v="social_centre"/>
     <tag k="building" v="residential"/>
-    <tag k="name" v="ΠΒΦ"/>
+    <tag k="name" v="Pi Beta Phi"/>
     <tag k="residential" v="university"/>
     <tag k="wikidata" v="Q7189942"/>
     <tag k="wikipedia" v="en:Pi Beta Phi"/>
@@ -35095,7 +35097,7 @@
     <nd ref="5762439410"/>
     <tag k="amenity" v="social_centre"/>
     <tag k="building" v="yes"/>
-    <tag k="name" v="ΚΚΓ"/>
+    <tag k="name" v="Kappa Kappa Gamma"/>
     <tag k="residential" v="university"/>
     <tag k="wikidata" v="Q1728686"/>
     <tag k="wikipedia" v="en:Kappa Kappa Gamma"/>
@@ -35131,7 +35133,7 @@
     <nd ref="5762439432"/>
     <tag k="amenity" v="social_centre"/>
     <tag k="building" v="yes"/>
-    <tag k="name" v="ΧΩ"/>
+    <tag k="name" v="Chi Omega"/>
     <tag k="residential" v="university"/>
     <tag k="wikidata" v="Q5095094"/>
     <tag k="wikipedia" v="en:Chi Omega"/>
@@ -43830,7 +43832,7 @@
     <tag k="delivery" v="no"/>
     <tag k="drive_through" v="yes"/>
     <tag k="indoor_seating" v="no"/>
-    <tag k="name" v="Chick-fil-A"/>
+    <tag k="name" v="Chick-fil-A RWC"/>
     <tag k="opening_hours" v="Mo-Sa 06:30-22:00; Su off"/>
     <tag k="ref" v="80775"/>
     <tag k="takeaway" v="yes"/>
@@ -49969,7 +49971,7 @@
     <member type="way" ref="1274643419" role="inner"/>
     <tag k="amenity" v="social_centre"/>
     <tag k="building" v="residential"/>
-    <tag k="name" v="ΑΞΔ"/>
+    <tag k="name" v="Alpha Xi Delta"/>
     <tag k="residential" v="university"/>
     <tag k="type" v="multipolygon"/>
     <tag k="wikidata" v="Q4735143"/>
