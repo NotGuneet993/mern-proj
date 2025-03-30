@@ -216,83 +216,105 @@ class _GraphMapState extends State<GraphMap> {
 
   @override
   Widget build(BuildContext context) {
-    return FlutterMap(
-      mapController: mapController,
-      options: MapOptions(
-        initialCenter: LatLng(28.6024, -81.2001),
-        initialZoom: 15.0,
-        onTap: (tapPosition, latlng) {
-          handleMapTap(latlng);
-        },
-      ),
+    return Stack(
       children: [
-        TileLayer(
-          urlTemplate: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
-          subdomains: ['a', 'b', 'c'],
-        ),
-        // Draw edges as polylines.
-        PolylineLayer(
-          polylines: edges.map((edge) {
-            Node? node1 = nodes.firstWhereOrNull((n) => n.id == edge.node1);
-            Node? node2 = nodes.firstWhereOrNull((n) => n.id == edge.node2);
-            if (node2 == null) return null;
-            return Polyline(
-              points: [node1!.latlng, node2.latlng],
-              strokeWidth: 3.0,
-              color: Colors.black,
-            );
-          }).whereType<Polyline>().toList(),
-        ),
-        // Overlay a transparent marker at each edge's midpoint for deletion.
-        MarkerLayer(
-          markers: edges.map((edge) {
-            Node? node1 = nodes.firstWhereOrNull((n) => n.id == edge.node1);
-            Node? node2 = nodes.firstWhereOrNull((n) => n.id == edge.node2);
-            if (node2 == null) return null;
-            LatLng mid = LatLng(
-              (node1!.latlng.latitude + node2.latlng.latitude) / 2,
-              (node1.latlng.longitude + node2.latlng.longitude) / 2,
-            );
-            return Marker(
-              point: mid,
-              width: 20,
-              height: 20,
-              child: GestureDetector(
-                onTap: () {
-                  if (mode == "delete") {
-                    deleteEdge(edge.id);
-                  }
-                },
-                child: Container(
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: Colors.transparent,
+        FlutterMap(
+          mapController: mapController,
+          options: MapOptions(
+            initialCenter: LatLng(28.6024, -81.2001),
+            initialZoom: 15.0,
+            onTap: (tapPosition, latlng) {
+              handleMapTap(latlng);
+            },
+          ),
+          children: [
+            TileLayer(
+              urlTemplate: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+              subdomains: ['a', 'b', 'c'],
+            ),
+            // Draw edges as polylines.
+            PolylineLayer(
+              polylines: edges.map((edge) {
+                Node? node1 = nodes.firstWhereOrNull((n) => n.id == edge.node1);
+                Node? node2 = nodes.firstWhereOrNull((n) => n.id == edge.node2);
+                if (node2 == null) return null;
+                return Polyline(
+                  points: [node1!.latlng, node2.latlng],
+                  strokeWidth: 3.0,
+                  color: Colors.black,
+                );
+              }).whereType<Polyline>().toList(),
+            ),
+            // Overlay a transparent marker at each edge's midpoint for deletion.
+            MarkerLayer(
+              markers: edges.map((edge) {
+                Node? node1 = nodes.firstWhereOrNull((n) => n.id == edge.node1);
+                Node? node2 = nodes.firstWhereOrNull((n) => n.id == edge.node2);
+                if (node2 == null) return null;
+                LatLng mid = LatLng(
+                  (node1!.latlng.latitude + node2.latlng.latitude) / 2,
+                  (node1.latlng.longitude + node2.latlng.longitude) / 2,
+                );
+                return Marker(
+                  point: mid,
+                  width: 20,
+                  height: 20,
+                  child: GestureDetector(
+                    onTap: () {
+                      if (mode == "delete") {
+                        deleteEdge(edge.id);
+                      }
+                    },
+                    child: Container(
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: Colors.transparent,
+                      ),
+                    ),
                   ),
-                ),
-              ),
-            );
-          }).whereType<Marker>().toList(),
-        ),
-        // Draw nodes as markers.
-        MarkerLayer(
-          markers: nodes.map((node) {
-            return Marker(
-              point: node.latlng,
-              width: 20,
-              height: 20,
-              child: GestureDetector(
-                onTap: () {
-                  handleNodeTap(node);
-                },
-                child: Container(
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: node.color,
+                );
+              }).whereType<Marker>().toList(),
+            ),
+            // Draw nodes as markers.
+            MarkerLayer(
+              markers: nodes.map((node) {
+                return Marker(
+                  point: node.latlng,
+                  width: 20,
+                  height: 20,
+                  child: GestureDetector(
+                    onTap: () {
+                      handleNodeTap(node);
+                    },
+                    child: Container(
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: node.color,
+                      ),
+                    ),
                   ),
-                ),
+                );
+              }).toList(),
+            ),
+          ],
+        ),
+        // Greeting overlay at the top.
+        SafeArea(
+          child: Container(
+            margin: const EdgeInsets.all(8.0),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            decoration: BoxDecoration(
+              color: Colors.white.withOpacity(0.8),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Text(
+              "Hello, ${globals.currentUser ?? 'Guest'}",
+              style: const TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
               ),
-            );
-          }).toList(),
+            ),
+          ),
         ),
       ],
     );
