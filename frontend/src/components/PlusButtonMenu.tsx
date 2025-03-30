@@ -3,11 +3,10 @@ import { FaPlus } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 
 interface PlusButtonMenuProps {
-    setModalOpen: (auth: boolean) => void;
     globalUser: String;
 }
 
-export default function PlusButtonMenu({ setModalOpen, globalUser } : PlusButtonMenuProps) {
+export default function PlusButtonMenu({globalUser } : PlusButtonMenuProps) {
 
     const [rotated, setRotated] = useState(false);
     const navigate = useNavigate();

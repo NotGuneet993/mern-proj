@@ -5,7 +5,6 @@ import PlusButtonMenu from '../components/PlusButtonMenu';
 import GeoJSONMap from '../components/Graph';
 
 function DashboardPage({globalUser} : {globalUser: string}) {
-  const [, setModalOpen] = useState(false);
   const [validNodes, setValidNodes] = useState<any[]>([]);
 
   // extract username from the top url 
@@ -23,7 +22,7 @@ function DashboardPage({globalUser} : {globalUser: string}) {
         <GeoJSONMap validNodes={validNodes}/>
 
         <div className='fixed bottom-[5%] left-[5%] z-50'>
-          <PlusButtonMenu globalUser={globalUser} setModalOpen={setModalOpen}/>
+          <PlusButtonMenu globalUser={globalUser} />
         </div>
       </div>
     </div>
