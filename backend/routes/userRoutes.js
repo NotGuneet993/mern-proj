@@ -80,7 +80,7 @@ router.post("/register", async (req, res) => {
       token : "",
       tkTime : "",
       tkTime : "",
-      classes: null
+      classes: []
     });
 
 
