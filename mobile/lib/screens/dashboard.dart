@@ -76,6 +76,8 @@ class Edge {
 }
 
 class GraphMap extends StatefulWidget {
+  const GraphMap({super.key});
+
   @override
   _GraphMapState createState() => _GraphMapState();
 }
@@ -231,9 +233,9 @@ class _GraphMapState extends State<GraphMap> {
           polylines: edges.map((edge) {
             Node? node1 = nodes.firstWhereOrNull((n) => n.id == edge.node1);
             Node? node2 = nodes.firstWhereOrNull((n) => n.id == edge.node2);
-            if (node1 == null || node2 == null) return null;
+            if (node2 == null) return null;
             return Polyline(
-              points: [node1.latlng, node2.latlng],
+              points: [node1!.latlng, node2.latlng],
               strokeWidth: 3.0,
               color: Colors.black,
             );
@@ -244,9 +246,9 @@ class _GraphMapState extends State<GraphMap> {
           markers: edges.map((edge) {
             Node? node1 = nodes.firstWhereOrNull((n) => n.id == edge.node1);
             Node? node2 = nodes.firstWhereOrNull((n) => n.id == edge.node2);
-            if (node1 == null || node2 == null) return null;
+            if (node2 == null) return null;
             LatLng mid = LatLng(
-              (node1.latlng.latitude + node2.latlng.latitude) / 2,
+              (node1!.latlng.latitude + node2.latlng.latitude) / 2,
               (node1.latlng.longitude + node2.latlng.longitude) / 2,
             );
             return Marker(
@@ -298,7 +300,7 @@ class _GraphMapState extends State<GraphMap> {
 // ----------------------- Dashboard Code -----------------------
 
 class DashboardScreen extends StatefulWidget {
-  const DashboardScreen({Key? key}) : super(key: key);
+  const DashboardScreen({super.key});
 
   @override
   _DashboardScreenState createState() => _DashboardScreenState();
