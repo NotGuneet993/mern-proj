@@ -375,13 +375,13 @@ for link in graph_data["links"]:
                 "target": link["target"]
             }
         }
-
+        '''
         if feature["properties"]["name"] is not None and feature["properties"]["name"] != "null":
             if feature["properties"]["name"] not in location_list:
                 location_list.add(feature["properties"]["name"])
             else:
                 print(f'DUPLICATE NAME: {feature["properties"]["name"]}')
-                print(feature["properties"])
+                print(feature["properties"])'''
 
         
         geojson["features"].append(feature)
@@ -405,7 +405,7 @@ client = MongoClient("mongodb://localhost:27017/")
 db = client["campus_navigation"]  # Replace with your DB name
 collection = db["maps"]  # Replace with your collection name
 
-# Insert the graph JSON
+# Insert the graph JSONs
 collection.delete_many({})  # Clears old data before inserting new
 collection.insert_one(graph_data)
 

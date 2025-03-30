@@ -8656,7 +8656,7 @@
     <tag k="brand" v="Starbucks"/>
     <tag k="brand:wikidata" v="Q37158"/>
     <tag k="cuisine" v="coffee_shop"/>
-    <tag k="name" v="Starbucks"/>
+    <tag k="name" v="Starbucks HS"/>
     <tag k="official_name" v="Starbucks Coffee"/>
     <tag k="phone" v="+1 407-823-4100"/>
     <tag k="ref" v="1006641"/>
@@ -8697,7 +8697,7 @@
     <tag k="drive_through" v="no"/>
     <tag k="indoor_seating" v="no"/>
     <tag k="internet_access" v="wlan"/>
-    <tag k="name" v="Chick-fil-A"/>
+    <tag k="name" v="Chick-fil-A BW"/>
     <tag k="opening_hours" v="Mo-Th 07:30-20:00; Fr 07:30-17:00; Sa 11:00-16:00; Su off"/>
     <tag k="phone" v="+1 407-823-2238"/>
     <tag k="ref" v="80246"/>
@@ -8713,7 +8713,7 @@
     <tag k="brand" v="Smoothie King"/>
     <tag k="brand:wikidata" v="Q5491421"/>
     <tag k="cuisine" v="juice"/>
-    <tag k="name" v="Smoothie King"/>
+    <tag k="name" v="Smoothie King SU"/>
     <tag k="takeaway" v="yes"/>
   </node>
   <node id="3456763131" lat="28.6001263" lon="-81.2014219">
@@ -8756,7 +8756,7 @@
     <tag k="brand" v="Smoothie King"/>
     <tag k="brand:wikidata" v="Q5491421"/>
     <tag k="cuisine" v="juice"/>
-    <tag k="name" v="Smoothie King"/>
+    <tag k="name" v="Smoothie King RWC"/>
     <tag k="takeaway" v="yes"/>
   </node>
   <node id="3456766460" lat="28.6011038" lon="-81.2019066">
@@ -8970,7 +8970,7 @@
     <tag k="cuisine" v="pizza"/>
     <tag k="delivery" v="no"/>
     <tag k="drive_through" v="no"/>
-    <tag k="name" v="Domino's"/>
+    <tag k="name" v="Domino's BW"/>
     <tag k="opening_hours" v="Mo-Th 11:00-15:00; Fr-Su 11:00-14:00"/>
     <tag k="phone" v="+1 407-882-2010"/>
     <tag k="ref" v="8637"/>
@@ -14241,7 +14241,7 @@
     <tag k="brand" v="Domino's"/>
     <tag k="brand:wikidata" v="Q839466"/>
     <tag k="cuisine" v="pizza"/>
-    <tag k="name" v="Domino's"/>
+    <tag k="name" v="Domino's Plaza"/>
     <tag k="opening_hours" v="10:30-01:00"/>
     <tag k="phone" v="+1 407-882-1010"/>
     <tag k="ref" v="8620"/>
@@ -15925,7 +15925,7 @@
     <tag k="brand" v="Starbucks"/>
     <tag k="brand:wikidata" v="Q37158"/>
     <tag k="cuisine" v="coffee_shop"/>
-    <tag k="name" v="Starbucks"/>
+    <tag k="name" v="Starbucks SU"/>
     <tag k="official_name" v="Starbucks Coffee"/>
     <tag k="phone" v="+1 407-823-4100"/>
     <tag k="ref" v="1028614"/>
@@ -43830,7 +43830,7 @@
     <tag k="delivery" v="no"/>
     <tag k="drive_through" v="yes"/>
     <tag k="indoor_seating" v="no"/>
-    <tag k="name" v="Chick-fil-A"/>
+    <tag k="name" v="Chick-fil-A RWC"/>
     <tag k="opening_hours" v="Mo-Sa 06:30-22:00; Su off"/>
     <tag k="ref" v="80775"/>
     <tag k="takeaway" v="yes"/>
