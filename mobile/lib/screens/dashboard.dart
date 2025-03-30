@@ -7,6 +7,7 @@ import 'dart:io';
 import 'package:path_provider/path_provider.dart';
 import 'package:file_picker/file_picker.dart';
 import 'schedule.dart';
+import 'package:mobile/globals.dart' as globals;
 
 void main() {
   runApp(MaterialApp(

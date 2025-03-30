@@ -3,6 +3,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:syncfusion_flutter_calendar/calendar.dart';
+import 'package:mobile/globals.dart' as globals;
 
 // Define your API URL (replace with your actual URL)
 final API_URL = dotenv.env['VITE_API_URL'];

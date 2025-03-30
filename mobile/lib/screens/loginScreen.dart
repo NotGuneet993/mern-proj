@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:mobile/globals.dart' as globals;
 import 'dart:convert';
 import 'registration_screen.dart';
 import 'dashboard.dart';
@@ -33,6 +34,8 @@ class _LoginScreenState extends State<LoginScreen> {
       );
 
       if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        globals.currentUser = data['username'];
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Login successful!')),
         );
