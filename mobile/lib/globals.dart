@@ -1,3 +1,3 @@
-library globals;
+library;
 
 String? currentUser;

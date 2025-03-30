@@ -47,9 +47,7 @@ class ClassData {
 
   factory ClassData.fromJson(Map<String, dynamic> json) {
     var scheduleJson = json['class_schedule'] as List?;
-    List<ClassSchedule>? schedule = scheduleJson != null
-        ? scheduleJson.map((item) => ClassSchedule.fromJson(item)).toList()
-        : null;
+    List<ClassSchedule>? schedule = scheduleJson?.map((item) => ClassSchedule.fromJson(item)).toList();
 
     return ClassData(
       id: json['_id'],
@@ -68,7 +66,7 @@ class ClassData {
 
 class SchedulePage extends StatefulWidget {
   final String globalUser;
-  const SchedulePage({Key? key, required this.globalUser}) : super(key: key);
+  const SchedulePage({super.key, required this.globalUser});
 
   @override
   _SchedulePageState createState() => _SchedulePageState();
@@ -384,7 +382,7 @@ class _SchedulePageState extends State<SchedulePage> {
                                                 ))
                                             .toList(),
                                       ),
-                                    ButtonBar(
+                                    OverflowBar(
                                       alignment: MainAxisAlignment.end,
                                       children: [
                                         TextButton.icon(
@@ -503,7 +501,7 @@ class MeetingDataSource extends CalendarDataSource {
 // A simple dialog widget to add a class
 class AddClassDialog extends StatefulWidget {
   final Function(ClassData) onSave;
-  const AddClassDialog({Key? key, required this.onSave}) : super(key: key);
+  const AddClassDialog({super.key, required this.onSave});
 
   @override
   _AddClassDialogState createState() => _AddClassDialogState();
