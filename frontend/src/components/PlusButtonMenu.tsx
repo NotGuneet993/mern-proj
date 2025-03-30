@@ -1,13 +1,16 @@
 import { useState } from "react";
 import { FaPlus } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
 
 interface PlusButtonMenuProps {
     setModalOpen: (auth: boolean) => void;
+    globalUser: String;
 }
 
-export default function PlusButtonMenu({ setModalOpen } : PlusButtonMenuProps) {
+export default function PlusButtonMenu({ setModalOpen, globalUser } : PlusButtonMenuProps) {
 
     const [rotated, setRotated] = useState(false);
+    const navigate = useNavigate();
 
     return (
         <div style={{
@@ -18,12 +21,8 @@ export default function PlusButtonMenu({ setModalOpen } : PlusButtonMenuProps) {
         >
             {rotated && (
                 <div className="flex flex-col items-center">
-                    <p className="text-lg my-1 hover:text-blue-500 hover:cursor-pointer"
-                    onClick={() => setModalOpen(true)}>
-                        Add Class
-                    </p>
-
-                    <p className="text-lg my-1 hover:text-blue-500 hover:cursor-pointer">Schedule</p>
+                    <p className="text-lg my-1 hover:text-blue-500 hover:cursor-pointer" 
+                    onClick={()=> navigate(`/schedule/${globalUser}`)}>Schedule</p>
                 </div>
             )}
             <FaPlus

@@ -1,4 +1,4 @@
-import  { useEffect, useState, useMemo } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { useParams } from 'react-router-dom';
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
@@ -23,7 +23,7 @@ interface ClassData {
   building: string;
   building_prefix?: string;
   room_number: string;
-  class_schedule: ClassSchedule[];
+  class_schedule: ClassSchedule[] | null;
 }
 
 type SchedulePageProps = {
@@ -52,7 +52,9 @@ const SchedulePage = ({ globalUser }: SchedulePageProps) => {
     })
       .then((res) => res.json())
       .then((data) => {
-        setClasses(data);
+        console.log("Fetched schedule data:", data);
+        // If data is not an array, default to an empty array
+        setClasses(Array.isArray(data) ? data : []);
       })
       .catch((err) => console.error('Error fetching schedule:', err));
   };
@@ -113,8 +115,9 @@ const SchedulePage = ({ globalUser }: SchedulePageProps) => {
   // Convert classes into FullCalendar events
   const events = useMemo(() => {
     const evts: any[] = [];
-    classes.forEach((cls) => {
-      cls.class_schedule
+    (classes || []).forEach((cls) => {
+      if (!cls) return;
+      (cls.class_schedule || [])
         .filter((sched) => sched.time !== 'None')
         .forEach((sched) => {
           // Expect time format "8:00 AM-9:00 AM"
@@ -198,50 +201,58 @@ const SchedulePage = ({ globalUser }: SchedulePageProps) => {
           <h2 className="text-xl font-bold mb-2 border-b border-yellow-500 pb-1 text-yellow-500">
             My Classes
           </h2>
-          {classes.map((cls) => (
-            <div
-              key={cls._id}
-              className="bg-black border border-yellow-500 p-2 rounded-lg shadow-sm mb-2 transition-transform transform hover:scale-102"
-            >
-              <div className="flex justify-between items-center mb-1">
-                <h3 className="text-lg font-bold text-yellow-400">{cls.class_name}</h3>
-                <span className="text-xs text-yellow-300">({cls.course_code})</span>
-              </div>
-              <p className="text-xs mb-1 text-yellow-300">
-                <strong>Prof:</strong> {cls.professor}
+          {classes.length === 0 ? (
+            <div className="flex items-center justify-center h-full">
+              <p className="text-yellow-300 text-base">
+                No classes added yet. Click "Add Class" to begin.
               </p>
-              <p className="text-xs mb-1 text-yellow-300">
-                <strong>Loc:</strong> {cls.building_prefix} {cls.building} {cls.room_number}
-              </p>
-              <div className="mt-1 space-y-0.5">
-                {cls.class_schedule
-                  .filter((sched) => sched.time !== 'None')
-                  .map((sched, i) => (
-                    <div key={i} className="flex justify-between text-xs text-yellow-300">
-                      <span className="font-medium">{sched.day}</span>
-                      <span className="font-semibold">{sched.time}</span>
-                    </div>
-                  ))}
-              </div>
-              {/* Edit and Delete Buttons */}
-              <div className="mt-2 flex justify-end space-x-2">
-                <button 
-                  className="px-2 py-1 bg-yellow-300 text-gray-800 rounded hover:bg-yellow-600"
-                  onClick={() => handleEditClass(cls)}
-                >
-                  <AiFillEdit className="inline-block mr-1" />
-                  <span className="text-xs">Edit</span>
-                </button>
-                <button 
-                  className="px-2 py-1 bg-red-500 text-white rounded hover:bg-red-600"
-                  onClick={() => handleDeleteClass(cls._id)}
-                >
-                  <AiFillDelete className="inline-block mr-1" />
-                  <span className="text-xs">Delete</span>
-                </button>
-              </div>
             </div>
-          ))}
+          ) : (
+            classes.map((cls) => (
+              <div
+                key={cls._id}
+                className="bg-black border border-yellow-500 p-2 rounded-lg shadow-sm mb-2 transition-transform transform hover:scale-102"
+              >
+                <div className="flex justify-between items-center mb-1">
+                  <h3 className="text-lg font-bold text-yellow-400">{cls.class_name}</h3>
+                  <span className="text-xs text-yellow-300">({cls.course_code})</span>
+                </div>
+                <p className="text-xs mb-1 text-yellow-300">
+                  <strong>Prof:</strong> {cls.professor}
+                </p>
+                <p className="text-xs mb-1 text-yellow-300">
+                  <strong>Loc:</strong> {cls.building_prefix} {cls.building} {cls.room_number}
+                </p>
+                <div className="mt-1 space-y-0.5">
+                  {(cls.class_schedule || [])
+                    .filter((sched) => sched.time !== 'None')
+                    .map((sched, i) => (
+                      <div key={i} className="flex justify-between text-xs text-yellow-300">
+                        <span className="font-medium">{sched.day}</span>
+                        <span className="font-semibold">{sched.time}</span>
+                      </div>
+                    ))}
+                </div>
+                {/* Edit and Delete Buttons */}
+                <div className="mt-2 flex justify-end space-x-2">
+                  <button 
+                    className="px-2 py-1 bg-yellow-300 text-gray-800 rounded hover:bg-yellow-600"
+                    onClick={() => handleEditClass(cls)}
+                  >
+                    <AiFillEdit className="inline-block mr-1" />
+                    <span className="text-xs">Edit</span>
+                  </button>
+                  <button 
+                    className="px-2 py-1 bg-red-500 text-white rounded hover:bg-red-600"
+                    onClick={() => handleDeleteClass(cls._id)}
+                  >
+                    <AiFillDelete className="inline-block mr-1" />
+                    <span className="text-xs">Delete</span>
+                  </button>
+                </div>
+              </div>
+            ))
+          )}
         </div>
         <button
           className="text-yellow-300 text-base p-2 bg-black border border-yellow-500 rounded-lg flex items-center justify-center hover:bg-yellow-500 hover:text-black transition duration-300 ease-in-out"

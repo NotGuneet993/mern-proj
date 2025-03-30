@@ -27,7 +27,7 @@ function App() {
         <Route path='/' element={<LandingPage />} />
         <Route path="/get-started" element={<LoginPage setAuth={setAuth} setIsLoginComp={setIsLoginComp} isLoginComp={isLoginComp} setGlobalUser={setGlobalUser}/>} />
         <Route element={<ProtectedRoute isAuth={isAuth}/>}>
-          <Route path="/dashboard/:user" element={<DashboardPage />} />
+          <Route path="/dashboard/:user" element={<DashboardPage globalUser={globalUser} />} />
         </Route>
         <Route path="/navigate" element={<NavigationPage />} />
         <Route path="/stim" element={<StimPage />} />
