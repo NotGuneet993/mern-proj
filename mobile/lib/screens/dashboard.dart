@@ -6,6 +6,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:path_provider/path_provider.dart';
 import 'package:file_picker/file_picker.dart';
+import 'schedule.dart';
 
 void main() {
   runApp(MaterialApp(
@@ -217,8 +218,8 @@ class _GraphMapState extends State<GraphMap> {
     return FlutterMap(
       mapController: mapController,
       options: MapOptions(
-        center: LatLng(28.6024, -81.2001),
-        zoom: 15.0,
+        initialCenter: LatLng(28.6024, -81.2001),
+        initialZoom: 15.0,
         onTap: (tapPosition, latlng) {
           handleMapTap(latlng);
         },
@@ -255,7 +256,7 @@ class _GraphMapState extends State<GraphMap> {
               point: mid,
               width: 20,
               height: 20,
-              builder: (ctx) => GestureDetector(
+              child: GestureDetector(
                 onTap: () {
                   if (mode == "delete") {
                     deleteEdge(edge.id);
@@ -278,7 +279,7 @@ class _GraphMapState extends State<GraphMap> {
               point: node.latlng,
               width: 20,
               height: 20,
-              builder: (ctx) => GestureDetector(
+              child: GestureDetector(
                 onTap: () {
                   handleNodeTap(node);
                 },
@@ -340,7 +341,7 @@ class _DashboardScreenState extends State<DashboardScreen>
         controller: _tabController,
         children: [
           // Blank dashboard screen.
-          Center(child: Text("Dashboard Content")),
+          SchedulePage(globalUser: "testUser"),
           // Map screen.
           GraphMap(),
         ],
