@@ -274,10 +274,30 @@ router.put("/addClassToUser", async (req, res) => {
     // Return the updated user or just a message
     return res.status(200).json({
       message: "Class assigned to user successfully",
-      user: updatedUser,
     });
   } catch (error) {
     res.status(500).json({ message: `Server error: ${error}` });
+  }
+});
+
+// GET /users/classes?username=<username>
+// This endpoint returns all populated class documents for the given user.
+router.get("/classes", async (req, res) => {
+  try {
+    const { username } = req.query;
+    if (!username) {
+      return res.status(400).json({ message: "Username query parameter is required" });
+    }
+    // Find the user by username and populate the 'classes' field.
+    const userDoc = await User.findOne({ username }).populate("classes");
+    if (!userDoc) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    // Return the populated classes array.
+    return res.status(200).json(userDoc.classes);
+  } catch (error) {
+    console.error("Error fetching user classes:", error);
+    return res.status(500).json({ message: "Server error" });
   }
 });
 

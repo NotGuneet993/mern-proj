@@ -217,8 +217,8 @@ function AddModal({ isOpen, onClose, onSave }: AddModalProps) {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-gray-900/50 flex items-center justify-center z-50 pt-20 overflow-scroll">
-      <div className="relative max-w-5xl w-full bg-white p-6 rounded shadow-lg">
+    <div className="fixed inset-0 bg-gray-900/50 flex items-center justify-center z-60 pb-10 mt-15 md:pt-20 md:pb-5 overflow-scroll">
+      <div className="relative max-w-5xl w-full bg-white p-6 rounded shadow-lg text-black">
         {/* Close Button */}
         <button
           type="button"
