@@ -12,7 +12,6 @@ import MailVerifyPage from './pages/MailVerifyPage'
 import ForgotPasswordPage from './pages/ForgotPasswordPage'
 import VerifyForgot from './pages/VerifyForgot'
 import SchedulePage from './pages/SchedulePage'
-
 import Redirect from './pages/Redirect'
 import ProtectedRoute from './components/ProtectedRoute'
 
