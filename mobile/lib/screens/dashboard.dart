@@ -1,3 +1,5 @@
+import 'dart:ffi';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
@@ -8,6 +10,10 @@ import 'package:path_provider/path_provider.dart';
 import 'package:file_picker/file_picker.dart';
 import 'schedule.dart';
 import 'package:mobile/globals.dart' as globals;
+import 'package:http/http.dart' as http;
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+
+final API_URL = dotenv.env['VITE_API_URL'];
 
 void main() {
   runApp(MaterialApp(
@@ -87,7 +93,9 @@ class GraphMap extends StatefulWidget {
 class _GraphMapState extends State<GraphMap> {
   List<Node> nodes = [];
   List<Edge> edges = [];
-  final List<String> buildingOptions = ['A', 'B', 'C', 'D'];
+
+  List<String> buildingOptions = [];
+
   final TextEditingController fromController = TextEditingController();
   final TextEditingController toController = TextEditingController();
   // Mode is kept in case you want to add interactions later.
@@ -96,6 +104,12 @@ class _GraphMapState extends State<GraphMap> {
   String nodeLabel = "";
   TextEditingController nodeLabelController = TextEditingController();
   final MapController mapController = MapController();
+
+  @override
+  void initState() {
+    super.initState();
+    loadBuildingOptions();
+  }
 
   // When the map is tapped, add a node if in "addNode" mode.
   void handleMapTap(LatLng latlng) {
@@ -117,6 +131,26 @@ class _GraphMapState extends State<GraphMap> {
   // Implement navigation for map
   void navigation() {
 
+  }
+
+  Future<List<String>> getClasses() async {
+    final response = await http.get(
+        Uri.parse('$API_URL/api/locations/getLocation'),
+        headers: {'Content-Type': 'application/json'},
+      );
+    final data = jsonDecode(response.body);
+    final List<String> listName = [];
+    for (var i = 0; i < data.length; i++) {
+      listName.add(data[i]["buildingName"]);
+    }
+    return listName;
+  }
+
+  Future<void> loadBuildingOptions() async {
+    List<String> options = await getClasses();
+    setState(() {
+      buildingOptions = options;
+    });
   }
 
   // When a node is tapped.
