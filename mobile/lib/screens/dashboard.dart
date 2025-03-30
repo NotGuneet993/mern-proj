@@ -87,6 +87,9 @@ class GraphMap extends StatefulWidget {
 class _GraphMapState extends State<GraphMap> {
   List<Node> nodes = [];
   List<Edge> edges = [];
+  final List<String> buildingOptions = ['A', 'B', 'C', 'D'];
+  final TextEditingController fromController = TextEditingController();
+  final TextEditingController toController = TextEditingController();
   // Mode is kept in case you want to add interactions later.
   String mode = "none"; // "addNode", "connectNodes", "delete", or "none"
   List<Node> selectedNodes = [];
@@ -109,6 +112,11 @@ class _GraphMapState extends State<GraphMap> {
         nodeLabelController.clear();
       });
     }
+  }
+
+  // Implement navigation for map
+  void navigation() {
+
   }
 
   // When a node is tapped.
@@ -304,15 +312,77 @@ class _GraphMapState extends State<GraphMap> {
             margin: const EdgeInsets.all(8.0),
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.8),
+              color: Colors.white.withOpacity(0.95),
               borderRadius: BorderRadius.circular(8),
             ),
-            child: Text(
-              "Hello, ${globals.currentUser ?? 'Guest'}",
-              style: const TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-              ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  "Hello, ${globals.currentUser ?? 'Guest'}",
+                  style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                Row(
+                  children: [
+                    Text(
+                      "From: ",
+                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                    ),
+                    SizedBox(width: 8),
+                    Expanded(
+                      child: Autocomplete<String>(
+                        optionsBuilder: (TextEditingValue textEditingValue) {
+                          if (textEditingValue.text.isEmpty) {
+                            return buildingOptions;
+                          } else {
+                            return buildingOptions.where((String option) =>
+                                option.toLowerCase().contains(
+                                    textEditingValue.text.toLowerCase()));
+                          }
+                        },
+                        onSelected: (String selection) {
+                          print("From: $selection");
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+                Row(
+                  children: [
+                    Text(
+                      "To: ",
+                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                    ),
+                    SizedBox(width: 8),
+                    Expanded(
+                      child: Autocomplete<String>(
+                        optionsBuilder: (TextEditingValue textEditingValue) {
+                          if (textEditingValue.text.isEmpty) {
+                            return buildingOptions;
+                          } else {
+                            return buildingOptions.where((String option) =>
+                                option.toLowerCase().contains(
+                                    textEditingValue.text.toLowerCase()));
+                          }
+                        },
+                        onSelected: (String selection) {
+                          print("To: $selection");
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+                TextButton(
+                  onPressed: navigation,
+                  child: const Text(
+                    "Navigate",
+                    style: TextStyle(fontSize: 16, color:  Color.fromARGB(255, 236, 220, 39)),
+                  ),
+                ),
+              ],
             ),
           ),
         ),
