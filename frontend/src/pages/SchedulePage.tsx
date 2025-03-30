@@ -191,7 +191,7 @@ const SchedulePage = ({ globalUser }: SchedulePageProps) => {
   };
 
   return (
-    <div className="h-screen flex flex-row pt-14 bg-gray-900">
+    <div className="h-screen flex flex-row pt-14 bg-black">
       {/* LEFT COLUMN: Schedule List */}
       <div className="flex flex-col w-1/3 h-full text-white">
         <div className="flex-1 p-2 overflow-y-auto">
@@ -226,7 +226,7 @@ const SchedulePage = ({ globalUser }: SchedulePageProps) => {
               {/* Edit and Delete Buttons */}
               <div className="mt-2 flex justify-end space-x-2">
                 <button 
-                  className="px-2 py-1 bg-yellow-300 text-gray-800 rounded hover:bg-blue-600"
+                  className="px-2 py-1 bg-yellow-300 text-gray-800 rounded hover:bg-yellow-600"
                   onClick={() => handleEditClass(cls)}
                 >
                   <AiFillEdit className="inline-block mr-1" />
