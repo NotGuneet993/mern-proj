@@ -5,9 +5,7 @@ import 'dart:convert';
 import 'package:syncfusion_flutter_calendar/calendar.dart';
 import 'package:mobile/globals.dart' as globals;
 
-// Define your API URL (replace with your actual URL)
 final API_URL = dotenv.env['VITE_API_URL'];
-// Models
 class ClassSchedule {
   final String day;
   final String time; // e.g., "8:00 AM-9:00 AM" or "None"

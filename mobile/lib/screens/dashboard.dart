@@ -312,7 +312,7 @@ class _GraphMapState extends State<GraphMap> {
             margin: const EdgeInsets.all(8.0),
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.95),
+              color: Colors.white.withOpacity(0.9),
               borderRadius: BorderRadius.circular(8),
             ),
             child: Column(
