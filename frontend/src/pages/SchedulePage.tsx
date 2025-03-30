@@ -158,7 +158,7 @@ const SchedulePage = ({ globalUser }: SchedulePageProps) => {
   // Handler for editing a class (placeholder)
   const handleEditClass = (classToEdit: ClassData) => {
     console.log("Edit class:", classToEdit);
-    // You could open an edit modal with pre-populated values here
+    // TODO: Open an edit modal with pre-populated values
   };
 
   // Handler for adding a class (passed to AddModal)
@@ -194,55 +194,57 @@ const SchedulePage = ({ globalUser }: SchedulePageProps) => {
     <div className="h-screen flex flex-row pt-14 bg-gray-900">
       {/* LEFT COLUMN: Schedule List */}
       <div className="flex flex-col w-1/3 h-full text-white">
-        <div className="flex-1 p-4 overflow-y-auto">
-          <h2 className="text-2xl font-bold mb-4 border-b border-yellow-500 pb-2 text-yellow-500">
+        <div className="flex-1 p-2 overflow-y-auto">
+          <h2 className="text-xl font-bold mb-2 border-b border-yellow-500 pb-1 text-yellow-500">
             My Classes
           </h2>
           {classes.map((cls) => (
             <div
               key={cls._id}
-              className="bg-black border border-yellow-500 p-4 rounded-lg shadow-lg mb-4 transition-transform transform hover:scale-102"
+              className="bg-black border border-yellow-500 p-2 rounded-lg shadow-sm mb-2 transition-transform transform hover:scale-102"
             >
-              <div className="flex justify-between items-center mb-2">
-                <h3 className="text-xl font-bold text-yellow-400">{cls.class_name}</h3>
-                <span className="text-sm text-yellow-300">({cls.course_code})</span>
+              <div className="flex justify-between items-center mb-1">
+                <h3 className="text-lg font-bold text-yellow-400">{cls.class_name}</h3>
+                <span className="text-xs text-yellow-300">({cls.course_code})</span>
               </div>
-              <p className="text-sm mb-1 text-yellow-300">
-                <strong>Professor:</strong> {cls.professor}
+              <p className="text-xs mb-1 text-yellow-300">
+                <strong>Prof:</strong> {cls.professor}
               </p>
-              <p className="text-sm mb-1 text-yellow-300">
-                <strong>Location:</strong> {cls.building_prefix} {cls.building} {cls.room_number}
+              <p className="text-xs mb-1 text-yellow-300">
+                <strong>Loc:</strong> {cls.building_prefix} {cls.building} {cls.room_number}
               </p>
-              <div className="mt-2">
+              <div className="mt-1 space-y-0.5">
                 {cls.class_schedule
                   .filter((sched) => sched.time !== 'None')
                   .map((sched, i) => (
-                    <div key={i} className="flex justify-between text-sm text-yellow-300">
+                    <div key={i} className="flex justify-between text-xs text-yellow-300">
                       <span className="font-medium">{sched.day}</span>
                       <span className="font-semibold">{sched.time}</span>
                     </div>
                   ))}
               </div>
               {/* Edit and Delete Buttons */}
-              <div className="mt-4 flex justify-end space-x-2">
+              <div className="mt-2 flex justify-end space-x-2">
                 <button 
-                  className="px-3 py-1 bg-yellow-300 text-gray-800 rounded hover:bg-blue-600"
+                  className="px-2 py-1 bg-yellow-300 text-gray-800 rounded hover:bg-blue-600"
                   onClick={() => handleEditClass(cls)}
                 >
                   <AiFillEdit className="inline-block mr-1" />
+                  <span className="text-xs">Edit</span>
                 </button>
                 <button 
-                  className="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600"
+                  className="px-2 py-1 bg-red-500 text-white rounded hover:bg-red-600"
                   onClick={() => handleDeleteClass(cls._id)}
                 >
                   <AiFillDelete className="inline-block mr-1" />
+                  <span className="text-xs">Delete</span>
                 </button>
               </div>
             </div>
           ))}
         </div>
         <button
-          className="text-yellow-300 text-lg p-4 bg-black border border-yellow-500 rounded-lg flex items-center justify-center hover:bg-yellow-500 hover:text-black transition duration-300 ease-in-out"
+          className="text-yellow-300 text-base p-2 bg-black border border-yellow-500 rounded-lg flex items-center justify-center hover:bg-yellow-500 hover:text-black transition duration-300 ease-in-out"
           onClick={() => setModalOpen(true)}
         >
           Add Class
@@ -254,8 +256,8 @@ const SchedulePage = ({ globalUser }: SchedulePageProps) => {
             onSave={handleAddClass}
           />
         )}
-        <div className="p-4 bg-black border border-yellow-500 rounded-lg flex items-center justify-center">
-          <p className="text-yellow-300 text-lg">Aux Spot</p>
+        <div className="p-2 bg-black border border-yellow-500 rounded-lg flex items-center justify-center">
+          <p className="text-yellow-300 text-base">Aux Spot</p>
         </div>
       </div>
 
