@@ -133,7 +133,7 @@ for way in root.findall('way'):
             valid_edges.append((u, v, {"highway": highway_type, "name": name}))
     
     # Set the "close distance" threshold (in miles)
-    CLOSE_DISTANCE_THRESHOLD_MILES = 0.015  # Example threshold of 0.1 miles (about 160 meters)
+    CLOSE_DISTANCE_THRESHOLD_MILES = 0.0  # Example threshold of 0.1 miles (about 160 meters)
 
     if is_building and name and len(building_nodes) > 2:
         # Compute centroid of the building
@@ -142,7 +142,8 @@ for way in root.findall('way'):
         centroid_id = max(nodes.keys()) + 1  # Assign new node ID
         building_name = name if name else "centroid"
         nodes[centroid_id] = {"lat": lat_mean, "lon": lon_mean, "name": building_name, "highway": "highway"}
-        # print(nodes[centroid_id])
+        #print(centroid_id, building_name)
+        # print(centroid_id, nodes[centroid_id])
         location_map[building_name] = centroid_id
 
         building_centroids[building_id] = centroid_id
@@ -174,7 +175,7 @@ for way in root.findall('way'):
         # Connect centroid to entrances
         for entrance in entrances:
             valid_edges.append((centroid_id, entrance, {"highway": "entrance"}))
-
+    
         building_nodes.append(centroid_id)
         
         # # Remove the name attribute from the building nodes, but keep the edges intact
@@ -214,7 +215,103 @@ for node_id, attr in nodes.items():
 # Add valid edges
 G.add_edges_from(valid_edges)
 
+edges_to_add = [
+    (12634159225, 3137212226, {"highway": "entrance"}),
+    (12634159227, 3095789392, {"highway": "entrance"}),
+    (12634159220, 8922223724, {"highway": "entrance"}),
+    (893880700, 12634159191, {"highway": "entrance"}),
+    (12597548239, 9661240583, {"highway": "entrance"}),
+    (12597548239, 3972820188, {"highway": "entrance"}),
+    (12597548239, 9661240582, {"highway": "entrance"}),
+    (12597548239, 3456763127, {"highway": "entrance"}),
+    (12597548239, 9661240584, {"highway": "entrance"}),
+    (12597548239, 9326345827, {"highway": "entrance"}),
+    (12597548239, 4687137242, {"highway": "entrance"}),
+    (7745911631, 3456763130, {"highway": "entrance"}),
+    (3420036612, 4687137243, {"highway": "entrance"}),
+    (3420036612, 9661240585, {"highway": "entrance"}),
+    (12597548239, 9661240585, {"highway": "entrance"}),
+    (12634159193, 1668087207, {"highway": "entrance"}),
+    (12634159193, 3420036308, {"highway": "entrance"}),
+    (3137057801, 12634159236, {"highway": "entrance"}),
+    (12634159322, 2762673598, {"highway": "entrance"}),
+    (3456766459, 12634159220, {"highway": "entrance"}),
+    (12634159267, 2762673704, {"highway": "entrance"}),
+    (2762673605, 6083840333, {"highway": "entrance"}),
+    (12634159203, 3148137796, {"highway": "entrance"}),
+    (12634159203, 3456743117, {"highway": "entrance"}),
+    (12634159190, 3456743102, {"highway": "entrance"}),
+    (12634159201, 7783536108, {"highway": "entrance"}),
+    (12634159189, 3153646700, {"highway": "entrance"}),
+    (12634159189, 3153646713, {"highway": "entrance"}),
+    (4725148053, 12634159241, {"highway": "entrance"}),
+    (12634159318, 3148137926, {"highway": "entrance"}),
+    (12634159318, 3148137930, {"highway": "entrance"}),
+    (12634159318, 3148137928, {"highway": "entrance"}),
+    (12634159195, 1668083714, {"highway": "entrance"}),
+    (3147766616, 12634159195, {"highway": "entrance"}),
+    (12634159217, 3137058032, {"highway": "entrance"}),
+    (12634159217, 1672331173, {"highway": "entrance"}),
+    (1719808115, 1672331173, {"highway": "entrance"}),
+    (8925265164, 9590977214, {"highway": "entrance"}),
+    (12634159300, 9590977214, {"highway": "entrance"}),
+    (9590977215, 12634159300, {"highway": "entrance"}),
+    (9590977215, 4267311909, {"highway": "entrance"}),
+    (9273630918, 12470213244, {"highway": "entrance"}),
+    (9273630918, 12470213236, {"highway": "entrance"}),
+    (9273630918, 12470213232, {"highway": "entrance"}),
+    (9273630918, 12470213240, {"highway": "entrance"}),
+    (2762462863, 12479573263, {"highway": "entrance"}),
+    (12479573271, 12479573287, {"highway": "entrance"}),
+    (12469924926, 12469924984, {"highway": "entrance"}),
+    (12469924928, 12469924977, {"highway": "entrance"}),
+    (12469924929, 12469924980, {"highway": "entrance"}),
+    (12469924931, 12469924973, {"highway": "entrance"}),
+    (12469924932, 12469924969, {"highway": "entrance"}),
+    (12469924934, 12469924976, {"highway": "entrance"}),
+    (12469924935, 12469924972, {"highway": "entrance"}),
+    (12469924937, 12469924965, {"highway": "entrance"}),
+    (12469924968, 12469924907, {"highway": "entrance"}),
+    (12479573287, 12469924906, {"highway": "entrance"}),
 
+
+    (12469924953, 12469924999, {"highway": "entrance"}),
+    (12469924954, 12469924998, {"highway": "entrance"}),
+    (12469924956, 12469924995, {"highway": "entrance"}),
+    (12469924957, 12469924994, {"highway": "entrance"}),
+    (12469924959, 12469924991, {"highway": "entrance"}),
+    (12469924960, 12469924990, {"highway": "entrance"}),
+    (12469924962, 12469924987, {"highway": "entrance"}),
+    (12469924963, 12469924986, {"highway": "entrance"}),
+    (12634159235, 7725843220, {"highway": "entrance"}),
+
+    
+]
+
+# Add these new nodes
+for node1, node2, attributes in edges_to_add:
+    G.add_edge(node1, node2, **attributes)  # Only add edge-specific data
+
+edges_to_remove = [
+    (12634159236, 3137057804),
+    (12634159236, 3137057807),
+    (3137058049, 3456766459),
+    (893880671, 12634159201),
+    (6438179451, 12634159189),
+    (12634159241, 3095577382),
+    (3148137931, 12634159318),
+    (3137057818, 12634159217),
+    (12634159300, 3678231228),
+    (9273630918, 2762462834),
+    (12479573271, 12470213229),
+]
+
+for node1, node2 in edges_to_remove:
+    try:
+        G.remove_edge(u, v)
+    except:
+        print(f'Removing edge ({u}, {v}) failed as it doesnt exist')
+        continue
 
 for u, v in G.edges():
     lat1, lon1 = G.nodes[u]['lat'], G.nodes[u]['lon']
@@ -231,6 +328,7 @@ print(f'There are {G.number_of_nodes()} nodes and {G.number_of_edges()} edges in
 components = list(nx.connected_components(G))
 
 # Print number of components
+# 842 components now
 print(f"Number of connected components: {len(components)}")
 component_sizes = [len(c) for c in components]
 print(f"Smallest component size: {min(component_sizes)}")

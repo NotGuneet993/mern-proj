@@ -71,7 +71,7 @@ export default function GeoJSONMap({ validNodes } : GeoJSONMapProps) {
     // Define the style for the edge features
     const edgeStyle = new Style({
       stroke: new Stroke({
-        color: 'rgba(0, 0, 0, 0.0)', // Black color with 20% opacity
+        color: 'rgba(0, 0, 0, 0.5)', // Black color with 20% opacity
         width: 1, // Line width
       }),
     });

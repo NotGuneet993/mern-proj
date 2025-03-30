@@ -22650,6 +22650,8 @@
     <nd ref="1672331562"/>
     <nd ref="1672331746"/>
     <nd ref="1672332047"/>
+    <tag k="building" v="yes"/>
+    <tag k="name" v="Knight's Pantry"/>
   </way>
   <way id="154740105">
     <nd ref="1672329122"/>
