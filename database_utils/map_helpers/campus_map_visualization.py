@@ -296,7 +296,7 @@ edges_to_add = [
     (12634159193, 1668087207, {"highway": "entrance"}),
     (12634159193, 3420036308, {"highway": "entrance"}),
     (3137057801, 12634159236, {"highway": "entrance"}),
-    (12634159322, 2762673598, {"highway": "entrance"}),
+    (12634159324, 2762673598, {"highway": "entrance"}),
     (3456766459, 12634159220, {"highway": "entrance"}),
     (12634159267, 2762673704, {"highway": "entrance"}),
     (2762673605, 6083840333, {"highway": "entrance"}),
@@ -307,18 +307,23 @@ edges_to_add = [
     (12634159189, 3153646700, {"highway": "entrance"}),
     (12634159189, 3153646713, {"highway": "entrance"}),
     (4725148053, 12634159241, {"highway": "entrance"}),
-    (12634159318, 3148137926, {"highway": "entrance"}),
-    (12634159318, 3148137930, {"highway": "entrance"}),
-    (12634159318, 3148137928, {"highway": "entrance"}),
+    (12634159320, 3148137926, {"highway": "entrance"}),
+    (12634159320, 3148137930, {"highway": "entrance"}),
+    (12634159320, 3148137928, {"highway": "entrance"}),
     (12634159195, 1668083714, {"highway": "entrance"}),
     (3147766616, 12634159195, {"highway": "entrance"}),
     (12634159217, 3137058032, {"highway": "entrance"}),
     (12634159217, 1672331173, {"highway": "entrance"}),
     (1719808115, 1672331173, {"highway": "entrance"}),
     (8925265164, 9590977214, {"highway": "entrance"}),
-    (12634159300, 9590977214, {"highway": "entrance"}),
-    (9590977215, 12634159300, {"highway": "entrance"}),
+    (12634159300, 12479573277, {"highway": "entrance"}),
+    (9590977215, 12634159301, {"highway": "entrance"}),
+    (9590977214, 12634159301, {"highway": "entrance"}),
     (9590977215, 4267311909, {"highway": "entrance"}),
+
+    (3456757093, 3456757091, {"highway": "entrance"}),
+
+
     (9273630918, 12470213244, {"highway": "entrance"}),
     (9273630918, 12470213236, {"highway": "entrance"}),
     (9273630918, 12470213232, {"highway": "entrance"}),
@@ -347,8 +352,8 @@ edges_to_add = [
     (3136972001, 12634159197, {"highway": "entrance"}),
     (3148137803, 12634159197, {"highway": "entrance"}),
     (3148137809, 12634159197, {"highway": "entrance"}),
-    (12634159303, 9507892200, {"highway": "entrance"}),
-    (12634159303, 9507892202, {"highway": "entrance"}),
+    (12634159305, 9507892200, {"highway": "entrance"}),
+    (12634159305, 9507892202, {"highway": "entrance"}),
     (2980303892, 12634159192, {"highway": "entrance"}),
     (2980303892, 12634159183, {"highway": "entrance"}),
     (12634159307, 7783268122, {"highway": "entrance"}),
@@ -371,25 +376,44 @@ edges_to_add = [
     (3456763128, 3095577370, {"highway": "entrance"}),
     (1668088071, 3456763126, {"highway": "entrance"}),
     (8932946951, 8932946941, {"highway": "entrance"}),
-    (8932946951, 12634159298, {"highway": "entrance"}),
+    (8932946951, 3137212220, {"highway": "entrance"}),
+    (12634159307, 7783592533, {"highway": "entrance"}),
+    (12634159308, 12286263662, {"highway": "entrance"}),
+    (12634159308, 12634159307, {"highway": "entrance"}),
+
+    (12634159162, 12634159226, {"highway": "entrance"}),
+    (12634159199, 7745913401, {"highway": "entrance"}),
+
+    (7783536130, 7783536132, {"highway": "entrance"}),
+    (7783536115, 7783536123, {"highway": "entrance"}),
+
+    (893880669, 1719809142, {"highway": "entrance"}),
+    (893880669, 7783536108, {"highway": "entrance"}),
+    (7783536128, 7783536129, {"highway": "entrance"}),
+
+    (1719808727, 7783521844, {"highway": "entrance"}),
+    (7783521827, 7783521841, {"highway": "entrance"}),
+    (7783521841, 7783521844, {"highway": "entrance"}),
+    (7783521842, 7783521827, {"highway": "entrance"}),
+    (7783521862, 7783521863, {"highway": "entrance"}),
+    (7783521855, 7783521860, {"highway": "entrance"}),
+    (7783521863, 7783521860, {"highway": "entrance"}),
+    (7783536115, 7783536130, {"highway": "entrance"}),
+    (7783536123, 7783536132, {"highway": "entrance"}),
+
+    (6438179459, 7783536130, {"highway": "entrance"}),
+    (3148137823, 3147766603, {"highway": "entrance"}),
+    (3148137822, 3148137824, {"highway": "entrance"}),
+    (3147766658, 3151833125, {"highway": "entrance"}),
+    (3151833125, 1668083714, {"highway": "entrance"}),
 
 
-    # (1668088071, 3456763126, {"highway": "entrance"}),
-    # (1668088071, 3456763126, {"highway": "entrance"}),
-    # (1668088071, 3456763126, {"highway": "entrance"}),
-
-    # (1668088071, 3456763126, {"highway": "entrance"}),
-    # (1668088071, 3456763126, {"highway": "entrance"}),
-    # (1668088071, 3456763126, {"highway": "entrance"}),
-
-    # (1668088071, 3456763126, {"highway": "entrance"}),
-    # (1668088071, 3456763126, {"highway": "entrance"}),
-
-    # (1668088071, 3456763126, {"highway": "entrance"}),
-    # (1668088071, 3456763126, {"highway": "entrance"}),
-    # (1668088071, 3456763126, {"highway": "entrance"}),
-
-    
+    (4267311553, 4267311552, {"highway": "entrance"}),
+    (3456763129, 3456766460, {"highway": "entrance"}),
+    (3095788285, 2762462981, {"highway": "entrance"}),
+    (12634159242, 5001725305, {"highway": "entrance"}),
+    (12634159189, 3153646710, {"highway": "entrance"}),
+    (12634159197, 3136972008, {"highway": "entrance"}),
 ]
 
 # Add these new nodes
@@ -409,7 +433,9 @@ edges_to_remove = [
     (9273630918, 2762462834),
     (12479573271, 12470213229),
     (3128392670, 3456763131),
-    (2980303903, 1668083140)
+    (2980303903, 1668083140),
+    (12634159199, 3128392699),
+    (12634159199, 7742619966)
 ]
 
 for node1, node2 in edges_to_remove:
