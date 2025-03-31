@@ -1,37 +1,41 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { FaSearch } from "react-icons/fa";
-import geojsonData from "../../../backend/data/campus_map.json";  // Direct import
 
+const API_URL = import.meta.env.VITE_API_URL;
 
 type PathBarProps = {
     username: string;
-    onSearch: (validNodes: any[]) => void; // Callback function to send the nodeIds to GeoJSONMap component
+    setPath: (validNodes: any) => void;
+    
 }
 
-export default function PathBar({ username, onSearch } : PathBarProps) {
-    const locations: string[] = (geojsonData as any).locations;
-    const [startLocation, setStartLocation] = useState<string>(locations[0]);
-    const [endLocation, setEndLocation] = useState<string>(locations[1]);
+export default function PathBar({ username, setPath } : PathBarProps) {
 
-    // Temp Mapping from location names to node IDs (Example: Adjust based on actual data structure)
-    const locationToNodeId: { [key: string]: any } = {
-        "Jimmy John's": 7855050884,
-        "Qdoba": 3456763127,
-        "Einstein Bagels": 3456763134
-        // Add other locations and their corresponding node IDs
-    };
+    let locations: any[] = [];
 
-    // Handle generating the path on the graph
-    // NEED TO UPDATE THIS TO CALL API TO GET DIJKSTRA PATH
+    const [startLocation, setStartLocation] = useState('');
+    const [endLocation, setEndLocation] = useState('');
+
     const handleSearch = () => {
-        const startNode = locationToNodeId[startLocation];
-        const endNode = locationToNodeId[endLocation];
 
-        if (startNode && endNode) {
-            // Update this to send the actual path, not just the two nodes
-            onSearch([startNode, endNode]);  // Send valid node IDs to the parent component
-        }
     };
+
+    useEffect(() => {
+        const getLocations = async () => {
+            try {
+                const res = await fetch(`${API_URL}/locations/getLocation`)
+                if (!res.ok) throw new Error("Couldn't get location");
+
+                locations = await res.json();
+
+            } catch (error) {
+                console.log(error);
+            }
+        }
+
+        getLocations();
+        console.log(locations);
+    }, []);
 
     return (
         <div className="z-1 flex flex-wrap w-[90vw] h-[55px] bg-white justify-center items-center mt-[10px] border-stone-400 rounded-full drop-shadow-lg">
