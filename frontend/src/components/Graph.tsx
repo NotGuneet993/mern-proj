@@ -14,13 +14,6 @@ import Stroke from "ol/style/Stroke";
 import Circle from "ol/style/Circle";
 import Fill from "ol/style/Fill";
 
-// interface GeoJSONFeatureCollection {  // blocking deplyment
-//   type: "FeatureCollection";
-//   features: any[];
-//   locations: string[];
-//   uniqueFeatres: any[];
-// }
-
 type GeoJSONMapProps = {
   validNodes: any[];
 }
@@ -94,12 +87,11 @@ export default function GeoJSONMap({ validNodes } : GeoJSONMapProps) {
     let extent = source.getExtent(); // Get bounds in EPSG:3857
 
     // Apply a buffer to the extent
-    const bufferDistance = (extent[2] - extent[0]) * 0.1; // 10% of the width as a buffer
     extent = [
-      extent[0] - bufferDistance, // Extend minX
-      extent[1] - bufferDistance, // Extend minY
-      extent[2] + bufferDistance, // Extend maxX
-      extent[3] + bufferDistance, // Extend maxY
+      -9040587.189786093, // Extend minX
+      3322798.3912665765, // Extend minY
+      -9037165.56259758, // Extend maxX
+      3326826.042694283, // Extend maxY
     ];
 
     // Create the map with the vector layer containing both the edges and the nodes
@@ -115,8 +107,8 @@ export default function GeoJSONMap({ validNodes } : GeoJSONMapProps) {
       ],
       view: new View({
         center: [
-          (extent[0] + extent[2]) / 2,
-          (extent[1] + extent[3]) / 2,
+          -9038876.38,
+          3274812.22,
         ],
         zoom: 14, // Set the zoom level
         extent: extent, // Lock the map to the expanded bounds
