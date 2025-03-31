@@ -15,7 +15,13 @@ router.get('/getLocation', async (req, res) => {
     try {
 
         const locations = await Locations.find({})
-        res.json(locations);
+        
+        resArr = []
+        for (let obj of locations) {
+            resArr.push(obj.buildingName)
+        }
+
+        res.json(resArr);
 
     } catch (error) {
 
