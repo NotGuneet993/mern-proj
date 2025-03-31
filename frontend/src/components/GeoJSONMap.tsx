@@ -98,9 +98,9 @@ export default function GeoJSONMap({ path } : GeoJSONMapProps) {
       view: new View({
         center: [
           -9038876.38,
-          3274812.22,
+          3324912.22,
         ],
-        zoom: 14, // Set the zoom level
+        zoom: 16, // Set the zoom level
         extent: extent, // Lock the map to the expanded bounds
       }),
     });
