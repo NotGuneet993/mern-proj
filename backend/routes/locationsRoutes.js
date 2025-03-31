@@ -28,7 +28,7 @@ router.get('/getLocation', async (req, res) => {
 
 // this gets the node path ids from mongo and converts geoJson object 
 // inputs are location1 and location2
-// respoonse is path
+// response is path
 router.get('/getPath', async (req, res) => {
     const { location1, location2 } = req.query;
     
