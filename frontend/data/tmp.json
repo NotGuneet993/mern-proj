@@ -1,0 +1,116 @@
+{
+    "type": "FeatureCollection",
+    "features": [{
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [-81.2003730125,
+                    28.60055705
+                ]
+            },
+            "properties": {
+                "id": 12634159187,
+                "name": "Technology Commons II"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "LineString",
+                "coordinates": [
+                    [-81.200558,
+                        28.6006415
+                    ],
+                    [-81.2003730125,
+                        28.60055705
+                    ]
+                ]
+            },
+            "properties": {
+                "name": null,
+                "distance": 0.012648262018723676,
+                "source": 7786070324,
+                "target": 12634159187
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [-81.200558,
+                    28.6006415
+                ]
+            },
+            "properties": {
+                "id": 7786070324,
+                "name": null
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "LineString",
+                "coordinates": [
+                    [-81.2005748,
+                        28.6006329
+                    ],
+                    [-81.200558,
+                        28.6006415
+                    ]
+                ]
+            },
+            "properties": {
+                "name": "Technology Commons II",
+                "distance": 0.0011797161051341942,
+                "source": 7783239697,
+                "target": 7786070324
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [-81.2005748,
+                    28.6006329
+                ]
+            },
+            "properties": {
+                "id": 7783239697,
+                "name": null
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "LineString",
+                "coordinates": [
+                    [-81.2005805,
+                        28.6005728
+                    ],
+                    [-81.2005748,
+                        28.6006329
+                    ]
+                ]
+            },
+            "properties": {
+                "name": null,
+                "distance": 0.004166926588856327,
+                "source": 3456763133,
+                "target": 7783239697
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [-81.2005805,
+                    28.6005728
+                ]
+            },
+            "properties": {
+                "id": 3456763133,
+                "name": "Cafe Bustelo"
+            }
+        }
+    ]
+}

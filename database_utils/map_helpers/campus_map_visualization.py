@@ -75,6 +75,43 @@ for node in root.findall('node'):
             break  # No need to check more tags for this node
 
 
+# for way in root.findall('way'):
+#     for tag in way.findall('tag'):
+#         if tag.attrib['k'] == "power" and tag.attrib['v'] == "line":
+#             is_power_line = True
+#             break
+#         elif tag.attrib['k'] == "highway":
+#             highway_type = "highway"
+#         elif tag.attrib['k'] == "name":
+#             name = tag.attrib['v']
+#         elif tag.attrib['k'] == "building":
+#             is_building = True
+#         elif tag.attrib['k'] == "natural" and tag.attrib['v'] == "wetland":
+#             is_power_line = True
+#             for nd in way.findall('nd'):
+#                 way.remove(nd)
+#             root.remove(way)
+#             break
+#         elif tag.attrib['k'] == "water" and tag.attrib['v'] == "pond":
+#             is_power_line = True
+#             for nd in way.findall('nd'):
+#                 way.remove(nd)
+#             root.remove(way)
+#             break
+#         elif tag.attrib['k'] == "water" and tag.attrib['v'] == "river":
+#             is_power_line = True
+#             for nd in way.findall('nd'):
+#                 way.remove(nd)
+#             root.remove(way)
+#             break
+        
+#         elif tag.attrib['k'] == "natural" and tag.attrib['v'] == "wood":
+#             is_power_line = True
+#             for nd in way.findall('nd'):
+#                 way.remove(nd)
+#             root.remove(way)
+#             break
+    
 print(f'Removing {len(nodes_to_remove)} nodes from the graph')
 
 # Create a list of all nodes (id -> node)
@@ -115,6 +152,31 @@ for way in root.findall('way'):
             name = tag.attrib['v']
         elif tag.attrib['k'] == "building":
             is_building = True
+        elif tag.attrib['k'] == "natural" and tag.attrib['v'] == "wetland":
+            is_power_line = True
+            # for nd in way.findall('nd'):
+            #     way.remove(nd)
+            #     nodes.pop(int(nd.attrib['ref']), None)
+            # break
+        elif tag.attrib['k'] == "water" and tag.attrib['v'] == "pond":
+            is_power_line = True
+            # for nd in way.findall('nd'):
+            #     way.remove(nd)
+            #     nodes.pop(int(nd.attrib['ref']), None)
+            # break
+        elif tag.attrib['k'] == "water" and tag.attrib['v'] == "river":
+            is_power_line = True
+            # for nd in way.findall('nd'):
+            #     way.remove(nd)
+            #     nodes.pop(int(nd.attrib['ref']), None)
+            # break
+        
+        elif tag.attrib['k'] == "natural" and tag.attrib['v'] == "wood":
+            is_power_line = True
+            # for nd in way.findall('nd'):
+            #     way.remove(nd)
+            #     nodes.pop(int(nd.attrib['ref']), None)
+            # break
     
     if is_power_line:
         continue
@@ -273,8 +335,6 @@ edges_to_add = [
     (12469924937, 12469924965, {"highway": "entrance"}),
     (12469924968, 12469924907, {"highway": "entrance"}),
     (12479573287, 12469924906, {"highway": "entrance"}),
-
-
     (12469924953, 12469924999, {"highway": "entrance"}),
     (12469924954, 12469924998, {"highway": "entrance"}),
     (12469924956, 12469924995, {"highway": "entrance"}),
@@ -284,6 +344,50 @@ edges_to_add = [
     (12469924962, 12469924987, {"highway": "entrance"}),
     (12469924963, 12469924986, {"highway": "entrance"}),
     (12634159235, 7725843220, {"highway": "entrance"}),
+    (3136972001, 12634159197, {"highway": "entrance"}),
+    (3148137803, 12634159197, {"highway": "entrance"}),
+    (3148137809, 12634159197, {"highway": "entrance"}),
+    (12634159303, 9507892200, {"highway": "entrance"}),
+    (12634159303, 9507892202, {"highway": "entrance"}),
+    (2980303892, 12634159192, {"highway": "entrance"}),
+    (2980303892, 12634159183, {"highway": "entrance"}),
+    (12634159307, 7783268122, {"highway": "entrance"}),
+    (3456763131, 3128392703, {"highway": "entrance"}),
+    (2980303903, 893880976, {"highway": "entrance"}),
+    (9661240587, 6083840329, {"highway": "entrance"}),
+    (9661240586, 6083840329, {"highway": "entrance"}),
+    (12469925001, 3095789490, {"highway": "entrance"}),
+    (12634159246, 1701706089, {"highway": "entrance"}),
+    (1701706089, 3456757085, {"highway": "entrance"}),
+    (1701706089, 12260370964, {"highway": "entrance"}),
+    (12260370964, 3456757091, {"highway": "entrance"}),
+    (3456757091, 12150621459, {"highway": "entrance"}),
+    (3456757091, 12150621458, {"highway": "entrance"}),
+    (2199385633, 6314866391, {"highway": "entrance"}),
+    (3456766463, 7743185634, {"highway": "entrance"}),
+    (3456766462, 7743185634, {"highway": "entrance"}),
+    (4687137241, 3095577371, {"highway": "entrance"}),
+    (3456763128, 3095577371, {"highway": "entrance"}),
+    (3456763128, 3095577370, {"highway": "entrance"}),
+    (1668088071, 3456763126, {"highway": "entrance"}),
+    (8932946951, 8932946941, {"highway": "entrance"}),
+    (8932946951, 12634159298, {"highway": "entrance"}),
+
+
+    # (1668088071, 3456763126, {"highway": "entrance"}),
+    # (1668088071, 3456763126, {"highway": "entrance"}),
+    # (1668088071, 3456763126, {"highway": "entrance"}),
+
+    # (1668088071, 3456763126, {"highway": "entrance"}),
+    # (1668088071, 3456763126, {"highway": "entrance"}),
+    # (1668088071, 3456763126, {"highway": "entrance"}),
+
+    # (1668088071, 3456763126, {"highway": "entrance"}),
+    # (1668088071, 3456763126, {"highway": "entrance"}),
+
+    # (1668088071, 3456763126, {"highway": "entrance"}),
+    # (1668088071, 3456763126, {"highway": "entrance"}),
+    # (1668088071, 3456763126, {"highway": "entrance"}),
 
     
 ]
@@ -304,6 +408,8 @@ edges_to_remove = [
     (12634159300, 3678231228),
     (9273630918, 2762462834),
     (12479573271, 12470213229),
+    (3128392670, 3456763131),
+    (2980303903, 1668083140)
 ]
 
 for node1, node2 in edges_to_remove:
