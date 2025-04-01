@@ -5,6 +5,7 @@ import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import interactionPlugin from '@fullcalendar/interaction';
 import AddModal from '../temp_Modal/AddModal'; 
+import SearchModal from '../temp_Modal/SearchModal'; 
 import { AiFillEdit, AiFillDelete } from 'react-icons/ai';
 const API_URL = import.meta.env.VITE_API_URL;
 
