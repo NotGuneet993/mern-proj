@@ -90,6 +90,7 @@ class GraphMap extends StatefulWidget {
 
 class _GraphMapState extends State<GraphMap> {
   List<Node> nodes = [];
+  List<Node> pathNodes = [];
   List<Edge> edges = [];
   List<Polyline> geoJsonPolylines = [];
   
@@ -213,10 +214,19 @@ class _GraphMapState extends State<GraphMap> {
     }
 
     setState(() {
-      // Add the new nodes to the existing nodes
+      // 1. Remove any old path nodes
+      for (final n in pathNodes) {
+        nodes.remove(n);
+      }
+      pathNodes.clear();
+
+      // 2. Clear the old polylines
+      geoJsonPolylines.clear();
+
+      // 3. Add new path data
+      pathNodes.addAll(newNodes);
       nodes.addAll(newNodes);
-      // Update the polylines from the GeoJSON
-      geoJsonPolylines = newPolylines;
+      geoJsonPolylines.addAll(newPolylines);
     });
 
     print('Added ${newNodes.length} nodes and ${newPolylines.length} polylines from GeoJSON.');
