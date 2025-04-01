@@ -3,7 +3,6 @@ const mongoose = require('mongoose');
 const LocationsSchema = new mongoose.Schema({
 
     buildingName: { type: String, require: true },
-    prefix: { type: String, require: false },
     nodeID: { type: Number, require: true },
 
 }, { timestamps: true, collection: "Locations" });
