@@ -112,6 +112,30 @@ class _GraphMapState extends State<GraphMap> {
     super.initState();
     loadBuildingOptions();
   }
+  
+  void clearMap() {
+    setState(() {
+      // Clear dropdown selections
+      selectedFrom = null;
+      selectedTo = null;
+
+      setState(() {
+        selectedFrom = "";
+      });
+      setState(() {
+        selectedTo = "";
+      });
+  
+      // Remove path nodes from the main nodes list
+      for (final n in pathNodes) {
+        nodes.remove(n);
+      }
+      pathNodes.clear();
+  
+      // Clear polylines
+      geoJsonPolylines.clear();
+    });
+  }
 
   // When the map is tapped, add a node if in "addNode" mode.
   void handleMapTap(LatLng latlng) {
@@ -531,6 +555,15 @@ class _GraphMapState extends State<GraphMap> {
                   },
                   child: const Text(
                     "Navigate",
+                    style: TextStyle(fontSize: 16, color:  Color.fromARGB(255, 236, 220, 39)),
+                  ),
+                ),
+                TextButton(
+                  onPressed: () {
+                    clearMap();
+                  },
+                  child: const Text(
+                    "Clear",
                     style: TextStyle(fontSize: 16, color:  Color.fromARGB(255, 236, 220, 39)),
                   ),
                 ),
