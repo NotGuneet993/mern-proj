@@ -1,6 +1,7 @@
 require('dotenv').config();
 const express = require("express");
 const session = require("express-session");
+const bodyParser = require('body-parser');
 
 const app = express();
 const PORT = process.env.PORT || 5001;
@@ -44,6 +45,9 @@ app.use((req, res, next) => {
   req.crypto = crypto;
   next();
 });
+
+//body parser 
+app.use(bodyParser.json());
 
 // Connect MongoDB Client
 const mongoose = require("mongoose");

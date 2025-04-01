@@ -12,6 +12,7 @@
     "license": "ISC",
     "dependencies": {
         "@datastructures-js/priority-queue": "github:datastructures-js/priority-queue",
+        "argon2": "^0.41.1",
         "body-parser": "^1.20.3",
         "cookie-parser": "^1.4.7",
         "cors": "^2.8.5",

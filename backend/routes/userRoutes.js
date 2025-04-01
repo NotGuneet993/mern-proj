@@ -1,7 +1,7 @@
 const express = require("express");
 const User = require("../models/Users.js");
 const sendVerification = require("../functions/mailgun.js");
-
+const argon2 = require('argon2');
 const router = express.Router();
 
 // Login Route
@@ -19,7 +19,8 @@ router.post("/login", async (req, res) => {
     }
     
     // This if statement holds, we're checking a pw hashed through frontend against a hashed pw in DB
-    if (password !== user.password) {
+    const match = await argon2.verify(user.password, password);
+    if (!match) {
       return res.status(403).json({ username: null, authorization: false, message: "Incorrect password" });
     }
 
@@ -69,12 +70,15 @@ router.post("/register", async (req, res) => {
       return res.status(409).json({ username: null, authorization: false, message: `User already exists` });
     }
 
+    // hash pw
+    const hashedPassword = await argon2.hash(password);
+
     // No conflicts: create a new user
     newUser = new User({
       name : name,
       email : email,
       username : username,
-      password: password,
+      password: hashedPassword,
       emailVerified: false,
       emailVerified: false,
       token : "",
