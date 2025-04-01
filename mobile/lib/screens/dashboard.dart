@@ -355,8 +355,12 @@ class _GraphMapState extends State<GraphMap> {
         FlutterMap(
           mapController: mapController,
           options: MapOptions(
+            interactionOptions: InteractionOptions(
+                    flags: InteractiveFlag.all),
             initialCenter: LatLng(28.6024, -81.2001),
             initialZoom: 15.0,
+            minZoom: 2.0,   // allow zooming out further
+            maxZoom: 19.0,  // allow zooming in closer
             onTap: (tapPosition, latlng) {
               handleMapTap(latlng);
             },
