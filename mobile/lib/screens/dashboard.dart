@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
@@ -92,8 +91,11 @@ class GraphMap extends StatefulWidget {
 class _GraphMapState extends State<GraphMap> {
   List<Node> nodes = [];
   List<Edge> edges = [];
-
+  List<Polyline> geoJsonPolylines = [];
+  
   List<String> buildingOptions = [];
+  String? selectedFrom;
+  String? selectedTo;
 
   final TextEditingController fromController = TextEditingController();
   final TextEditingController toController = TextEditingController();
@@ -128,27 +130,118 @@ class _GraphMapState extends State<GraphMap> {
   }
 
   // Implement navigation for map
-  void navigation() {
+  Future<void> navigation(String? from, String? to) async {
+  if (from == null || to == null) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text("Please select both From and To locations.")),
+    );
+    return;
+  }
+  print("Navigating from: $from to: $to");
 
+  final encodedFrom = Uri.encodeComponent(from);
+  final encodedTo = Uri.encodeComponent(to);
+
+  final response = await http.get(
+    Uri.parse('$API_URL/api/locations/getPath?location1=$encodedFrom&location2=$encodedTo'),
+    headers: {'Content-Type': 'application/json'},
+  );
+
+  print("Response status: ${response.statusCode}");
+  print("Response body: ${response.body}");
+
+  // Check if the response body is HTML rather than JSON.
+  if (response.body.trim().startsWith('<')) {
+    print("Received HTML response instead of JSON.");
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text("Error: Unexpected HTML response from server.")),
+    );
+    return;
   }
 
-  Future<List<String>> getClasses() async {
+  if (response.statusCode != 200) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text("Error: ${response.statusCode}")),
+    );
+    return;
+  }
+
+  try {
+    final geoJson = jsonDecode(response.body);
+    // Make sure 'path' exists and is a List
+    if (!geoJson.containsKey('path') || geoJson['path'] is! List) {
+      print('Invalid JSON structure - missing "path"');
+      return;
+    }
+    
+    final features = geoJson['path'] as List;
+    List<Node> newNodes = [];
+    List<Polyline> newPolylines = [];
+
+    for (var feature in features) {
+      final geometry = feature['geometry'];
+      final properties = feature['properties'];
+      final type = geometry['type'];
+      if (type == 'Point') {
+        // Coordinates are [lng, lat]
+        final coords = geometry['coordinates'];
+        double lng = coords[0];
+        double lat = coords[1];
+        String id = properties['id']?.toString() ?? 'node-${DateTime.now().millisecondsSinceEpoch}';
+        String label = properties['name']?.toString() ?? '';
+        newNodes.add(Node(
+          id: id,
+          latlng: LatLng(lat, lng),
+          label: label,
+          color: label.isNotEmpty ? Colors.red : Colors.blue,
+        ));
+      } else if (type == 'LineString') {
+        // Coordinates is a list of [lng, lat] pairs
+        final coordsList = geometry['coordinates'] as List;
+        List<LatLng> points = [];
+        for (var coords in coordsList) {
+          double lng = coords[0];
+          double lat = coords[1];
+          points.add(LatLng(lat, lng));
+        }
+        newPolylines.add(Polyline(
+          points: points,
+          strokeWidth: 3.0,
+          color: Colors.black,
+        ));
+      }
+    }
+
+    setState(() {
+      // Add the new nodes to the existing nodes
+      nodes.addAll(newNodes);
+      // Update the polylines from the GeoJSON
+      geoJsonPolylines = newPolylines;
+    });
+
+    print('Added ${newNodes.length} nodes and ${newPolylines.length} polylines from GeoJSON.');
+    } catch (e) {
+      print("JSON decoding error: $e");
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("JSON decoding error")),
+      );
+    }
+  }
+
+  Future<String> getClasses() async {
     final response = await http.get(
         Uri.parse('$API_URL/api/locations/getLocation'),
         headers: {'Content-Type': 'application/json'},
       );
-    final data = jsonDecode(response.body);
-    final List<String> listName = [];
-    for (var i = 0; i < data.length; i++) {
-      listName.add(data[i]["buildingName"]);
-    }
-    return listName;
+    
+    return response.body;
   }
 
   Future<void> loadBuildingOptions() async {
-    List<String> options = await getClasses();
+    String options = await getClasses();
+    var decoded = jsonDecode(options) as List;
     setState(() {
-      buildingOptions = options;
+      buildingOptions = decoded.map((option) => option.toString()).toList();
     });
   }
 
@@ -286,6 +379,10 @@ class _GraphMapState extends State<GraphMap> {
                 );
               }).whereType<Polyline>().toList(),
             ),
+            // Draw polylines from GeoJSON
+            PolylineLayer(
+              polylines: geoJsonPolylines,
+            ),
             // Overlay a transparent marker at each edge's midpoint for deletion.
             MarkerLayer(
               markers: edges.map((edge) {
@@ -376,8 +473,11 @@ class _GraphMapState extends State<GraphMap> {
                                     textEditingValue.text.toLowerCase()));
                           }
                         },
-                        onSelected: (String selection) {
-                          print("From: $selection");
+                        onSelected: (String fromSelection) {
+                          setState(() {
+                            selectedFrom = fromSelection;
+                          });
+                          print("From: $fromSelection");
                         },
                       ),
                     ),
@@ -401,15 +501,20 @@ class _GraphMapState extends State<GraphMap> {
                                     textEditingValue.text.toLowerCase()));
                           }
                         },
-                        onSelected: (String selection) {
-                          print("To: $selection");
+                        onSelected: (String toSelection) {
+                          setState(() {
+                            selectedTo = toSelection;
+                          });
+                          print("To: $toSelection");
                         },
                       ),
                     ),
                   ],
                 ),
                 TextButton(
-                  onPressed: navigation,
+                  onPressed: () {
+                    navigation(selectedFrom, selectedTo);
+                  },
                   child: const Text(
                     "Navigate",
                     style: TextStyle(fontSize: 16, color:  Color.fromARGB(255, 236, 220, 39)),
