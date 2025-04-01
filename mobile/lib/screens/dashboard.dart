@@ -97,6 +97,10 @@ class _GraphMapState extends State<GraphMap> {
   List<String> buildingOptions = [];
   String? selectedFrom;
   String? selectedTo;
+  Key fromAutocompleteKey = UniqueKey();
+  Key toAutocompleteKey = UniqueKey();
+  TextEditingController? _fromInternalController;
+  TextEditingController? _toInternalController;
 
   final TextEditingController fromController = TextEditingController();
   final TextEditingController toController = TextEditingController();
@@ -119,19 +123,16 @@ class _GraphMapState extends State<GraphMap> {
       selectedFrom = null;
       selectedTo = null;
 
-      setState(() {
-        selectedFrom = "";
-      });
-      setState(() {
-        selectedTo = "";
-      });
-  
+      // Clear the internal Autocomplete controllers if they exist
+      _fromInternalController?.clear();
+      _toInternalController?.clear();
+
       // Remove path nodes from the main nodes list
       for (final n in pathNodes) {
         nodes.remove(n);
       }
       pathNodes.clear();
-  
+
       // Clear polylines
       geoJsonPolylines.clear();
     });
@@ -502,14 +503,31 @@ class _GraphMapState extends State<GraphMap> {
                     SizedBox(width: 8),
                     Expanded(
                       child: Autocomplete<String>(
+                        // Removed the key parameter to let the widget manage its internal controller
                         optionsBuilder: (TextEditingValue textEditingValue) {
                           if (textEditingValue.text.isEmpty) {
                             return buildingOptions;
                           } else {
                             return buildingOptions.where((String option) =>
-                                option.toLowerCase().contains(
-                                    textEditingValue.text.toLowerCase()));
+                                option.toLowerCase().contains(textEditingValue.text.toLowerCase()));
                           }
+                        },
+                        fieldViewBuilder: (
+                          BuildContext context,
+                          TextEditingController textEditingController,
+                          FocusNode focusNode,
+                          VoidCallback onFieldSubmitted,
+                        ) {
+                          // Capture the provided controller for later use
+                          _fromInternalController = textEditingController;
+                          return TextField(
+                            controller: textEditingController,
+                            focusNode: focusNode,
+                            onEditingComplete: onFieldSubmitted,
+                            decoration: const InputDecoration(
+                              hintText: 'Type building name...',
+                            ),
+                          );
                         },
                         onSelected: (String fromSelection) {
                           setState(() {
@@ -530,14 +548,31 @@ class _GraphMapState extends State<GraphMap> {
                     SizedBox(width: 8),
                     Expanded(
                       child: Autocomplete<String>(
+                        // Removed the key parameter
                         optionsBuilder: (TextEditingValue textEditingValue) {
                           if (textEditingValue.text.isEmpty) {
                             return buildingOptions;
                           } else {
                             return buildingOptions.where((String option) =>
-                                option.toLowerCase().contains(
-                                    textEditingValue.text.toLowerCase()));
+                                option.toLowerCase().contains(textEditingValue.text.toLowerCase()));
                           }
+                        },
+                        fieldViewBuilder: (
+                          BuildContext context,
+                          TextEditingController textEditingController,
+                          FocusNode focusNode,
+                          VoidCallback onFieldSubmitted,
+                        ) {
+                          // Capture the provided controller for later use
+                          _toInternalController = textEditingController;
+                          return TextField(
+                            controller: textEditingController,
+                            focusNode: focusNode,
+                            onEditingComplete: onFieldSubmitted,
+                            decoration: const InputDecoration(
+                              hintText: 'Type building name...',
+                            ),
+                          );
                         },
                         onSelected: (String toSelection) {
                           setState(() {
