@@ -538,45 +538,52 @@ class DashboardScreen extends StatefulWidget {
   _DashboardScreenState createState() => _DashboardScreenState();
 }
 
-class _DashboardScreenState extends State<DashboardScreen>
-    with SingleTickerProviderStateMixin {
-  late TabController _tabController;
+class _DashboardScreenState extends State<DashboardScreen> {
+  int _currentIndex = 0;
 
-  @override
-  void initState() {
-    super.initState();
-    _tabController = TabController(length: 2, vsync: this);
-  }
-
-  @override
-  void dispose() {
-    _tabController.dispose();
-    super.dispose();
-  }
+  final List<Widget> _pages = [
+    SchedulePage(globalUser: "testUser"),
+    GraphMap(),
+  ];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Dashboard'),
-        backgroundColor: const Color.fromARGB(255, 236, 220, 39),
-        bottom: TabBar(
-          controller: _tabController,
-          tabs: const [
-            Tab(text: "Dashboard"),
-            Tab(text: "Graph Map"),
+      body: _pages[_currentIndex], // Show the selected page
+      bottomNavigationBar: SafeArea(
+      child: BottomAppBar(
+        height: 44, // Increase slightly to avoid overflow
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: [
+            GestureDetector(
+              onTap: () => setState(() => _currentIndex = 0),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.schedule,
+                      size: 20,
+                      color: _currentIndex == 0 ? Colors.blue : Colors.grey)
+                ],
+              ),
+            ),
+            GestureDetector(
+              onTap: () => setState(() => _currentIndex = 1),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.map,
+                      size: 20,
+                      color: _currentIndex == 1 ? Colors.blue : Colors.grey)
+                ],
+              ),
+            ),
           ],
         ),
       ),
-      body: TabBarView(
-        controller: _tabController,
-        children: [
-          // Blank dashboard screen.
-          SchedulePage(globalUser: "testUser"),
-          // Map screen.
-          GraphMap(),
-        ],
-      ),
+    ),
     );
   }
 }
