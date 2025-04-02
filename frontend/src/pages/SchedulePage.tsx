@@ -262,7 +262,7 @@ const handleDeleteClass = (classId?: string) => {
           Add Class
         </button>
         {modalOpen && (
-          <AddModal
+          <SearchModal //TODO a fucking LOT
             isOpen={modalOpen}
             onClose={() => setModalOpen(false)}
             onSave={handleAddClass}
