@@ -10,6 +10,8 @@ import 'schedule.dart';
 import 'package:mobile/globals.dart' as globals;
 import 'package:http/http.dart' as http;
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'dart:math';
+import 'package:geolocator/geolocator.dart';
 
 final API_URL = dotenv.env['VITE_API_URL'];
 
@@ -110,11 +112,24 @@ class _GraphMapState extends State<GraphMap> {
   String nodeLabel = "";
   TextEditingController nodeLabelController = TextEditingController();
   final MapController mapController = MapController();
+  LatLng? userLocation;
+  LatLng? nearestIndicatorPoint;
 
   @override
   void initState() {
     super.initState();
     loadBuildingOptions();
+    _initLocationTracking();
+    _testCurrentPosition();
+  }
+
+  void _testCurrentPosition() async {
+    try {
+      Position position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
+      print("Current position: ${position.latitude}, ${position.longitude}");
+    } catch (e) {
+      print("Error getting current position: $e");
+    }
   }
   
   void clearMap() {
@@ -153,6 +168,22 @@ class _GraphMapState extends State<GraphMap> {
         nodeLabelController.clear();
       });
     }
+  }
+
+  void _showMessageDialog(String title, String message) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(title),
+        content: Text(message),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('OK'),
+          )
+        ],
+      ),
+    );
   }
 
   // Implement navigation for map
@@ -383,6 +414,82 @@ class _GraphMapState extends State<GraphMap> {
     }
   }
 
+  Future<void> _initLocationTracking() async {
+    print("Initializing location tracking...");
+ 
+    bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      _showMessageDialog("Error!", "Please enable location services.");
+      print("ERROR WITH LOCATION SERVICES 1");
+      return;
+    }
+ 
+    LocationPermission permission = await Geolocator.checkPermission();
+ 
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+ 
+      if (permission == LocationPermission.denied) {
+        print("ERROR WITH LOCATION SERVICES 2");
+        _showMessageDialog("Error!", "Please enable location services.");
+        return;
+      }
+ 
+      if (permission == LocationPermission.deniedForever) {
+        print("ERROR WITH LOCATION SERVICES 3");
+        _showMessageDialog("Error!", "Location permissions are permanently denied. Please enable them in settings.");
+        await Geolocator.openAppSettings();
+        return;
+      }
+    } else if (permission == LocationPermission.deniedForever) {
+      print("ERROR WITH LOCATION SERVICES 3");
+      _showMessageDialog("Error!", "Location permissions are permanently denied. Please enable them in settings.");
+      await Geolocator.openAppSettings();
+      return;
+    }
+ 
+    // If we reach here, permissions are granted.
+    Geolocator.getPositionStream(
+      locationSettings: const LocationSettings(
+        accuracy: LocationAccuracy.high,
+      ),
+    ).listen(
+      (Position position) {
+        print("User location updated: ${position.latitude}, ${position.longitude}");
+        setState(() {
+          userLocation = LatLng(position.latitude, position.longitude);
+          _updateNearestIndicator();
+        });
+      },
+      onError: (error) {
+        print("Error receiving location updates: $error");
+      },
+    );
+  }
+
+  void _updateNearestIndicator() {
+    if (userLocation == null || geoJsonPolylines.isEmpty) return;
+    // Use the first polyline's points as the path.
+    final points = geoJsonPolylines.first.points;
+    if (points.isEmpty) return;
+    double minDistance = double.infinity;
+    LatLng closest = points.first;
+    for (var point in points) {
+      double distance = _distanceBetween(userLocation!, point);
+      if (distance < minDistance) {
+        minDistance = distance;
+        closest = point;
+      }
+    }
+    setState(() {
+      nearestIndicatorPoint = closest;
+    });
+  }
+
+  double _distanceBetween(LatLng a, LatLng b) {
+    return sqrt(pow(a.latitude - b.latitude, 2) + pow(a.longitude - b.longitude, 2));
+  }
+
   @override
   Widget build(BuildContext context) {
     return Stack(
@@ -472,6 +579,34 @@ class _GraphMapState extends State<GraphMap> {
                   ),
                 );
               }).toList(),
+            ),
+            MarkerLayer(
+              markers: [
+                // Marker for the user's current location
+                if (userLocation != null)
+                  Marker(
+                    point: userLocation!,
+                    width: 30,
+                    height: 30,
+                    child: const Icon(
+                      Icons.my_location,
+                      color: Colors.blue,
+                      size: 30,
+                    ),
+                  ),
+                // Marker for the nearest point on the generated path
+                if (nearestIndicatorPoint != null)
+                  Marker(
+                    point: nearestIndicatorPoint!,
+                    width: 20,
+                    height: 20,
+                    child: const Icon(
+                      Icons.arrow_upward,
+                      color: Colors.green,
+                      size: 20,
+                    ),
+                  ),
+              ],
             ),
           ],
         ),
@@ -586,6 +721,7 @@ class _GraphMapState extends State<GraphMap> {
                 ),
                 TextButton(
                   onPressed: () {
+                    FocusScope.of(context).unfocus();
                     navigation(selectedFrom, selectedTo);
                   },
                   child: const Text(
