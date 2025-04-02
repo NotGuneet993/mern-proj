@@ -262,7 +262,7 @@ const handleDeleteClass = (classId?: string) => {
           Add Class
         </button>
         {modalOpen && (
-          <SearchModal //TODO a fucking LOT
+          <SearchModal //TODO respec into handleSearchClass, let json response dictate use of SearchResults/Add modal w/ custom none found message for Add
             isOpen={modalOpen}
             onClose={() => setModalOpen(false)}
             onSave={handleAddClass}
