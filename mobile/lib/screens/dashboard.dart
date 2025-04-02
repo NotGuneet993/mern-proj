@@ -114,6 +114,7 @@ class _GraphMapState extends State<GraphMap> {
   final MapController mapController = MapController();
   LatLng? userLocation;
   LatLng? nearestIndicatorPoint;
+  double userHeading = 0.0;
 
   @override
   void initState() {
@@ -261,11 +262,11 @@ class _GraphMapState extends State<GraphMap> {
           double lat = coords[1];
           points.add(LatLng(lat, lng));
         }
-        newPolylines.add(Polyline(
-          points: points,
-          strokeWidth: 3.0,
-          color: Colors.black,
-        ));
+          newPolylines.add(Polyline(
+            points: points,
+            strokeWidth: 4.0,
+            color: Colors.blueAccent,
+          ));
       }
     }
 
@@ -458,6 +459,7 @@ class _GraphMapState extends State<GraphMap> {
         print("User location updated: ${position.latitude}, ${position.longitude}");
         setState(() {
           userLocation = LatLng(position.latitude, position.longitude);
+          userHeading = position.heading; // Update heading
           _updateNearestIndicator();
         });
       },
@@ -562,10 +564,11 @@ class _GraphMapState extends State<GraphMap> {
             // Draw nodes as markers.
             MarkerLayer(
               markers: nodes.map((node) {
+                bool isPathNode = pathNodes.any((pn) => pn.id == node.id);
                 return Marker(
                   point: node.latlng,
-                  width: 20,
-                  height: 20,
+                  width: isPathNode ? 10 : 20,
+                  height: isPathNode ? 10 : 20,
                   child: GestureDetector(
                     onTap: () {
                       handleNodeTap(node);
@@ -588,10 +591,13 @@ class _GraphMapState extends State<GraphMap> {
                     point: userLocation!,
                     width: 30,
                     height: 30,
-                    child: const Icon(
-                      Icons.my_location,
-                      color: Colors.blue,
-                      size: 30,
+                    child: Transform.rotate(
+                      angle: userHeading * 3.14159265359 / 180, // Convert degrees to radians
+                      child: Icon(
+                        Icons.navigation,
+                        color: Colors.blue,
+                        size: 30,
+                      ),
                     ),
                   ),
                 // Marker for the nearest point on the generated path
