@@ -8,10 +8,11 @@ const API_URL = import.meta.env.VITE_API_URL;
 type PathBarProps = {
     username: string;
     setPath: (validNodes: any) => void;
+    setWalkTime: (integer: number) => void;
     
 }
 
-export default function PathBar({ username, setPath } : PathBarProps) {
+export default function PathBar({ username, setPath, setWalkTime } : PathBarProps) {
 
     const [locations, setLocations] = useState([]);
     const [startLocation, setStartLocation] = useState('');
@@ -21,11 +22,21 @@ export default function PathBar({ username, setPath } : PathBarProps) {
         const src = startLocation;
         const dst = endLocation;
 
+        let distance = 0;
+
         try {
             const response = await fetch(`${API_URL}/locations/getPath?location1=${encodeURIComponent(src)}&location2=${encodeURIComponent(dst)}`)
             if (!response.ok) throw new Error("Couldn't fetch path")
             
             const data = await response.json();
+
+            for (let item of data.path) {
+                if (item.geometry.type === "LineString") {
+                    distance += item.properties.distance;
+                }
+            }
+
+            setWalkTime(Math.round((60/3) * distance));
 
             setPath({
                 "type": "FeatureCollection",
@@ -38,6 +49,7 @@ export default function PathBar({ username, setPath } : PathBarProps) {
     };
 
     const handleClear = () => {
+        setWalkTime(0);
         setPath({
             "type": "FeatureCollection",
             "features": []
@@ -51,6 +63,7 @@ export default function PathBar({ username, setPath } : PathBarProps) {
                 if (!res.ok) throw new Error("Couldn't get location");
 
                 const data = await res.json();
+
                 setLocations(data);
 
             } catch (error) {
