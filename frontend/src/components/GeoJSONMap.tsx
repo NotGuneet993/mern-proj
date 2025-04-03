@@ -154,7 +154,7 @@ return () => {
 }, [path]); // Re-run effect when validNodes changes
 
   return (
-    <div className="w-full h-[750px]">
+    <div className="w-full h-full">
       <div ref={mapRef} className="w-full h-full" />
     </div>
   );
