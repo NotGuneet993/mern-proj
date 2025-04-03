@@ -10,6 +10,8 @@ import 'schedule.dart';
 import 'package:mobile/globals.dart' as globals;
 import 'package:http/http.dart' as http;
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'dart:math';
+import 'package:geolocator/geolocator.dart';
 
 final API_URL = dotenv.env['VITE_API_URL'];
 
@@ -90,12 +92,17 @@ class GraphMap extends StatefulWidget {
 
 class _GraphMapState extends State<GraphMap> {
   List<Node> nodes = [];
+  List<Node> pathNodes = [];
   List<Edge> edges = [];
   List<Polyline> geoJsonPolylines = [];
   
   List<String> buildingOptions = [];
   String? selectedFrom;
   String? selectedTo;
+  Key fromAutocompleteKey = UniqueKey();
+  Key toAutocompleteKey = UniqueKey();
+  TextEditingController? _fromInternalController;
+  TextEditingController? _toInternalController;
 
   final TextEditingController fromController = TextEditingController();
   final TextEditingController toController = TextEditingController();
@@ -105,11 +112,46 @@ class _GraphMapState extends State<GraphMap> {
   String nodeLabel = "";
   TextEditingController nodeLabelController = TextEditingController();
   final MapController mapController = MapController();
+  LatLng? userLocation;
+  LatLng? nearestIndicatorPoint;
+  double userHeading = 0.0;
 
   @override
   void initState() {
     super.initState();
     loadBuildingOptions();
+    _initLocationTracking();
+    _testCurrentPosition();
+  }
+
+  void _testCurrentPosition() async {
+    try {
+      Position position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
+      print("Current position: ${position.latitude}, ${position.longitude}");
+    } catch (e) {
+      print("Error getting current position: $e");
+    }
+  }
+  
+  void clearMap() {
+    setState(() {
+      // Clear dropdown selections
+      selectedFrom = null;
+      selectedTo = null;
+
+      // Clear the internal Autocomplete controllers if they exist
+      _fromInternalController?.clear();
+      _toInternalController?.clear();
+
+      // Remove path nodes from the main nodes list
+      for (final n in pathNodes) {
+        nodes.remove(n);
+      }
+      pathNodes.clear();
+
+      // Clear polylines
+      geoJsonPolylines.clear();
+    });
   }
 
   // When the map is tapped, add a node if in "addNode" mode.
@@ -127,6 +169,22 @@ class _GraphMapState extends State<GraphMap> {
         nodeLabelController.clear();
       });
     }
+  }
+
+  void _showMessageDialog(String title, String message) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(title),
+        content: Text(message),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('OK'),
+          )
+        ],
+      ),
+    );
   }
 
   // Implement navigation for map
@@ -204,19 +262,28 @@ class _GraphMapState extends State<GraphMap> {
           double lat = coords[1];
           points.add(LatLng(lat, lng));
         }
-        newPolylines.add(Polyline(
-          points: points,
-          strokeWidth: 3.0,
-          color: Colors.black,
-        ));
+          newPolylines.add(Polyline(
+            points: points,
+            strokeWidth: 4.0,
+            color: Colors.blueAccent,
+          ));
       }
     }
 
     setState(() {
-      // Add the new nodes to the existing nodes
+      // 1. Remove any old path nodes
+      for (final n in pathNodes) {
+        nodes.remove(n);
+      }
+      pathNodes.clear();
+
+      // 2. Clear the old polylines
+      geoJsonPolylines.clear();
+
+      // 3. Add new path data
+      pathNodes.addAll(newNodes);
       nodes.addAll(newNodes);
-      // Update the polylines from the GeoJSON
-      geoJsonPolylines = newPolylines;
+      geoJsonPolylines.addAll(newPolylines);
     });
 
     print('Added ${newNodes.length} nodes and ${newPolylines.length} polylines from GeoJSON.');
@@ -348,6 +415,83 @@ class _GraphMapState extends State<GraphMap> {
     }
   }
 
+  Future<void> _initLocationTracking() async {
+    print("Initializing location tracking...");
+ 
+    bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      _showMessageDialog("Error!", "Please enable location services.");
+      print("ERROR WITH LOCATION SERVICES 1");
+      return;
+    }
+ 
+    LocationPermission permission = await Geolocator.checkPermission();
+ 
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+ 
+      if (permission == LocationPermission.denied) {
+        print("ERROR WITH LOCATION SERVICES 2");
+        _showMessageDialog("Error!", "Please enable location services.");
+        return;
+      }
+ 
+      if (permission == LocationPermission.deniedForever) {
+        print("ERROR WITH LOCATION SERVICES 3");
+        _showMessageDialog("Error!", "Location permissions are permanently denied. Please enable them in settings.");
+        await Geolocator.openAppSettings();
+        return;
+      }
+    } else if (permission == LocationPermission.deniedForever) {
+      print("ERROR WITH LOCATION SERVICES 3");
+      _showMessageDialog("Error!", "Location permissions are permanently denied. Please enable them in settings.");
+      await Geolocator.openAppSettings();
+      return;
+    }
+ 
+    // If we reach here, permissions are granted.
+    Geolocator.getPositionStream(
+      locationSettings: const LocationSettings(
+        accuracy: LocationAccuracy.high,
+      ),
+    ).listen(
+      (Position position) {
+        print("User location updated: ${position.latitude}, ${position.longitude}");
+        setState(() {
+          userLocation = LatLng(position.latitude, position.longitude);
+          userHeading = position.heading; // Update heading
+          _updateNearestIndicator();
+        });
+      },
+      onError: (error) {
+        print("Error receiving location updates: $error");
+      },
+    );
+  }
+
+  void _updateNearestIndicator() {
+    if (userLocation == null || geoJsonPolylines.isEmpty) return;
+    // Use the first polyline's points as the path.
+    final points = geoJsonPolylines.first.points;
+    if (points.isEmpty) return;
+    double minDistance = double.infinity;
+    LatLng closest = points.first;
+    for (var point in points) {
+      double distance = _distanceBetween(userLocation!, point);
+      if (distance < minDistance) {
+        minDistance = distance;
+        closest = point;
+      }
+    }
+    setState(() {
+      nearestIndicatorPoint = closest;
+    });
+  }
+
+  double _distanceBetween(LatLng a, LatLng b) {
+    return sqrt(pow(a.latitude - b.latitude, 2) + pow(a.longitude - b.longitude, 2));
+  }
+
   @override
   Widget build(BuildContext context) {
     return Stack(
@@ -355,8 +499,12 @@ class _GraphMapState extends State<GraphMap> {
         FlutterMap(
           mapController: mapController,
           options: MapOptions(
+            interactionOptions: InteractionOptions(
+                    flags: InteractiveFlag.all),
             initialCenter: LatLng(28.6024, -81.2001),
             initialZoom: 15.0,
+            minZoom: 2.0,   // allow zooming out further
+            maxZoom: 19.0,  // allow zooming in closer
             onTap: (tapPosition, latlng) {
               handleMapTap(latlng);
             },
@@ -416,10 +564,11 @@ class _GraphMapState extends State<GraphMap> {
             // Draw nodes as markers.
             MarkerLayer(
               markers: nodes.map((node) {
+                bool isPathNode = pathNodes.any((pn) => pn.id == node.id);
                 return Marker(
                   point: node.latlng,
-                  width: 20,
-                  height: 20,
+                  width: isPathNode ? 10 : 20,
+                  height: isPathNode ? 10 : 20,
                   child: GestureDetector(
                     onTap: () {
                       handleNodeTap(node);
@@ -433,6 +582,37 @@ class _GraphMapState extends State<GraphMap> {
                   ),
                 );
               }).toList(),
+            ),
+            MarkerLayer(
+              markers: [
+                // Marker for the user's current location
+                if (userLocation != null)
+                  Marker(
+                    point: userLocation!,
+                    width: 30,
+                    height: 30,
+                    child: Transform.rotate(
+                      angle: userHeading * 3.14159265359 / 180, // Convert degrees to radians
+                      child: Icon(
+                        Icons.navigation,
+                        color: Colors.blue,
+                        size: 30,
+                      ),
+                    ),
+                  ),
+                // Marker for the nearest point on the generated path
+                if (nearestIndicatorPoint != null)
+                  Marker(
+                    point: nearestIndicatorPoint!,
+                    width: 20,
+                    height: 20,
+                    child: const Icon(
+                      Icons.arrow_upward,
+                      color: Colors.green,
+                      size: 20,
+                    ),
+                  ),
+              ],
             ),
           ],
         ),
@@ -464,14 +644,31 @@ class _GraphMapState extends State<GraphMap> {
                     SizedBox(width: 8),
                     Expanded(
                       child: Autocomplete<String>(
+                        // Removed the key parameter to let the widget manage its internal controller
                         optionsBuilder: (TextEditingValue textEditingValue) {
                           if (textEditingValue.text.isEmpty) {
                             return buildingOptions;
                           } else {
                             return buildingOptions.where((String option) =>
-                                option.toLowerCase().contains(
-                                    textEditingValue.text.toLowerCase()));
+                                option.toLowerCase().contains(textEditingValue.text.toLowerCase()));
                           }
+                        },
+                        fieldViewBuilder: (
+                          BuildContext context,
+                          TextEditingController textEditingController,
+                          FocusNode focusNode,
+                          VoidCallback onFieldSubmitted,
+                        ) {
+                          // Capture the provided controller for later use
+                          _fromInternalController = textEditingController;
+                          return TextField(
+                            controller: textEditingController,
+                            focusNode: focusNode,
+                            onEditingComplete: onFieldSubmitted,
+                            decoration: const InputDecoration(
+                              hintText: 'Type building name...',
+                            ),
+                          );
                         },
                         onSelected: (String fromSelection) {
                           setState(() {
@@ -492,14 +689,31 @@ class _GraphMapState extends State<GraphMap> {
                     SizedBox(width: 8),
                     Expanded(
                       child: Autocomplete<String>(
+                        // Removed the key parameter
                         optionsBuilder: (TextEditingValue textEditingValue) {
                           if (textEditingValue.text.isEmpty) {
                             return buildingOptions;
                           } else {
                             return buildingOptions.where((String option) =>
-                                option.toLowerCase().contains(
-                                    textEditingValue.text.toLowerCase()));
+                                option.toLowerCase().contains(textEditingValue.text.toLowerCase()));
                           }
+                        },
+                        fieldViewBuilder: (
+                          BuildContext context,
+                          TextEditingController textEditingController,
+                          FocusNode focusNode,
+                          VoidCallback onFieldSubmitted,
+                        ) {
+                          // Capture the provided controller for later use
+                          _toInternalController = textEditingController;
+                          return TextField(
+                            controller: textEditingController,
+                            focusNode: focusNode,
+                            onEditingComplete: onFieldSubmitted,
+                            decoration: const InputDecoration(
+                              hintText: 'Type building name...',
+                            ),
+                          );
                         },
                         onSelected: (String toSelection) {
                           setState(() {
@@ -513,10 +727,20 @@ class _GraphMapState extends State<GraphMap> {
                 ),
                 TextButton(
                   onPressed: () {
+                    FocusScope.of(context).unfocus();
                     navigation(selectedFrom, selectedTo);
                   },
                   child: const Text(
                     "Navigate",
+                    style: TextStyle(fontSize: 16, color:  Color.fromARGB(255, 236, 220, 39)),
+                  ),
+                ),
+                TextButton(
+                  onPressed: () {
+                    clearMap();
+                  },
+                  child: const Text(
+                    "Clear",
                     style: TextStyle(fontSize: 16, color:  Color.fromARGB(255, 236, 220, 39)),
                   ),
                 ),
