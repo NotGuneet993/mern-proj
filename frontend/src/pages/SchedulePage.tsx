@@ -188,7 +188,7 @@ const handleDeleteClass = (classId?: string) => {
          found = true; 
         }
 
-        setModalOpen(true);
+        setModalOpen(true); // TODO this belongs elsewhere but im not sure where
       })
       .catch((err) => console.error('Error fetching class sections:', err));
 
