@@ -3,12 +3,15 @@ import { AiOutlineCloseCircle } from 'react-icons/ai';
 const API_URL = import.meta.env.VITE_API_URL;
 
 interface AddModalProps {
+  message: string;
   isOpen: boolean;
   onClose: () => void;
   onSave: (newClassData: any) => void;
 }
 
-function AddModal({ isOpen, onClose, onSave }: AddModalProps) {
+function AddModal({ message, isOpen, onClose, onSave }: AddModalProps) {
+  if (!message) message = "No Message Sent (How)";
+
   // Existing fields
   const [courseCode, setCourseCode] = useState('');
   const [className, setClassName] = useState('');
@@ -228,7 +231,7 @@ function AddModal({ isOpen, onClose, onSave }: AddModalProps) {
           <AiOutlineCloseCircle />
         </button>
 
-        <h2 className="text-xl font-semibold mb-4">Add Class</h2>
+        <h2 className="text-xl font-semibold mb-4">{message}</h2>
 
         <form onSubmit={handleSubmit} className="flex flex-col md:flex-row gap-8">
           {/* LEFT COLUMN */}

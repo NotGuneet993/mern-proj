@@ -166,6 +166,57 @@ const handleDeleteClass = (classId?: string) => {
     // TODO: Open an edit modal with pre-populated values
   };
 
+
+  // Handler for searching class sections (passed to SearchModal)
+  const handleSearchClass = (searchClassData: ClassData) => {
+    const params = new URLSearchParams({ course_code: searchClassData.course_code, professor: searchClassData.professor });
+    let sections = [];
+    let found = false;
+    fetch(`${API_URL}/schedule/search?${params.toString()}`)
+      .then((res) => res.json())
+      .then((data) => {
+        sections = data.map((cls: any) => ({
+          _id: cls._id, 
+          course_code: cls.course_code, 
+          class_name: cls.class_name, 
+          professor: cls.professor, 
+          meeting_type: cls.meeting_type, 
+          type: cls.type, 
+          class_schedule: cls.class_schedule}));
+        
+        if (sections.length > 0) {
+         found = true; 
+        }
+
+        setModalOpen(true);
+      })
+      .catch((err) => console.error('Error fetching class sections:', err));
+
+      if (found) {
+        console.log("Sections found!");
+        {modalOpen && (
+          <AddModal //TODO results modal
+            message="SECTION FOUND, THIS IS A PLACEHOLDER"
+            isOpen={modalOpen}
+            onClose={() => setModalOpen(false)}
+            onSave={handleAddClass}
+          />
+        )}
+      }
+      else {
+        console.log("No section found!");
+        {modalOpen && (
+          <AddModal
+            message="We couldn't find a section with those paramaters. Let's add it manually!"
+            isOpen={modalOpen}
+            onClose={() => setModalOpen(false)}
+            onSave={handleAddClass}
+          />
+        )}
+      }
+  
+  };
+
   // Handler for adding a class (passed to AddModal)
   const handleAddClass = (newClassData: ClassData) => {
     fetch(`${API_URL}/schedule/getClass`, {
@@ -262,10 +313,10 @@ const handleDeleteClass = (classId?: string) => {
           Add Class
         </button>
         {modalOpen && (
-          <SearchModal //TODO respec into handleSearchClass, let json response dictate use of SearchResults/Add modal w/ custom none found message for Add
+          <SearchModal
             isOpen={modalOpen}
             onClose={() => setModalOpen(false)}
-            onSave={handleAddClass}
+            onSave={handleSearchClass}
           />
         )}
         <div className="p-2 bg-black border border-yellow-500 rounded-lg flex items-center justify-center">
