@@ -30,17 +30,24 @@ export default function PathBar({ username, setPath, setWalkTime } : PathBarProp
             
             const data = await response.json();
 
+            // path with only start and end node displayed 
+            const cleanPath = [];
+            cleanPath.push(data.path[0]);
+
             for (let item of data.path) {
                 if (item.geometry.type === "LineString") {
                     distance += item.properties.distance;
+                    cleanPath.push(item);
                 }
             }
+
+            cleanPath.push(data.path[data.path.length - 1]);
 
             setWalkTime(Math.round((60/3) * distance));
 
             setPath({
                 "type": "FeatureCollection",
-                "features": data.path
+                "features": cleanPath
             });
 
         } catch (error) {
