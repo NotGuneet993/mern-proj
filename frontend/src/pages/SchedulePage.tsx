@@ -40,6 +40,7 @@ const SchedulePage = ({ globalUser }: SchedulePageProps) => {
   // State to hold class data and modal open status
   const [classes, setClasses] = useState<ClassData[]>([]);
   const [modalOpen, setModalOpen] = useState(false);
+  const [found, setFound] = useState(false);
 
   // Function to load classes from backend
   const loadClasses = () => {
@@ -171,7 +172,6 @@ const handleDeleteClass = (classId?: string) => {
   const handleSearchClass = (searchClassData: ClassData) => {
     const params = new URLSearchParams({ course_code: searchClassData.course_code, professor: searchClassData.professor });
     let sections = [];
-    let found = false;
     fetch(`${API_URL}/schedule/search?${params.toString()}`)
       .then((res) => res.json())
       .then((data) => {
@@ -182,16 +182,21 @@ const handleDeleteClass = (classId?: string) => {
           professor: cls.professor, 
           meeting_type: cls.meeting_type, 
           type: cls.type, 
-          class_schedule: cls.class_schedule}));
+          class_schedule: cls.class_schedule
+        }));
         
+
+        console.log(`${sections.length}, ${sections}`);
         if (sections.length > 0) {
-         found = true; 
+         setFound(true);
         }
 
-        setModalOpen(true); // TODO this belongs elsewhere but im not sure where
+        setModalOpen(false); // TODO this belongs elsewhere but im not sure where
       })
       .catch((err) => console.error('Error fetching class sections:', err));
 
+      setModalOpen(true);
+      console.log(`${found}, ${modalOpen}`);
       if (found) {
         console.log("Sections found!");
         {modalOpen && (
@@ -315,7 +320,7 @@ const handleDeleteClass = (classId?: string) => {
         {modalOpen && (
           <SearchModal
             isOpen={modalOpen}
-            onClose={() => setModalOpen(false)}
+            onClose={() => null}
             onSave={handleSearchClass}
           />
         )}
