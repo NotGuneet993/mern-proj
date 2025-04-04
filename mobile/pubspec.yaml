@@ -1,5 +1,5 @@
 name: mobile
-description: "A new Flutter project."
+description: "KnightNav Flutter Mobile Application"
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
@@ -34,12 +34,13 @@ dependencies:
   shared_preferences: ^2.2.2
   flutter_dotenv: ^5.1.0
   latlong2: ^0.9.1
-  file_picker: ^9.2.3
+  file_picker: ^10.0.0
   path_provider: ^2.0.9
   collection: ^1.17.0
   syncfusion_flutter_calendar: ^29.1.33
   flutter_map: ^8.1.1
-  geolocator: ^9.0.2
+  geolocator: ^13.0.4
+  table_calendar: ^3.0.8
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.

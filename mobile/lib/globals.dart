@@ -1,3 +1,4 @@
-library;
+// globals.dart
+library globals;
 
 String? currentUser;

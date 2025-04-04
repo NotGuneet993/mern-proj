@@ -1,3 +1,4 @@
+// login_screen.dart
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:mobile/globals.dart' as globals;
@@ -41,7 +42,7 @@ class _LoginScreenState extends State<LoginScreen> {
         );
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => DashboardScreen()),
+          MaterialPageRoute(builder: (context) => const DashboardScreen()),
         );
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -98,7 +99,7 @@ class _LoginScreenState extends State<LoginScreen> {
               ElevatedButton(
                 onPressed: handleLogin,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor:  Color.fromARGB(255, 236, 220, 39),
+                  backgroundColor: Color.fromARGB(255, 236, 220, 39),
                   padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 14),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(8),
@@ -114,7 +115,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 onPressed: navigateToRegistration,
                 child: const Text(
                   "Register",
-                  style: TextStyle(fontSize: 16, color:  Color.fromARGB(255, 236, 220, 39)),
+                  style: TextStyle(fontSize: 16, color: Color.fromARGB(255, 236, 220, 39)),
                 ),
               ),
             ],

@@ -1,3 +1,4 @@
+// registration_screen.dart
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -18,9 +19,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
   final passwordController = TextEditingController();
   final confirmPasswordController = TextEditingController();
 
-  // Updated regex to enforce 8-32 characters plus at least one uppercase letter and one special character.
-  final RegExp emailRegExp =
-      RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
+  final RegExp emailRegExp = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
   final RegExp passwordRegExp =
       RegExp(r'^(?=.*[A-Z])(?=.*[!@#\$%^&*]).{8,32}$');
 
@@ -51,10 +50,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
         title: Text(title),
         content: Text(message),
         actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text('OK'),
-          )
+          TextButton(onPressed: () => Navigator.of(context).pop(), child: const Text('OK')),
         ],
       ),
     );
@@ -97,9 +93,6 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
     final password = passwordController.text;
     final url = '${widget.API_URL}/api/users/register';
 
-    print(
-        "Registering with Name: $name, Email: $email, Username: $username, Password: $password");
-
     try {
       final response = await http.post(
         Uri.parse(url),
@@ -113,13 +106,11 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
       );
 
       if (response.statusCode == 200) {
-        _showMessageDialog("Success", "Registration successful, please check your email to verify your ");
+        _showMessageDialog("Success", "Registration successful, please check your email to verify your account.");
       } else if (response.statusCode == 409) {
-        _showMessageDialog(
-            "Error", "Email already associated with an account!");
+        _showMessageDialog("Error", "Email already associated with an account!");
       } else {
-        _showMessageDialog(
-            "Error", "Registration failed with status code: ${response.statusCode}");
+        _showMessageDialog("Error", "Registration failed with status code: ${response.statusCode}");
       }
     } catch (error) {
       print("Error during registration: $error");
@@ -205,8 +196,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                 onPressed: isFormValid ? handleRegistration : null,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color.fromARGB(255, 236, 220, 39),
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 40, vertical: 14),
+                  padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 14),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(8),
                   ),
