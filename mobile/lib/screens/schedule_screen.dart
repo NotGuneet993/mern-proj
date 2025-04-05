@@ -6,10 +6,10 @@ import 'package:http/http.dart' as http;
 import 'package:mobile/globals.dart' as globals;
 import 'add_class_dialog.dart';
 
-/// Represents a single day's schedule info, e.g. "Monday 8:00 AM-9:00 AM".
+/// Represents a single day's schedule info, e.g. "Monday 8:00 AM-9:00 AM" or "None".
 class ClassSchedule {
   final String day;
-  final String time; // e.g. "8:00 AM-9:00 AM" or "None"
+  final String time;
 
   ClassSchedule({required this.day, required this.time});
 
@@ -27,8 +27,8 @@ class ClassData {
   final String courseCode;
   final String className;
   final String professor;
-  final String meetingType;
-  final String type;
+  final String meetingType;   // in-person, mixed-mode, etc.
+  final String type;          // lecture, lab, etc.
   final String building;
   final String? buildingPrefix;
   final String roomNumber;
@@ -66,7 +66,7 @@ class ClassData {
 }
 
 class ScheduleScreen extends StatefulWidget {
-  const ScheduleScreen({super.key});
+  const ScheduleScreen({Key? key}) : super(key: key);
 
   @override
   State<ScheduleScreen> createState() => _ScheduleScreenState();
@@ -76,6 +76,7 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
   List<ClassData> _classes = [];
   bool _isLoading = false;
 
+  // If you have something like http://10.0.2.2:5000, ensure .env is set properly
   String get apiUrl => dotenv.env['VITE_API_URL'] ?? '';
 
   @override
@@ -84,6 +85,7 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
     _fetchClasses();
   }
 
+  /// Fetch the current user's classes from: GET /api/users/classes?username=...
   Future<void> _fetchClasses() async {
     final username = globals.currentUser;
     if (username == null) {
@@ -96,12 +98,15 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
     try {
       final url = Uri.parse('$apiUrl/api/users/classes?username=$username');
       final response = await http.get(url, headers: {'Content-Type': 'application/json'});
+      print("Fetch classes response code: ${response.statusCode}");
+      print("Fetch classes body: ${response.body}");
+
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
         if (data is List) {
-          final List<ClassData> loaded = data.map((e) => ClassData.fromJson(e)).toList();
+          final loaded = data.map((e) => ClassData.fromJson(e)).toList();
           setState(() {
-            _classes = loaded;
+            _classes = List<ClassData>.from(loaded);
           });
         } else {
           print("Unexpected response format: not a list");
@@ -118,7 +123,7 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
     }
   }
 
-  /// Removes the class from the user's schedule by calling `PUT /users/removeClassFromUser`
+  /// Removes the class from the user's schedule by calling PUT /api/users/removeClassFromUser
   Future<void> _deleteClass(String? classId) async {
     final username = globals.currentUser;
     if (classId == null || username == null) return;
@@ -143,14 +148,14 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
     }
   }
 
-  /// Called when user completes the "Add Class" dialog.
-  /// We must replicate: POST /schedule/getClass -> get classID -> PUT /users/addClassToUser
+  /// Called when user completes the "Add Class" dialog
+  /// We replicate: POST /api/schedule/getClass -> get classID -> PUT /api/users/addClassToUser
   Future<void> _handleAddClass(ClassData newClass) async {
     final username = globals.currentUser;
     if (username == null) return;
 
     try {
-      // 1) POST /schedule/getClass with the new class data to get or create a class doc.
+      // 1) POST /api/schedule/getClass with the new class data to get or create a class doc.
       final getClassUrl = Uri.parse('$apiUrl/api/schedule/getClass');
       final resp1 = await http.post(
         getClassUrl,
@@ -170,6 +175,7 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
           }).toList(),
         }),
       );
+
       if (resp1.statusCode != 200) {
         print("getClass call failed: ${resp1.statusCode} ${resp1.body}");
         return;
@@ -177,7 +183,7 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
       final decoded1 = jsonDecode(resp1.body);
       final classID = decoded1['classID'];
 
-      // 2) PUT /users/addClassToUser with that classID
+      // 2) PUT /api/users/addClassToUser with that classID
       final addToUserUrl = Uri.parse('$apiUrl/api/users/addClassToUser');
       final resp2 = await http.put(
         addToUserUrl,
@@ -251,22 +257,18 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
                             else
                               Text("Location: ${cls.building} ${cls.roomNumber}"),
                             const SizedBox(height: 6),
+
                             // Class schedule times
                             if (cls.classSchedule != null && cls.classSchedule!.isNotEmpty)
                               ...cls.classSchedule!
                                   .where((sched) => sched.time != 'None')
                                   .map((sched) => Text("${sched.day}: ${sched.time}"))
                                   .toList(),
-                            // Buttons: Delete etc.
+
+                            // Delete button
                             Row(
                               mainAxisAlignment: MainAxisAlignment.end,
                               children: [
-                                // Edit is optional, not implemented in this example
-                                // ElevatedButton(
-                                //   onPressed: () => _handleEditClass(cls),
-                                //   child: const Text("Edit"),
-                                // ),
-                                const SizedBox(width: 8),
                                 ElevatedButton(
                                   style: ElevatedButton.styleFrom(
                                     backgroundColor: Colors.red,
@@ -285,10 +287,10 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
       floatingActionButton: FloatingActionButton(
         backgroundColor: const Color.fromARGB(255, 236, 220, 39),
         onPressed: () async {
-          // Show the AddClassDialog
-          final result = await showDialog<ClassData>(
+          // Show the AddClassDialog (returns a ClassData if user saves)
+          final ClassData? result = await showDialog<ClassData>(
             context: context,
-            builder: (ctx) => AddClassDialog(),
+            builder: (ctx) => const AddClassDialog(),
           );
           if (result != null) {
             // The user submitted new class data
