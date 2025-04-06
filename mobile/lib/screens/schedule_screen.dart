@@ -5,6 +5,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 import 'package:mobile/globals.dart' as globals;
 import 'add_class_dialog.dart';
+import 'search_class_dialog.dart';
 
 /// Represents a single day's schedule info, e.g. "Monday 8:00 AM-9:00 AM" or "None".
 class ClassSchedule {
@@ -63,6 +64,15 @@ class ClassData {
           .toList(),
     );
   }
+
+  /// Helper to parse partial search results from the server
+  static List<ClassData> parseSearchList(String responseBody) {
+    final data = jsonDecode(responseBody);
+    if (data is List) {
+      return data.map((e) => ClassData.fromJson(e)).toList();
+    }
+    return [];
+  }
 }
 
 class ScheduleScreen extends StatefulWidget {
@@ -76,7 +86,6 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
   List<ClassData> _classes = [];
   bool _isLoading = false;
 
-  // If you have something like http://10.0.2.2:5000, ensure .env is set properly
   String get apiUrl => dotenv.env['VITE_API_URL'] ?? '';
 
   @override
@@ -92,14 +101,11 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
       print("No current user found. Cannot fetch classes.");
       return;
     }
-    setState(() {
-      _isLoading = true;
-    });
+    setState(() => _isLoading = true);
+
     try {
       final url = Uri.parse('$apiUrl/api/users/classes?username=$username');
       final response = await http.get(url, headers: {'Content-Type': 'application/json'});
-      print("Fetch classes response code: ${response.statusCode}");
-      print("Fetch classes body: ${response.body}");
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
@@ -117,13 +123,11 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
     } catch (err) {
       print("Error fetching schedule: $err");
     } finally {
-      setState(() {
-        _isLoading = false;
-      });
+      setState(() => _isLoading = false);
     }
   }
 
-  /// Removes the class from the user's schedule by calling PUT /api/users/removeClassFromUser
+  /// Removes the class from the user's schedule via PUT /api/users/removeClassFromUser
   Future<void> _deleteClass(String? classId) async {
     final username = globals.currentUser;
     if (classId == null || username == null) return;
@@ -138,7 +142,6 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
         }),
       );
       if (response.statusCode == 200) {
-        // Refresh the list
         await _fetchClasses();
       } else {
         print("Delete failed: ${response.statusCode} ${response.body}");
@@ -148,14 +151,14 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
     }
   }
 
-  /// Called when user completes the "Add Class" dialog
+  /// Called when user completes the "Add Class" flow
   /// We replicate: POST /api/schedule/getClass -> get classID -> PUT /api/users/addClassToUser
   Future<void> _handleAddClass(ClassData newClass) async {
     final username = globals.currentUser;
     if (username == null) return;
 
     try {
-      // 1) POST /api/schedule/getClass with the new class data to get or create a class doc.
+      // 1) POST /api/schedule/getClass
       final getClassUrl = Uri.parse('$apiUrl/api/schedule/getClass');
       final resp1 = await http.post(
         getClassUrl,
@@ -176,14 +179,15 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
         }),
       );
 
-      if (resp1.statusCode != 200) {
+      if (resp1.statusCode != 200 && resp1.statusCode != 201) {
         print("getClass call failed: ${resp1.statusCode} ${resp1.body}");
         return;
       }
+
       final decoded1 = jsonDecode(resp1.body);
       final classID = decoded1['classID'];
 
-      // 2) PUT /api/users/addClassToUser with that classID
+      // 2) PUT /api/users/addClassToUser
       final addToUserUrl = Uri.parse('$apiUrl/api/users/addClassToUser');
       final resp2 = await http.put(
         addToUserUrl,
@@ -194,13 +198,41 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
         }),
       );
       if (resp2.statusCode == 200) {
-        // Refresh
         await _fetchClasses();
       } else {
         print("addClassToUser failed: ${resp2.statusCode} ${resp2.body}");
       }
     } catch (err) {
       print("Error adding class: $err");
+    }
+  }
+
+  /// The user wants to add a class:
+  /// 1) Show SearchClassDialog
+  ///    - If user picks a class => call _handleAddClass(...)
+  ///    - If user chooses "Not my class" => show AddClassDialog
+  Future<void> _onFabPressed() async {
+    final searchResult = await showDialog<SearchClassResult>(
+      context: context,
+      builder: (ctx) => const SearchClassDialog(),
+    );
+    if (searchResult == null) return; // user canceled
+
+    if (searchResult.createNew) {
+      // Show AddClassDialog
+      final newClassData = await showDialog<ClassData>(
+        context: context,
+        builder: (ctx) => const AddClassDialog(),
+      );
+      if (newClassData != null) {
+        await _handleAddClass(newClassData);
+      }
+    } else {
+      // They selected an existing class
+      final selectedClass = searchResult.selectedClass;
+      if (selectedClass != null) {
+        await _handleAddClass(selectedClass);
+      }
     }
   }
 
@@ -286,17 +318,7 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
                 ),
       floatingActionButton: FloatingActionButton(
         backgroundColor: const Color.fromARGB(255, 236, 220, 39),
-        onPressed: () async {
-          // Show the AddClassDialog (returns a ClassData if user saves)
-          final ClassData? result = await showDialog<ClassData>(
-            context: context,
-            builder: (ctx) => const AddClassDialog(),
-          );
-          if (result != null) {
-            // The user submitted new class data
-            await _handleAddClass(result);
-          }
-        },
+        onPressed: _onFabPressed,
         child: const Icon(Icons.add, color: Colors.black),
       ),
     );
