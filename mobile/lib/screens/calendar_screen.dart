@@ -9,7 +9,7 @@ import 'schedule_screen.dart';
 import 'package:table_calendar/table_calendar.dart';
 
 class CalendarScreen extends StatefulWidget {
-  const CalendarScreen({super.key});
+  const CalendarScreen({Key? key}) : super(key: key);
 
   @override
   State<CalendarScreen> createState() => _CalendarScreenState();
@@ -18,18 +18,33 @@ class CalendarScreen extends StatefulWidget {
 class _CalendarScreenState extends State<CalendarScreen> {
   // We'll store classes in memory
   List<ClassData> _classes = [];
+
   // A map from DateTime -> list of strings (event titles)
   Map<DateTime, List<String>> _events = {};
 
+  // For TableCalendar
   CalendarFormat _calendarFormat = CalendarFormat.week;
   DateTime _focusedDay = DateTime.now();
   DateTime? _selectedDay;
+
+  // Adjust these as needed for your semester
+  final DateTime _startOfSemester = DateTime(2025, 1, 9);
+  final DateTime _endOfSemester = DateTime(2025, 4, 30);
 
   String get apiUrl => dotenv.env['VITE_API_URL'] ?? '';
 
   @override
   void initState() {
     super.initState();
+
+    // Ensure _focusedDay is not after _endOfSemester
+    final now = DateTime.now();
+    if (now.isAfter(_endOfSemester)) {
+      _focusedDay = _endOfSemester;
+    } else {
+      _focusedDay = now;
+    }
+
     _fetchClasses();
   }
 
@@ -48,69 +63,75 @@ class _CalendarScreenState extends State<CalendarScreen> {
           setState(() {
             _classes = loaded;
           });
-          // Build events
-          _buildEventsForWeek(loaded);
+          // Build events for the entire semester
+          _buildEventsForSemester(loaded);
         }
       } else {
-        print("Error fetching classes for calendar: ${resp.statusCode} ${resp.body}");
+        debugPrint("Error fetching classes for calendar: ${resp.statusCode} ${resp.body}");
       }
     } catch (err) {
-      print("Error: $err");
+      debugPrint("Error: $err");
     }
   }
 
-  /// Build a map from date -> list of event titles. We'll pick the "current or next 7 days"
-  /// repeated weekly logic. This is a simple approach: we’ll map each day name to a date
-  /// in the current week, then store events for that day.
-  void _buildEventsForWeek(List<ClassData> classes) {
+  /// Build a map from date -> list of event titles, for each week
+  /// between _startOfSemester and _endOfSemester.
+  void _buildEventsForSemester(List<ClassData> classes) {
     // Clear old events
     _events.clear();
 
-    // We find the date for each day of the week
-    // Mon=1, Tue=2, Wed=3, Thu=4, Fri=5, Sat=6, Sun=7
-    // Or use Sunday=0 approach. We can adapt.
-    // We'll do Monday=1... Sunday=7 approach:
-    Map<String, int> dayMap = {
+    // Monday=1, Tuesday=2, ..., Sunday=7
+    final Map<String, int> dayMap = {
       'Monday': 1,
       'Tuesday': 2,
       'Wednesday': 3,
       'Thursday': 4,
       'Friday': 5,
       'Saturday': 6,
-      'Sunday': 7
+      'Sunday': 7,
     };
-
-    // We'll find the start of the current week (Monday), then add dayMap[dayName]-1
-    // Or adapt to your preference if Sunday is the first day.
-    DateTime now = DateTime.now();
-    // get the most recent Monday
-    DateTime monday = now.subtract(Duration(days: now.weekday - 1));
-    // If your definition of Monday is different, adjust.
 
     for (final cls in classes) {
       if (cls.classSchedule == null) continue;
+
       for (final sched in cls.classSchedule!) {
         if (sched.time == 'None') continue;
-
-        final dayName = sched.day; // e.g. "Monday"
+        final dayName = sched.day;
         final dayIndex = dayMap[dayName];
         if (dayIndex == null) continue;
 
-        // The day of that schedule in the current week
-        final dateForDay = monday.add(Duration(days: dayIndex - 1));
+        // Find the first occurrence of that weekday on/after _startOfSemester
+        final firstOccur = _findFirstOccurrenceOfWeekday(dayIndex, _startOfSemester);
+        if (firstOccur == null) continue;
 
-        // We could parse the startTime, endTime for a more advanced approach,
-        // but for display we'll just show them as text.
-        final eventTitle =
-            "${cls.className} (${cls.courseCode})\n$dayName ${sched.time}";
+        // Keep adding 7 days until we pass _endOfSemester
+        DateTime current = firstOccur;
+        while (!current.isAfter(_endOfSemester)) {
+          final eventTitle = "${cls.className} (${cls.courseCode})\n$dayName ${sched.time}";
+          final dayKey = DateTime(current.year, current.month, current.day);
+          _events.putIfAbsent(dayKey, () => []);
+          _events[dayKey]!.add(eventTitle);
 
-        // Put it in the _events map
-        final dayKey = DateTime(dateForDay.year, dateForDay.month, dateForDay.day);
-        _events.putIfAbsent(dayKey, () => []);
-        _events[dayKey]!.add(eventTitle);
+          current = current.add(const Duration(days: 7));
+        }
       }
     }
+
     setState(() {});
+  }
+
+  /// Finds the first occurrence of `targetWeekday` on or after [startDate].
+  /// Monday=1, Tuesday=2, ... Sunday=7
+  DateTime? _findFirstOccurrenceOfWeekday(int targetWeekday, DateTime startDate) {
+    if (targetWeekday < 1 || targetWeekday > 7) return null;
+
+    if (startDate.weekday == targetWeekday) {
+      return startDate;
+    }
+
+    int diff = targetWeekday - startDate.weekday;
+    if (diff < 0) diff += 7;
+    return startDate.add(Duration(days: diff));
   }
 
   List<String> _getEventsForDay(DateTime day) {
@@ -128,18 +149,16 @@ class _CalendarScreenState extends State<CalendarScreen> {
       body: Column(
         children: [
           TableCalendar(
-            firstDay: DateTime.now().subtract(const Duration(days: 365)),
-            lastDay: DateTime.now().add(const Duration(days: 365)),
+            firstDay: _startOfSemester,
+            lastDay: _endOfSemester,
             focusedDay: _focusedDay,
             calendarFormat: _calendarFormat,
             selectedDayPredicate: (day) => isSameDay(_selectedDay, day),
-            eventLoader: (day) {
-              return _getEventsForDay(day);
-            },
+            eventLoader: (day) => _getEventsForDay(day),
             onDaySelected: (selectedDay, focusedDay) {
               setState(() {
                 _selectedDay = selectedDay;
-                _focusedDay = focusedDay; // update focused day
+                _focusedDay = focusedDay;
               });
             },
             onFormatChanged: (format) {
@@ -148,7 +167,12 @@ class _CalendarScreenState extends State<CalendarScreen> {
               });
             },
             onPageChanged: (focusedDay) {
-              _focusedDay = focusedDay;
+              // If the new page is after endOfSemester, clamp it
+              if (focusedDay.isAfter(_endOfSemester)) {
+                _focusedDay = _endOfSemester;
+              } else {
+                _focusedDay = focusedDay;
+              }
             },
           ),
           const SizedBox(height: 8),
@@ -163,19 +187,14 @@ class _CalendarScreenState extends State<CalendarScreen> {
 
   Widget _buildEventList() {
     final dayEvents = _selectedDay == null ? [] : _getEventsForDay(_selectedDay!);
-
     if (dayEvents.isEmpty) {
-      return const Center(
-        child: Text("No events"),
-      );
+      return const Center(child: Text("No events"));
     }
     return ListView.builder(
       itemCount: dayEvents.length,
-      itemBuilder: (ctx, idx) {
-        return ListTile(
-          title: Text(dayEvents[idx]),
-        );
-      },
+      itemBuilder: (ctx, idx) => ListTile(
+        title: Text(dayEvents[idx]),
+      ),
     );
   }
 }
