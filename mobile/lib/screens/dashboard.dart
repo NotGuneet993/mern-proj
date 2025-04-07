@@ -6,16 +6,15 @@ import 'calendar_screen.dart';
 import 'graph_map.dart';
 
 class DashboardScreen extends StatefulWidget {
-  const DashboardScreen({super.key});
+  const DashboardScreen({Key? key}) : super(key: key);
 
   @override
-  _DashboardScreenState createState() => _DashboardScreenState();
+  State<DashboardScreen> createState() => _DashboardScreenState();
 }
 
 class _DashboardScreenState extends State<DashboardScreen> {
-  int _currentIndex = 0;
+  int _currentIndex = 2;
 
-  // We have three pages: the new ScheduleScreen, the new CalendarScreen, and the existing GraphMap.
   final List<Widget> _pages = [
     const ScheduleScreen(),
     const CalendarScreen(),
@@ -25,51 +24,63 @@ class _DashboardScreenState extends State<DashboardScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: _pages[_currentIndex], // Show the selected page
-      bottomNavigationBar: SafeArea(
-        child: BottomAppBar(
-          height: 44, // adjust as needed
+      body: _pages[_currentIndex],
+      bottomNavigationBar: BottomAppBar(
+        color: Colors.white,
+        // Give enough height that 48x48 IconButtons won't overflow
+        height: 56,
+        child: SafeArea(
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
-              // Schedule
-              GestureDetector(
-                onTap: () => setState(() => _currentIndex = 0),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(Icons.list,
-                        size: 20,
-                        color: _currentIndex == 0 ? Colors.blue : Colors.grey),
-                  ],
-                ),
-              ),
-              // Calendar
-              GestureDetector(
-                onTap: () => setState(() => _currentIndex = 1),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(Icons.calendar_today,
-                        size: 20,
-                        color: _currentIndex == 1 ? Colors.blue : Colors.grey),
-                  ],
-                ),
-              ),
               // Map
-              GestureDetector(
-                onTap: () => setState(() => _currentIndex = 2),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(Icons.map,
-                        size: 20,
-                        color: _currentIndex == 2 ? Colors.blue : Colors.grey),
-                  ],
+              IconButton(
+                icon: Icon(
+                  Icons.map,
+                  color: _currentIndex == 2 ? Colors.blue : Colors.grey,
                 ),
+                // The icon will stay 24px, but the button
+                // constraints guarantee a 48x48 hitbox.
+                iconSize: 24,
+                padding: EdgeInsets.zero,
+                alignment: Alignment.center,
+                constraints: const BoxConstraints(
+                  minWidth: 96,
+                  minHeight: 48,
+                ),
+                onPressed: () => setState(() => _currentIndex = 2),
+              ),
+
+              // Schedule
+              IconButton(
+                icon: Icon(
+                  Icons.list,
+                  color: _currentIndex == 0 ? Colors.blue : Colors.grey,
+                ),
+                iconSize: 24,
+                padding: EdgeInsets.zero,
+                alignment: Alignment.center,
+                constraints: const BoxConstraints(
+                  minWidth: 96,
+                  minHeight: 48,
+                ),
+                onPressed: () => setState(() => _currentIndex = 0),
+              ),
+
+              // Calendar
+              IconButton(
+                icon: Icon(
+                  Icons.calendar_today,
+                  color: _currentIndex == 1 ? Colors.blue : Colors.grey,
+                ),
+                iconSize: 24,
+                padding: EdgeInsets.zero,
+                alignment: Alignment.center,
+                constraints: const BoxConstraints(
+                  minWidth: 96,
+                  minHeight: 48,
+                ),
+                onPressed: () => setState(() => _currentIndex = 1),
               ),
             ],
           ),
