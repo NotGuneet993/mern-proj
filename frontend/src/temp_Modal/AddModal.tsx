@@ -3,12 +3,15 @@ import { AiOutlineCloseCircle } from 'react-icons/ai';
 const API_URL = import.meta.env.VITE_API_URL;
 
 interface AddModalProps {
+  message: string;
   isOpen: boolean;
   onClose: () => void;
   onSave: (newClassData: any) => void;
 }
 
-function AddModal({ isOpen, onClose, onSave }: AddModalProps) {
+function AddModal({ message, isOpen, onClose, onSave }: AddModalProps) {
+  if (!message) message = "No Message Sent (How)";
+
   // Existing fields
   const [courseCode, setCourseCode] = useState('');
   const [className, setClassName] = useState('');
@@ -24,7 +27,8 @@ function AddModal({ isOpen, onClose, onSave }: AddModalProps) {
   const [matchedCourseCodes, setMatchedCourseCodes] = useState<string[]>([]);
   const [matchedClassNames, setMatchedClassNames] = useState<string[]>([]);
   const [matchedProfessors, setMatchedProfessors] = useState<string[]>([]);
-  const [focusedField, setFocusedField] = useState<'courseCode' | 'className' | 'professor' | null>(null);
+  const [matchedBuildings, setMatchedBuildings] = useState<string[]>([]);
+  const [focusedField, setFocusedField] = useState<'courseCode' | 'className' | 'professor' | 'building' | null>(null);
 
   // Days of the week
   const daysOfWeek = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
@@ -106,6 +110,22 @@ function AddModal({ isOpen, onClose, onSave }: AddModalProps) {
     }
   }, [professor, focusedField]);
 
+  useEffect(() => {
+    if (focusedField === 'building' && building.trim() && searchCount < 50) {
+      setSearchCount((prev) => prev + 1);
+      const params = new URLSearchParams({ building });
+      fetch(`${API_URL}/schedule/search?${params.toString()}`)
+        .then((res) => res.json())
+        .then((data) => {
+          const buildings = data.map((cls: any) => cls.building);
+          setMatchedBuildings(buildings);
+        })
+        .catch((err) => console.error('Error fetching building matches:', err));
+    } else {
+      setMatchedBuildings([]);
+    }
+  }, [building, focusedField]);
+
   /***************************************************************
    * Handler: user picks a suggestion
    ***************************************************************/
@@ -121,6 +141,10 @@ function AddModal({ isOpen, onClose, onSave }: AddModalProps) {
     setProfessor(prof);
     setMatchedProfessors([]);
   };
+  const selectBuilding = (bldg: string) => {
+    setBuilding(bldg);
+    setMatchedBuildings([]);
+  }
 
   /***************************************************************
    * Toggle day enabled
@@ -196,6 +220,7 @@ function AddModal({ isOpen, onClose, onSave }: AddModalProps) {
     setMatchedCourseCodes([]);
     setMatchedClassNames([]);
     setMatchedProfessors([]);
+    setMatchedBuildings([]);
 
     // Reset schedule
     setSchedule(
@@ -217,7 +242,7 @@ function AddModal({ isOpen, onClose, onSave }: AddModalProps) {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-gray-900/50 flex items-center justify-center z-60 pb-10 mt-15 md:pt-20 md:pb-5 overflow-scroll">
+    <div className="fixed inset-0 bg-gray-900/50 flex items-center justify-center z-100 pb-10 mt-15 md:pt-20 md:pb-5 overflow-scroll">
       <div className="relative max-w-5xl w-full bg-white p-6 rounded shadow-lg text-black">
         {/* Close Button */}
         <button
@@ -228,7 +253,7 @@ function AddModal({ isOpen, onClose, onSave }: AddModalProps) {
           <AiOutlineCloseCircle />
         </button>
 
-        <h2 className="text-xl font-semibold mb-4">Add Class</h2>
+        <h2 className="text-xl font-semibold mb-4">{message}</h2>
 
         <form onSubmit={handleSubmit} className="flex flex-col md:flex-row gap-8">
           {/* LEFT COLUMN */}
@@ -361,22 +386,41 @@ function AddModal({ isOpen, onClose, onSave }: AddModalProps) {
               <option value="discussion">Discussion</option>
             </select>
 
-            {/* BUILDING */}
+            {/* Building */}
             <label htmlFor="building" className="block mb-1">
-              Building (Required)
+              Building
             </label>
             <input
               id="building"
               type="text"
               value={building}
+              onFocus={() => setFocusedField('building')}
+              onBlur={() => {
+                setTimeout(() => {
+                  setMatchedBuildings([]);
+                  setFocusedField(null);
+                }, 150);
+              }}
               onChange={(e) => setBuilding(e.target.value)}
               className="border p-1 w-full mb-2"
-              required
             />
+            {focusedField === 'building' && matchedBuildings.length > 0 && (
+              <ul className="border bg-white mb-2 max-h-40 overflow-y-auto">
+                {matchedBuildings.map((name, idx) => (
+                  <li
+                    key={`${name}-${idx}`}
+                    onMouseDown={() => selectBuilding(name)}
+                    className="px-2 py-1 cursor-pointer hover:bg-blue-100"
+                  >
+                    {name}
+                  </li>
+                ))}
+              </ul>
+            )}
 
             {/* BUILDING PREFIX */}
             <label htmlFor="buildingPrefix" className="block mb-1">
-              Building Prefix (Optional)
+              Building Prefix <span className="text-green-500">(Optional)</span>
             </label>
             <input
               id="buildingPrefix"
@@ -388,7 +432,7 @@ function AddModal({ isOpen, onClose, onSave }: AddModalProps) {
 
             {/* ROOM NUMBER */}
             <label htmlFor="roomNumber" className="block mb-1">
-              Room Number (Required)
+              Room Number <span className="text-red-500">(Required)</span>
             </label>
             <input
               id="roomNumber"

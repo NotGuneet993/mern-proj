@@ -5,26 +5,11 @@ import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import interactionPlugin from '@fullcalendar/interaction';
 import AddModal from '../temp_Modal/AddModal'; 
-import { AiFillEdit, AiFillDelete } from 'react-icons/ai';
+import SearchModal from '../temp_Modal/SearchModal'; 
+import ResultsModal from '../temp_Modal/ResultsModal'; 
+import { AiFillDelete } from 'react-icons/ai';
+import { ClassData } from '../types/ClassData';
 const API_URL = import.meta.env.VITE_API_URL;
-
-interface ClassSchedule {
-  day: string;
-  time: string; // e.g. "8:00 AM-9:00 AM" or "None"
-}
-
-interface ClassData {
-  _id?: string;
-  course_code: string;
-  class_name: string;
-  professor: string;
-  meeting_type: string;
-  type: string;
-  building: string;
-  building_prefix?: string;
-  room_number: string;
-  class_schedule: ClassSchedule[] | null;
-}
 
 type SchedulePageProps = {
   globalUser: string;
@@ -39,6 +24,18 @@ const SchedulePage = ({ globalUser }: SchedulePageProps) => {
   // State to hold class data and modal open status
   const [classes, setClasses] = useState<ClassData[]>([]);
   const [modalOpen, setModalOpen] = useState(false);
+  const [found, setFound] = useState<boolean | null>(null); // null meaning we haven't searched yet
+  const [searchResults, setSearchResults] = useState<ClassData[]>([]);
+  const [manualMode, setManualMode] = useState(false); // for manual class addition
+
+  // Handler for resetting search-related variables on modal close
+  const handleCloseModal = () => {
+    setModalOpen(false);
+    setFound(null);
+    setSearchResults([]);
+    if (manualMode) setManualMode(false);
+    console.log("Modal closed");
+  };
 
   // Function to load classes from backend
   const loadClasses = () => {
@@ -104,12 +101,20 @@ const SchedulePage = ({ globalUser }: SchedulePageProps) => {
     return { hour: hours, minute: minutes };
   };
 
-  // Helper: Create an ISO string from a day name and a time string (e.g., "8:00 AM")
-  const createDateTime = (dayName: string, timeStr: string): string => {
+  // Helper: Create an array of ISO strings from a day name and a time string (e.g., "8:00 AM")
+  const createDateTimes = (dayName: string, timeStr: string): string[] => {
+    let dates = [];
+    const endOfSem = new Date('2025-04-30T00:00:00'); // TODO End of Spring, change as needed
+    
     const date = getNextDateForDay(dayName);
     const { hour, minute } = parseTimeString(timeStr);
     date.setHours(hour, minute, 0, 0);
-    return date.toISOString();
+    while (date < endOfSem) {
+      dates.push(date.toISOString());
+      date.setDate(date.getDate() + 7); // Add a week
+    }
+    
+    return dates;
   };
 
   // Convert classes into FullCalendar events
@@ -123,74 +128,127 @@ const SchedulePage = ({ globalUser }: SchedulePageProps) => {
           // Expect time format "8:00 AM-9:00 AM"
           const [startTimeStr, endTimeStr] = sched.time.split('-');
           if (startTimeStr && endTimeStr) {
-            const event = {
-              title: `${cls.class_name} (${cls.course_code})`,
-              start: createDateTime(sched.day, startTimeStr.trim()),
-              end: createDateTime(sched.day, endTimeStr.trim()),
-              extendedProps: {
-                professor: cls.professor,
-                location: `${cls.building_prefix || ''} ${cls.building} ${cls.room_number}`.trim(),
-              },
-              color: '#d4af37', // Gold background
-              textColor: '#000000', // Black text
-            };
-            evts.push(event);
+            const starts = createDateTimes(sched.day, startTimeStr.trim());
+            const ends = createDateTimes(sched.day, endTimeStr.trim());
+            const total = starts.length;
+            
+            let i = 0; while (i < total) {
+              const event = {
+                title: `${cls.class_name} (${cls.course_code})`,
+                start: starts[i],
+                end: ends[i],
+                extendedProps: {
+                  professor: cls.professor,
+                  location: `${cls.building_prefix || ''} ${cls.building} ${cls.room_number}`.trim(),
+                },
+                color: '#d4af37', // Gold background
+                textColor: '#000000', // Black text
+              };
+              
+              evts.push(event);
+              i += 1;
+            }
           }
         });
     });
+    
+    console.log(evts);
     return evts;
   }, [classes]);
 
-  // Handler for deleting a class
-// Updated handler for deleting a class from a user
-const handleDeleteClass = (classId?: string) => {
-  if (!classId) return;
-  fetch(`${API_URL}/users/removeClassFromUser`, {
-    method: 'PUT',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ username: username, classId: classId }),
-  })
-    .then((res) => res.json())
-    .then((result) => {
-      console.log("Delete result:", result);
-      // After removal, re-fetch the updated classes
-      loadClasses();
+  // Updated handler for deleting a class from a user
+  const handleDeleteClass = (classId?: string) => {
+    if (!classId) return;
+    fetch(`${API_URL}/users/removeClassFromUser`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username: username, classId: classId }),
     })
-    .catch((err) => console.error("Error deleting class:", err));
-};
+      .then((res) => res.json())
+      .then((result) => {
+        console.log("Delete result:", result);
+        // After removal, re-fetch the updated classes
+        loadClasses();
+      })
+      .catch((err) => console.error("Error deleting class:", err));
+  };
 
   // Handler for editing a class (placeholder)
+  /*
   const handleEditClass = (classToEdit: ClassData) => {
     console.log("Edit class:", classToEdit);
     // TODO: Open an edit modal with pre-populated values
   };
+  */
+
+
+  // Handler for searching class sections (passed to SearchModal)
+  const handleSearchClass = (searchClassData: ClassData) => {
+    const params = new URLSearchParams({ 
+      course_code: searchClassData.course_code, professor: searchClassData.professor,
+      meeting_type: searchClassData.meeting_type, type: searchClassData.type });
+    let sections = [];
+    fetch(`${API_URL}/schedule/search?${params.toString()}`)
+      .then((res) => res.json())
+      .then((data) => {
+        sections = data.map((cls: any) => ({
+          _id: cls._id, 
+          course_code: cls.course_code, 
+          class_name: cls.class_name, 
+          professor: cls.professor, 
+          meeting_type: cls.meeting_type, 
+          type: cls.type, 
+          class_schedule: cls.class_schedule,
+          building: cls.building,
+          building_prefix: cls.building_prefix,
+          room_number: cls.room_number
+        }));
+        
+
+        setSearchResults(sections);
+        console.log(sections); // TODO Remove
+        setFound(sections.length > 0);
+        setModalOpen(true);
+      })
+      .catch((err) => {
+        console.error('Error fetching class sections:', err);
+        setFound(false);
+        setSearchResults([]);
+        setModalOpen(true); // still show modal even on error
+      });
+  
+  };
 
   // Handler for adding a class (passed to AddModal)
-  const handleAddClass = (newClassData: ClassData) => {
-    fetch(`${API_URL}/schedule/getClass`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(newClassData)
-    })
-      .then((response) => response.json())
-      .then((getClassResult) => {
-        const classID = getClassResult.classID;
-        // Now call the endpoint to add this class to the user's array
-        return fetch(`${API_URL}/users/addClassToUser`, {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ username: username, classId: classID })
+  const handleAddClass = (newClassData: ClassData[]) => {
+    newClassData.forEach((cls) => {
+      const body = JSON.stringify(cls);
+      console.log(`Body contains: ${body}`);
+      fetch(`${API_URL}/schedule/getClass`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: body
+      })
+        .then((response) => response.json())
+        .then((getClassResult) => {
+          const classID = getClassResult.classID;
+          // Now call the endpoint to add this class to the user's array
+          return fetch(`${API_URL}/users/addClassToUser`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username: username, classId: classID })
+          });
+        })
+        .then((response) => response.json())
+        .then((addToUserResult) => {
+          console.log('Added class to user:', addToUserResult);
+          // After successfully adding, re-fetch classes to update the schedule
+          loadClasses();
+        })
+        .catch((error) => {
+          console.error('Error in adding class or updating user:', error);
         });
-      })
-      .then((response) => response.json())
-      .then((addToUserResult) => {
-        console.log('Added class to user:', addToUserResult);
-        // After successfully adding, re-fetch classes to update the schedule
-        loadClasses();
-      })
-      .catch((error) => {
-        console.error('Error in adding class or updating user:', error);
-      });
+    });
   };
 
   return (
@@ -236,13 +294,6 @@ const handleDeleteClass = (classId?: string) => {
                 {/* Edit and Delete Buttons */}
                 <div className="mt-2 flex justify-end space-x-2">
                   <button 
-                    className="px-2 py-1 bg-yellow-300 text-gray-800 rounded hover:bg-yellow-600"
-                    onClick={() => handleEditClass(cls)}
-                  >
-                    <AiFillEdit className="inline-block mr-1" />
-                    <span className="text-xs">Edit</span>
-                  </button>
-                  <button 
                     className="px-2 py-1 bg-red-500 text-white rounded hover:bg-red-600"
                     onClick={() => handleDeleteClass(cls._id)}
                   >
@@ -260,16 +311,42 @@ const handleDeleteClass = (classId?: string) => {
         >
           Add Class
         </button>
+        {/* Part 1: Search for a class */}
         {modalOpen && (
-          <AddModal
+          <SearchModal
             isOpen={modalOpen}
-            onClose={() => setModalOpen(false)}
+            onClose={() => handleCloseModal()}
+            onSave={handleSearchClass}
+          />
+        )}
+        {/* Part 2A: Display search results or default to Add modal */}
+        {modalOpen && found !== null && (
+          found ? (
+            <ResultsModal
+              results={searchResults}
+              isOpen={modalOpen}
+              onClose={() => handleCloseModal()}
+              onSave={handleAddClass}
+              manualMode={ () => {setManualMode(true); setModalOpen(true)} }
+            />
+          ) : (
+            <AddModal
+              message="We couldn't find a section with those parameters! Let's add it manually."
+              isOpen={modalOpen}
+              onClose={() => handleCloseModal()}
+              onSave={handleAddClass}
+            />
+          )
+        )}
+        {/* Part 2B: User-driven manual addition */}
+        {modalOpen && manualMode && (
+          <AddModal
+            message="Manual Class Addition"
+            isOpen={modalOpen}
+            onClose={() => handleCloseModal()}
             onSave={handleAddClass}
           />
         )}
-        <div className="p-2 bg-black border border-yellow-500 rounded-lg flex items-center justify-center">
-          <p className="text-yellow-300 text-base">Aux Spot</p>
-        </div>
       </div>
 
       {/* RIGHT COLUMN: Calendar View */}
