@@ -21,7 +21,7 @@ class SearchClassResult {
 /// performs a partial search on /schedule/search, displays up to 10 matches.
 /// The user can pick one OR tap "Not my class" to create a new one.
 class SearchClassDialog extends StatefulWidget {
-  const SearchClassDialog({Key? key}) : super(key: key);
+  const SearchClassDialog({super.key});
 
   @override
   State<SearchClassDialog> createState() => _SearchClassDialogState();

@@ -1,6 +1,5 @@
 // calendar_screen.dart
 import 'dart:convert';
-import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -9,7 +8,7 @@ import 'schedule_screen.dart';
 import 'package:table_calendar/table_calendar.dart';
 
 class CalendarScreen extends StatefulWidget {
-  const CalendarScreen({Key? key}) : super(key: key);
+  const CalendarScreen({super.key});
 
   @override
   State<CalendarScreen> createState() => _CalendarScreenState();
@@ -20,7 +19,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
   List<ClassData> _classes = [];
 
   // A map from DateTime -> list of strings (event titles)
-  Map<DateTime, List<String>> _events = {};
+  final Map<DateTime, List<String>> _events = {};
 
   // For TableCalendar
   CalendarFormat _calendarFormat = CalendarFormat.week;

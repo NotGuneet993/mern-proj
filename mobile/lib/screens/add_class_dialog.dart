@@ -25,7 +25,7 @@ class _ScheduleDay {
 }
 
 class AddClassDialog extends StatefulWidget {
-  const AddClassDialog({Key? key}) : super(key: key);
+  const AddClassDialog({super.key});
 
   @override
   State<AddClassDialog> createState() => _AddClassDialogState();
@@ -188,7 +188,7 @@ class _AddClassDialogState extends State<AddClassDialog> {
               // SCHEDULE
               const Text("Class Schedule (Enable and set times)"),
               const SizedBox(height: 8),
-              ..._schedule.map(_buildScheduleRow).toList(),
+              ..._schedule.map(_buildScheduleRow),
             ],
           ),
         ),

@@ -77,7 +77,7 @@ class Edge {
 
 /// The main map widget that handles navigation, drawing edges/nodes, etc.
 class GraphMap extends StatefulWidget {
-  const GraphMap({Key? key}) : super(key: key);
+  const GraphMap({super.key});
 
   @override
   _GraphMapState createState() => _GraphMapState();

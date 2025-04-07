@@ -76,7 +76,7 @@ class ClassData {
 }
 
 class ScheduleScreen extends StatefulWidget {
-  const ScheduleScreen({Key? key}) : super(key: key);
+  const ScheduleScreen({super.key});
 
   @override
   State<ScheduleScreen> createState() => _ScheduleScreenState();
@@ -295,7 +295,7 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
                               ...cls.classSchedule!
                                   .where((sched) => sched.time != 'None')
                                   .map((sched) => Text("${sched.day}: ${sched.time}"))
-                                  .toList(),
+                                  ,
 
                             // Delete button
                             Row(
