@@ -252,7 +252,7 @@ const SchedulePage = ({ globalUser }: SchedulePageProps) => {
   };
 
   return (
-    <div className="h-screen flex flex-row pt-14 bg-black">
+    <div className="h-[100vh] flex flex-row pt-14 bg-black">
       {/* LEFT COLUMN: Schedule List */}
       <div className="flex flex-col w-1/3 h-full text-white">
         <div className="flex-1 p-2 overflow-y-auto">
@@ -306,7 +306,7 @@ const SchedulePage = ({ globalUser }: SchedulePageProps) => {
           )}
         </div>
         <button
-          className="text-yellow-300 text-base p-2 bg-black border border-yellow-500 rounded-lg flex items-center justify-center hover:bg-yellow-500 hover:text-black transition duration-300 ease-in-out"
+          className="text-yellow-300 text-base p-2 bg-black border border-yellow-500 rounded-lg flex items-center justify-center hover:bg-yellow-500 hover:text-black transition duration-300 ease-in-out my-4"
           onClick={() => setModalOpen(true)}
         >
           Add Class
@@ -350,7 +350,7 @@ const SchedulePage = ({ globalUser }: SchedulePageProps) => {
       </div>
 
       {/* RIGHT COLUMN: Calendar View */}
-      <div className="flex-1 ml-4 p-4 border rounded-lg bg-black text-white">
+      <div className="flex-1 m-4 p-4 border rounded-lg bg-black text-white">
         <h2 className="text-2xl mb-4 text-yellow-400">Calendar View</h2>
         <FullCalendar
           plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
@@ -361,7 +361,7 @@ const SchedulePage = ({ globalUser }: SchedulePageProps) => {
             right: 'dayGridMonth,timeGridWeek,timeGridDay',
           }}
           events={events}
-          height="100%"
+          height="90%"
         />
       </div>
     </div>

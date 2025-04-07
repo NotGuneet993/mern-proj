@@ -27,11 +27,11 @@ function App() {
         <Route path="/get-started" element={<LoginPage setAuth={setAuth} setIsLoginComp={setIsLoginComp} isLoginComp={isLoginComp} setGlobalUser={setGlobalUser}/>} />
         <Route element={<ProtectedRoute isAuth={isAuth}/>}>
           <Route path="/dashboard/:user" element={<DashboardPage globalUser={globalUser} />} />
+          <Route path="/schedule/:user" element={<SchedulePage globalUser={globalUser} />} />
         </Route>
         <Route path="/stim" element={<StimPage />} />
         <Route path="/mailVerifyPage" element={<MailVerifyPage />} />
         <Route path="/forgotPassword" element={<ForgotPasswordPage />} />
-        <Route path="/schedule/:user" element={<SchedulePage globalUser={globalUser} />} />
         <Route path="/verifyUser/:username" element={<Redirect setAuth={setAuth} setGlobalUser={setGlobalUser} />} />
         <Route path="/verifyForgot/:username" element={<VerifyForgot />} />
         <Route path="/*" element={<LandingPage />} />
