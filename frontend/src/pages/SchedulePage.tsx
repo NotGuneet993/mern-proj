@@ -7,7 +7,7 @@ import interactionPlugin from '@fullcalendar/interaction';
 import AddModal from '../temp_Modal/AddModal'; 
 import SearchModal from '../temp_Modal/SearchModal'; 
 import ResultsModal from '../temp_Modal/ResultsModal'; 
-import { AiFillEdit, AiFillDelete } from 'react-icons/ai';
+import { AiFillDelete } from 'react-icons/ai';
 import { ClassData } from '../types/ClassData';
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -174,10 +174,12 @@ const SchedulePage = ({ globalUser }: SchedulePageProps) => {
   };
 
   // Handler for editing a class (placeholder)
+  /*
   const handleEditClass = (classToEdit: ClassData) => {
     console.log("Edit class:", classToEdit);
     // TODO: Open an edit modal with pre-populated values
   };
+  */
 
 
   // Handler for searching class sections (passed to SearchModal)
