@@ -1,5 +1,3 @@
-// graph_map.dart
-
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
@@ -91,6 +89,7 @@ class _GraphMapState extends State<GraphMap> {
   List<Node> pathNodes = [];
   List<Edge> edges = [];
   List<Polyline> geoJsonPolylines = [];
+  List<Marker> routeMarkers = [];
 
   // Autocomplete building options
   List<String> buildingOptions = [];
@@ -126,8 +125,8 @@ class _GraphMapState extends State<GraphMap> {
   /// Test the current position once, primarily for debugging.
   void _testCurrentPosition() async {
     try {
-      Position position =
-          await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
+      Position position = await Geolocator.getCurrentPosition(
+          desiredAccuracy: LocationAccuracy.high);
       debugPrint("Current position: ${position.latitude}, ${position.longitude}");
     } catch (e) {
       debugPrint("Error getting current position: $e");
@@ -141,12 +140,12 @@ class _GraphMapState extends State<GraphMap> {
       selectedTo = null;
       _fromInternalController?.clear();
       _toInternalController?.clear();
-
       for (final n in pathNodes) {
         nodes.remove(n);
       }
       pathNodes.clear();
       geoJsonPolylines.clear();
+      routeMarkers.clear();
     });
   }
 
@@ -174,13 +173,16 @@ class _GraphMapState extends State<GraphMap> {
         title: Text(title),
         content: Text(message),
         actions: [
-          TextButton(onPressed: () => Navigator.of(context).pop(), child: const Text('OK')),
+          TextButton(
+              onPressed: () => Navigator.of(context).pop(), child: const Text('OK')),
         ],
       ),
     );
   }
 
   /// Make a GET request to fetch a route from "from" to "to".
+  /// This method extracts the first and last coordinates from all LineString features,
+  /// then creates a polyline along with start and end markers.
   Future<void> navigation(String? from, String? to) async {
     if (from == null || to == null) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -192,14 +194,15 @@ class _GraphMapState extends State<GraphMap> {
 
     final encodedFrom = Uri.encodeComponent(from);
     final encodedTo = Uri.encodeComponent(to);
-
-    final url = Uri.parse('$apiUrl/api/locations/getPath?location1=$encodedFrom&location2=$encodedTo');
-    final response = await http.get(url, headers: {'Content-Type': 'application/json'});
+    final url = Uri.parse(
+        '$apiUrl/api/locations/getPath?location1=$encodedFrom&location2=$encodedTo');
+    final response =
+        await http.get(url, headers: {'Content-Type': 'application/json'});
 
     debugPrint("Response status: ${response.statusCode}");
     debugPrint("Response body: ${response.body}");
 
-    // Check if the response body is HTML rather than JSON
+    // Check if the response body is HTML rather than JSON.
     if (response.body.trim().startsWith('<')) {
       debugPrint("Received HTML response instead of JSON.");
       ScaffoldMessenger.of(context).showSnackBar(
@@ -223,28 +226,16 @@ class _GraphMapState extends State<GraphMap> {
       }
 
       final features = geoJson['path'] as List;
-      List<Node> newNodes = [];
+      // Initialize the first and last coordinate variables.
+      LatLng? firstCoord;
+      LatLng? lastCoord;
       List<Polyline> newPolylines = [];
 
+      // Process each feature.
       for (var feature in features) {
         final geometry = feature['geometry'];
-        final properties = feature['properties'];
         final type = geometry['type'];
-
-        if (type == 'Point') {
-          final coords = geometry['coordinates'];
-          double lng = coords[0];
-          double lat = coords[1];
-          String id = properties['id']?.toString() ??
-              'node-${DateTime.now().millisecondsSinceEpoch}';
-          String label = properties['name']?.toString() ?? '';
-          newNodes.add(Node(
-            id: id,
-            latlng: LatLng(lat, lng),
-            label: label,
-            color: label.isNotEmpty ? Colors.red : Colors.blue,
-          ));
-        } else if (type == 'LineString') {
+        if (type == 'LineString') {
           final coordsList = geometry['coordinates'] as List;
           List<LatLng> points = [];
           for (var coords in coordsList) {
@@ -259,25 +250,51 @@ class _GraphMapState extends State<GraphMap> {
               color: Colors.blueAccent,
             ),
           );
+          if (coordsList.isNotEmpty) {
+            if (firstCoord == null) {
+              final c = coordsList.first;
+              firstCoord = LatLng(c[1], c[0]);
+            }
+            final cLast = coordsList.last;
+            lastCoord = LatLng(cLast[1], cLast[0]);
+          }
         }
       }
 
-      setState(() {
-        // Remove any old path nodes
-        for (final n in pathNodes) {
-          nodes.remove(n);
-        }
-        pathNodes.clear();
+      // Check that we obtained valid start and end coordinates.
+      if (firstCoord != null && lastCoord != null) {
+        final startMarker = Marker(
+          point: firstCoord,
+          width: 40,
+          height: 40,
+          child: const Icon(Icons.location_on, color: Colors.red, size: 40),
+        );
+        final endMarker = Marker(
+          point: lastCoord,
+          width: 40,
+          height: 40,
+          child: const Icon(Icons.flag, color: Colors.red, size: 40),
+        );
 
-        // Clear old polylines
-        geoJsonPolylines.clear();
+        setState(() {
+          for (final n in pathNodes) {
+            nodes.remove(n);
+          }
+          pathNodes.clear();
+          geoJsonPolylines.clear();
+          routeMarkers.clear();
 
-        // Add new path data
-        pathNodes.addAll(newNodes);
-        nodes.addAll(newNodes);
-        geoJsonPolylines.addAll(newPolylines);
-      });
-      debugPrint('Added ${newNodes.length} nodes and ${newPolylines.length} polylines from GeoJSON.');
+          // Add the new polyline(s) and markers.
+          geoJsonPolylines.addAll(newPolylines);
+          routeMarkers.addAll([startMarker, endMarker]);
+        });
+        debugPrint('Created polyline with start and end markers.');
+      } else {
+        debugPrint("No valid line coordinates found in the route.");
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("No valid route data returned.")),
+        );
+      }
     } catch (e) {
       debugPrint("JSON decoding error: $e");
       ScaffoldMessenger.of(context).showSnackBar(
@@ -288,7 +305,8 @@ class _GraphMapState extends State<GraphMap> {
 
   Future<String> getClasses() async {
     final url = Uri.parse('$apiUrl/api/locations/getLocation');
-    final response = await http.get(url, headers: {'Content-Type': 'application/json'});
+    final response =
+        await http.get(url, headers: {'Content-Type': 'application/json'});
     return response.body;
   }
 
@@ -329,7 +347,6 @@ class _GraphMapState extends State<GraphMap> {
         setState(() {
           edges.add(newEdge);
           selectedNodes.clear();
-          // Restore original colors for the nodes
           for (var n in nodes) {
             if (n.id == node1.id || n.id == node2.id) {
               n.color = n.label.isNotEmpty ? Colors.red : Colors.blue;
@@ -425,28 +442,28 @@ class _GraphMapState extends State<GraphMap> {
       }
       if (permission == LocationPermission.deniedForever) {
         debugPrint("ERROR WITH LOCATION SERVICES 3");
-        _showMessageDialog(
-            "Error!", "Location permissions are permanently denied. Please enable them in settings.");
+        _showMessageDialog("Error!",
+            "Location permissions are permanently denied. Please enable them in settings.");
         await Geolocator.openAppSettings();
         return;
       }
     } else if (permission == LocationPermission.deniedForever) {
       debugPrint("ERROR WITH LOCATION SERVICES 3");
-      _showMessageDialog(
-          "Error!", "Location permissions are permanently denied. Please enable them in settings.");
+      _showMessageDialog("Error!",
+          "Location permissions are permanently denied. Please enable them in settings.");
       await Geolocator.openAppSettings();
       return;
     }
 
-    // If we reach here, permissions are granted
     Geolocator.getPositionStream(
       locationSettings: const LocationSettings(accuracy: LocationAccuracy.high),
     ).listen(
       (Position position) {
-        debugPrint("User location updated: ${position.latitude}, ${position.longitude}");
+        debugPrint(
+            "User location updated: ${position.latitude}, ${position.longitude}");
         setState(() {
           userLocation = LatLng(position.latitude, position.longitude);
-          userHeading = position.heading; // Update heading
+          userHeading = position.heading;
           _updateNearestIndicator();
         });
       },
@@ -460,7 +477,7 @@ class _GraphMapState extends State<GraphMap> {
   void _updateNearestIndicator() {
     if (userLocation == null || geoJsonPolylines.isEmpty) return;
 
-    final points = geoJsonPolylines.first.points; // use the first polyline for simplicity
+    final points = geoJsonPolylines.first.points;
     if (points.isEmpty) return;
 
     double minDistance = double.infinity;
@@ -477,7 +494,7 @@ class _GraphMapState extends State<GraphMap> {
     });
   }
 
-  /// Simple Euclidean distance (not real Earth-based haversine) for demonstration.
+  /// Simple Euclidean distance (for demonstration).
   double _distanceBetween(LatLng a, LatLng b) {
     return sqrt(pow(a.latitude - b.latitude, 2) + pow(a.longitude - b.longitude, 2));
   }
@@ -486,7 +503,7 @@ class _GraphMapState extends State<GraphMap> {
   Widget build(BuildContext context) {
     return Stack(
       children: [
-        /// The map itself
+        /// The map
         FlutterMap(
           mapController: mapController,
           options: MapOptions(
@@ -498,13 +515,13 @@ class _GraphMapState extends State<GraphMap> {
             onTap: (tapPosition, latlng) => handleMapTap(latlng),
           ),
           children: [
-            /// Base tile layer
+            /// Base tile layer.
             TileLayer(
               urlTemplate: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
               subdomains: ['a', 'b', 'c'],
             ),
 
-            /// Edges as polylines
+            /// Edges as polylines.
             PolylineLayer(
               polylines: edges.map((edge) {
                 Node? node1 = nodes.firstWhereOrNull((n) => n.id == edge.node1);
@@ -518,18 +535,17 @@ class _GraphMapState extends State<GraphMap> {
               }).whereType<Polyline>().toList(),
             ),
 
-            /// GeoJSON polylines (the route from the server)
+            /// GeoJSON polylines (route).
             PolylineLayer(
               polylines: geoJsonPolylines,
             ),
 
-            /// Invisible markers to detect a tap for deleting edges
+            /// Invisible markers for edge deletion.
             MarkerLayer(
               markers: edges.map((edge) {
                 Node? node1 = nodes.firstWhereOrNull((n) => n.id == edge.node1);
                 Node? node2 = nodes.firstWhereOrNull((n) => n.id == edge.node2);
                 if (node1 == null || node2 == null) return null;
-                // Midpoint
                 LatLng mid = LatLng(
                   (node1.latlng.latitude + node2.latlng.latitude) / 2,
                   (node1.latlng.longitude + node2.latlng.longitude) / 2,
@@ -555,7 +571,7 @@ class _GraphMapState extends State<GraphMap> {
               }).whereType<Marker>().toList(),
             ),
 
-            /// Nodes as markers
+            /// Nodes as markers.
             MarkerLayer(
               markers: nodes.map((node) {
                 bool isPathNode = pathNodes.any((pn) => pn.id == node.id);
@@ -576,7 +592,12 @@ class _GraphMapState extends State<GraphMap> {
               }).toList(),
             ),
 
-            /// User location + nearest path indicator
+            /// Route markers (start and end).
+            MarkerLayer(
+              markers: routeMarkers,
+            ),
+
+            /// User location and nearest path indicator.
             MarkerLayer(
               markers: [
                 if (userLocation != null)
@@ -585,7 +606,7 @@ class _GraphMapState extends State<GraphMap> {
                     width: 30,
                     height: 30,
                     child: Transform.rotate(
-                      angle: userHeading * 3.14159265359 / 180.0, // deg -> rad
+                      angle: userHeading * pi / 180.0,
                       child: const Icon(Icons.navigation, color: Colors.blue, size: 30),
                     ),
                   ),
@@ -601,7 +622,7 @@ class _GraphMapState extends State<GraphMap> {
           ],
         ),
 
-        /// Controls overlay (From / To, etc.)
+        /// Controls overlay.
         SafeArea(
           child: Container(
             margin: const EdgeInsets.all(8.0),
@@ -614,7 +635,7 @@ class _GraphMapState extends State<GraphMap> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
-                  "Hello, ${globals.currentUser ?? 'Guest'}",
+                  "Hello, ${(globals.currentUser == null || globals.currentUser!.isEmpty) ? 'Guest' : globals.currentUser![0].toUpperCase() + globals.currentUser!.substring(1)}",
                   style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                 ),
                 Row(
@@ -627,9 +648,8 @@ class _GraphMapState extends State<GraphMap> {
                           if (textEditingValue.text.isEmpty) {
                             return buildingOptions;
                           } else {
-                            return buildingOptions.where((option) => option
-                                .toLowerCase()
-                                .contains(textEditingValue.text.toLowerCase()));
+                            return buildingOptions.where((option) =>
+                                option.toLowerCase().contains(textEditingValue.text.toLowerCase()));
                           }
                         },
                         fieldViewBuilder: (
@@ -668,9 +688,8 @@ class _GraphMapState extends State<GraphMap> {
                           if (textEditingValue.text.isEmpty) {
                             return buildingOptions;
                           } else {
-                            return buildingOptions.where((option) => option
-                                .toLowerCase()
-                                .contains(textEditingValue.text.toLowerCase()));
+                            return buildingOptions.where((option) =>
+                                option.toLowerCase().contains(textEditingValue.text.toLowerCase()));
                           }
                         },
                         fieldViewBuilder: (
