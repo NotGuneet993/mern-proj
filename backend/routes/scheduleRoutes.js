@@ -159,5 +159,38 @@ router.get('/search', async (req, res) => {
   }
 });
 
+//classes by weekday endpoint
+//path is: /schedule/cbw
+//inputs are array of ObjectIds representing classes and weekday (int 0-6 starting with Monday)
+//array with provided courses sorted by time on specified day is returned (empty if no class provided occurs on that weekday)
+router.post("/cbw", async (req, res) => {
+  try {
+    const { classes, weekday} = req.body;
+    let eligible = [];
+    let newTimes = {};
+
+    let i=0; while(i < classes.length) {
+      const cur = classes[i];
+      if (!cur) 
+        return res.status(404).json({ message: "Class not found" });
+
+      const time = cur.class_schedule[weekday].time
+      if (time !== "None") {
+        // One-liner of doom and despair
+        newTimes[cur._id] = new Date(new Date(`${new Date().toISOString().split('T')[0]} ${String(time).split('-')[0]}`).toISOString()).getTime();
+        eligible.push(cur)
+      }
+
+      i += 1;
+    }
+
+    await eligible.sort((a, b) => {return newTimes[a._id] - newTimes[b._id]});
+
+    res.status(200).json(eligible);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: `Server error: ${error}` });
+  }
+});
 
 module.exports = router;
