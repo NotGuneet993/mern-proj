@@ -46,6 +46,26 @@ class Node {
   }
 }
 
+class NearestNode {
+  final String name;
+  final double long;
+  final double lat;
+
+  NearestNode({
+    required this.name,
+    required this.long,
+    required this.lat,
+  });
+
+  factory NearestNode.fromJson(Map<String, dynamic> json) {
+    return NearestNode(
+      name: json['name'],
+      long: (json['long'] is num) ? json['long'].toDouble() : double.parse(json['long']),
+      lat: (json['lat'] is num) ? json['lat'].toDouble() : double.parse(json['lat']),
+    );
+  }
+}
+
 /// A class representing an edge (connection) between two nodes on the map.
 class Edge {
   String id;
@@ -127,7 +147,6 @@ class _GraphMapState extends State<GraphMap> {
     try {
       Position position = await Geolocator.getCurrentPosition(
           desiredAccuracy: LocationAccuracy.high);
-      debugPrint("Current position: ${position.latitude}, ${position.longitude}");
     } catch (e) {
       debugPrint("Error getting current position: $e");
     }
@@ -180,10 +199,52 @@ class _GraphMapState extends State<GraphMap> {
     );
   }
 
+  //grab the label of the nearest node
+  Future<NearestNode?> getNearestNode() async {
+  if (userLocation == null) return null;
+  
+  // Extract longitude and latitude from userLocation
+  double userLong = userLocation!.longitude;
+  double userLat = userLocation!.latitude;
+
+  // Encode them as strings for the URL query parameters.
+  final encodedLong = Uri.encodeComponent(userLong.toString());
+  final encodedLat = Uri.encodeComponent(userLat.toString());
+
+  // Build the request URL
+  final url = Uri.parse(
+      '$apiUrl/api/locations/nearest?lat=$encodedLat&long=$encodedLong');
+
+  try {
+    // Perform the GET request.
+    final response = await http.get(url, headers: {'Content-Type': 'application/json'});
+  
+    if (response.statusCode == 200) {
+      // Decode the JSON response into a Map.
+      final Map<String, dynamic> jsonResponse = json.decode(response.body);
+  
+      // Use the factory constructor to create a NearestNode object.
+      NearestNode nearestNode = NearestNode.fromJson(jsonResponse);
+      return nearestNode;
+    } else {
+      debugPrint("Error: ${response.statusCode}");
+      return null;
+    }
+  } catch (e) {
+    debugPrint("Exception while fetching nearest node: $e");
+    return null;
+  }
+}
+
   /// Make a GET request to fetch a route from "from" to "to".
   /// This method extracts the first and last coordinates from all LineString features,
   /// then creates a polyline along with start and end markers.
   Future<void> navigation(String? from, String? to) async {
+    NearestNode? nearestNode = await getNearestNode();
+    debugPrint("Nearest Building: ${nearestNode?.name}");
+    
+    from = nearestNode?.name;
+
     if (from == null || to == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Please select both From and To locations.")),
@@ -252,9 +313,8 @@ class _GraphMapState extends State<GraphMap> {
           );
           if (coordsList.isNotEmpty) {
             if (firstCoord == null) {
-              final c = coordsList.first;
-              firstCoord = LatLng(c[1], c[0]);
-            }
+              firstCoord = LatLng(nearestNode!.lat, nearestNode.long);
+            }  
             final cLast = coordsList.last;
             lastCoord = LatLng(cLast[1], cLast[0]);
           }
@@ -517,7 +577,7 @@ class _GraphMapState extends State<GraphMap> {
           children: [
             /// Base tile layer.
             TileLayer(
-              urlTemplate: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+              urlTemplate: "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
               subdomains: ['a', 'b', 'c'],
             ),
 
@@ -609,14 +669,7 @@ class _GraphMapState extends State<GraphMap> {
                       angle: userHeading * pi / 180.0,
                       child: const Icon(Icons.navigation, color: Colors.blue, size: 30),
                     ),
-                  ),
-                if (nearestIndicatorPoint != null)
-                  Marker(
-                    point: nearestIndicatorPoint!,
-                    width: 20,
-                    height: 20,
-                    child: const Icon(Icons.arrow_upward, color: Colors.green, size: 20),
-                  ),
+                  ), 
               ],
             ),
           ],
@@ -637,46 +690,6 @@ class _GraphMapState extends State<GraphMap> {
                 Text(
                   "Hello, ${(globals.currentUser == null || globals.currentUser!.isEmpty) ? 'Guest' : globals.currentUser![0].toUpperCase() + globals.currentUser!.substring(1)}",
                   style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                ),
-                Row(
-                  children: [
-                    const Text("From:", style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: Autocomplete<String>(
-                        optionsBuilder: (TextEditingValue textEditingValue) {
-                          if (textEditingValue.text.isEmpty) {
-                            return buildingOptions;
-                          } else {
-                            return buildingOptions.where((option) =>
-                                option.toLowerCase().contains(textEditingValue.text.toLowerCase()));
-                          }
-                        },
-                        fieldViewBuilder: (
-                          BuildContext context,
-                          TextEditingController textEditingController,
-                          FocusNode focusNode,
-                          VoidCallback onFieldSubmitted,
-                        ) {
-                          _fromInternalController = textEditingController;
-                          return TextField(
-                            controller: textEditingController,
-                            focusNode: focusNode,
-                            onEditingComplete: onFieldSubmitted,
-                            decoration: const InputDecoration(
-                              hintText: 'Type building name...',
-                            ),
-                          );
-                        },
-                        onSelected: (String fromSelection) {
-                          setState(() {
-                            selectedFrom = fromSelection;
-                          });
-                          debugPrint("From: $fromSelection");
-                        },
-                      ),
-                    ),
-                  ],
                 ),
                 Row(
                   children: [
