@@ -102,7 +102,11 @@ router.get('/nearest', async (req, res) => {
         }
     
         // Return the label (name) from the node's properties.
-        res.json({ name: nearestDoc.properties.name });
+        res.json({ 
+            name: nearestDoc.properties.name,
+            long: nearestDoc.geometry.coordinates[0],
+            lat: nearestDoc.geometry.coordinates[1]
+         });
       } catch (err) {
         console.error(err);
         res.status(500).json({ error: "Internal server error" });
