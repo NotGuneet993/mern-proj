@@ -312,9 +312,7 @@ class _GraphMapState extends State<GraphMap> {
             ),
           );
           if (coordsList.isNotEmpty) {
-            if (firstCoord == null) {
-              firstCoord = LatLng(nearestNode!.lat, nearestNode.long);
-            }  
+            firstCoord ??= LatLng(nearestNode!.lat, nearestNode.long);  
             final cLast = coordsList.last;
             lastCoord = LatLng(cLast[1], cLast[0]);
           }
