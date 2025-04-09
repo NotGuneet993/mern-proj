@@ -1,6 +1,7 @@
 const express = require("express");
 const Locations = require("../models/Locations.js");
 const Paths = require("../models/Paths.js");
+const Buildings = require("../models/Buildings.js");
 const router = express.Router();
 
 // hashmaps 
@@ -70,5 +71,43 @@ router.get('/getPath', async (req, res) => {
 
 });
 
+
+router.get('/nearest', async (req, res) => {
+
+    try {
+        // Parse latitude and longitude from query params
+        const lat = parseFloat(req.query.lat);
+        const long = parseFloat(req.query.long);
+    
+        if (isNaN(lat) || isNaN(long)) {
+          return res.status(400).json({ error: "Invalid lat and long parameters" });
+        }
+    
+        // Query for the nearest document using MongoDB geospatial query.
+        // The $near operator requires your query point in [lng, lat] order.
+        const nearestDoc = await Buildings.findOne({
+          geometry: {
+            $near: {
+              $geometry: {
+                type: "Point",
+                coordinates: [ long, lat ]
+              }
+              
+            }
+          }
+        });
+    
+        if (!nearestDoc) {
+          return res.status(404).json({ error: "No nearby node found" });
+        }
+    
+        // Return the label (name) from the node's properties.
+        res.json({ name: nearestDoc.properties.name });
+      } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: "Internal server error" });
+      }
+}
+);
 
 module.exports = router;
