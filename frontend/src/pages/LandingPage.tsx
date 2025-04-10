@@ -6,8 +6,8 @@ export default function LandingPage() {
     return (
         <div className="bg-stone-900 flex flex-col md:flex-row h-full">
 
-            <div className="hidden md:flex w-full md:w-1/2 z-2 items-center justify-center">
-                <img src={edgeMap} alt="ucf edges" className="w-screen h-screen rotate-270" />
+            <div className="hidden md:flex w-full md:w-1/2 z-2 items-center justify-center borde">
+                <img src={edgeMap} alt="ucf edges" className="w-[90%] h-[90%] rotate-270" />
             </div>
 
             <div className="w-full md:w-1/2 flex items-center justify-center p-8">
