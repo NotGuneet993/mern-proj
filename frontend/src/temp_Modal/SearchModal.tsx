@@ -218,9 +218,9 @@ function SearchModal({ isOpen, onClose, onSave }: SearchModalProps) {
 
                 </div>
 
-                {/* RIGHT COLUMN: Awesome thumbs up PNG */}
+                {/* RIGHT COLUMN: Awesome thumbs up SVG */}
                 <div className="md:w-1/2 flex justify-center">
-                  <img src="/src/assets/thumbsup.png" className="w-105 h-78"/>
+                  <img src="/src/assets/thumbsup.svg" className="w-105 h-78 bg-white"/>
                 </div>
 
               </form>
