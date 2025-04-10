@@ -33,7 +33,11 @@ function DashboardPage({globalUser} : {globalUser: string}) {
           
         <GeoJSONMap path={path} />
 
-        {showNavigator && (<ClassNavigator globalUser={globalUser} setPath={setPath} setDistance={setDistance} />)}
+        {showNavigator && (
+          <div className='fixed top-[50%] right-[30%]'>
+            <ClassNavigator globalUser={globalUser} setPath={setPath} setDistance={setDistance} />
+          </div>
+          )}
 
         <div className='fixed bottom-[5%] left-[5%] z-50'>
           <PlusButtonMenu globalUser={globalUser} onNavigateClick={toggleNavigator} />

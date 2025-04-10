@@ -83,8 +83,9 @@ export default function ClassNavigator({globalUser, setPath, setDistance}: Class
 
         try{
             for (let i = 0; i < curr_classes.length - 1; i++) {
-                const src: string = curr_classes[i].building_prefix ?? '';
-                const dst: string = curr_classes[i + 1].building_prefix ?? '';
+                const src: string = curr_classes[i].building ?? '';
+                const dst: string = curr_classes[i + 1].building ?? '';
+                if (src === '' || dst === '') continue;
                 
                 const response = await fetch(`${API_URL}/locations/getPath?location1=${encodeURIComponent(src)}&location2=${encodeURIComponent(dst)}`);
                 if(!response.ok) throw new Error("Couldn't fetch path");
@@ -171,7 +172,7 @@ export default function ClassNavigator({globalUser, setPath, setDistance}: Class
 
 
     return (
-        <div className="flex justify-end w-screen fixed top-4 right-0 z-50">
+        <div className="flex justify-end w-screen z-70">
             <div className="flex flex-col items-left">
                 <div className="bg-white rounded-xl p-4 shadow-md w-fit flex gap-2">
                     {days.map((day) => (
