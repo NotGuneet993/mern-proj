@@ -30,8 +30,8 @@ function SearchModal({ isOpen, onClose, onSave }: SearchModalProps) {
         fetch(`${API_URL}/schedule/search?${params.toString()}`)
             .then((res) => res.json())
             .then((data) => {
-            const codes = data.map((cls: any) => cls.course_code);
-            setMatchedCourseCodes(codes);
+            const codes: string[] = data.map((cls: any) => cls.course_code);
+            setMatchedCourseCodes([... new Set(codes)]);
             })
             .catch((err) => console.error('Error fetching courseCode matches:', err));
         } else {
@@ -46,8 +46,8 @@ function SearchModal({ isOpen, onClose, onSave }: SearchModalProps) {
         fetch(`${API_URL}/schedule/search?${params.toString()}`)
             .then((res) => res.json())
             .then((data) => {
-            const profs = data.map((cls: any) => cls.professor);
-            setMatchedProfessors(profs);
+            const profs: string[] = data.map((cls: any) => cls.professor);
+            setMatchedProfessors([...new Set(profs)]);
             })
             .catch((err) => console.error('Error fetching professor matches:', err));
         } else {

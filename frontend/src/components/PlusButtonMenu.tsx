@@ -24,7 +24,7 @@ export default function PlusButtonMenu({globalUser, onNavigateClick } : PlusButt
                     <p className="text-lg my-1 hover:text-blue-500 hover:cursor-pointer" 
                     onClick={()=> navigate(`/schedule/${globalUser}`)}>Schedule</p>
                     <p className="text-lg my-1 hover:text-blue-500 hover:cursor-pointer" 
-                    onClick={onNavigateClick}>Navigate Schedule</p>
+                    onClick={onNavigateClick}>Map classes</p>
                 </div>
             )}
             <FaPlus

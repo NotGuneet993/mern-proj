@@ -142,13 +142,13 @@ router.get('/search', async (req, res) => {
       searchFilters.class_name = { $regex: className, $options: 'i' };
     }
     if (meeting_type) {
-      searchFilters.class_name = { $regex: meeting_type, $options: 'i' };
+      searchFilters.meeting_type = { $regex: meeting_type, $options: 'i' };
     }
     if (type) {
-      searchFilters.class_name = { $regex: type, $options: 'i' };
+      searchFilters.type = { $regex: type, $options: 'i' };
     }
     if (building) {
-      searchFilters.class_name = { $regex: building, $options: 'i' };
+      searchFilters.building = { $regex: building, $options: 'i' };
     }
 
     const matchedClasses = await Schedule.find(searchFilters).limit(10);
