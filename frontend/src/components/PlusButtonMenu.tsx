@@ -4,9 +4,10 @@ import { useNavigate } from "react-router-dom";
 
 interface PlusButtonMenuProps {
     globalUser: String;
+    onNavigateClick: () => void;
 }
 
-export default function PlusButtonMenu({globalUser } : PlusButtonMenuProps) {
+export default function PlusButtonMenu({globalUser, onNavigateClick } : PlusButtonMenuProps) {
 
     const [rotated, setRotated] = useState(false);
     const navigate = useNavigate();
@@ -22,6 +23,8 @@ export default function PlusButtonMenu({globalUser } : PlusButtonMenuProps) {
                 <div className="flex flex-col items-center">
                     <p className="text-lg my-1 hover:text-blue-500 hover:cursor-pointer" 
                     onClick={()=> navigate(`/schedule/${globalUser}`)}>Schedule</p>
+                    <p className="text-lg my-1 hover:text-blue-500 hover:cursor-pointer" 
+                    onClick={onNavigateClick}>Navigate Schedule</p>
                 </div>
             )}
             <FaPlus

@@ -8,13 +8,17 @@ import ClassNavigator from '../components/ClassNavigator';
 
 
 function DashboardPage({globalUser} : {globalUser: string}) {
-
+  const [showNavigator, setShowNavigator] = useState(false);
   const [path, setPath] = useState({
     "type": "FeatureCollection",
     "features": []
   });
 
   const [distance, setDistance] = useState(0);
+
+  const toggleNavigator = () => {
+    setShowNavigator(prev => !prev);
+  };
 
   // extract username from the top url 
   const { user } = useParams();
@@ -24,15 +28,15 @@ function DashboardPage({globalUser} : {globalUser: string}) {
       <div className='flex flex-col justify-center items-center h-[calc(100vh-60px)]'>
 
         <div className="fixed flex top-[70px] box-border w-screen h-[80px] justify-center z-1">
-          <PathBar username={user ?? 'Plaeholder'} setPath={setPath} setDistance={setDistance}/>
+          <PathBar username={user ?? 'Placeholder'} setPath={setPath} setDistance={setDistance}/>
         </div>
           
         <GeoJSONMap path={path} />
 
-        <ClassNavigator globalUser={globalUser} setPath={setPath} setDistance={setDistance} />
+        {showNavigator && (<ClassNavigator globalUser={globalUser} setPath={setPath} setDistance={setDistance} />)}
 
         <div className='fixed bottom-[5%] left-[5%] z-50'>
-          <PlusButtonMenu globalUser={globalUser} />
+          <PlusButtonMenu globalUser={globalUser} onNavigateClick={toggleNavigator} />
         </div>
         <div className='fixed bottom-[5%] right-[5%] z-50'>
           <DistanceComp distance={distance} />
