@@ -4,6 +4,14 @@
     "react": "^19.0.0"
   },
   "devDependencies": {
-    "@types/ol": "^6.5.3"
+    "@types/graceful-fs": "^4.1.9",
+    "@types/istanbul-lib-coverage": "^2.0.6",
+    "@types/istanbul-lib-report": "^3.0.3",
+    "@types/istanbul-reports": "^3.0.4",
+    "@types/node": "^22.14.0",
+    "@types/ol": "^6.5.3",
+    "@types/stack-utils": "^2.0.3",
+    "@types/yargs": "^17.0.33",
+    "@types/yargs-parser": "^21.0.3"
   }
 }

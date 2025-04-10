@@ -10,7 +10,7 @@ const edgeMap = require("../hashmaps/edgeMap.json");
 
 // url is /locations/getLocation
 // no input params
-// an array of 179 locations is returned 
+// an array of 183 locations is returned 
 router.get('/getLocation', async (req, res) => {
 
     try {
