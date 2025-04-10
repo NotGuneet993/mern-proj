@@ -139,7 +139,7 @@ export default function ClassNavigator({globalUser, setPath, setDistance}: Class
     };
 
     // Get the current user's classes
-    const { user } = useParams<{ user: string, setPath:  }>();
+    const { user } = useParams();
     // Use the route parameter if globalUser is not set
     const username = globalUser || user || '';
 
