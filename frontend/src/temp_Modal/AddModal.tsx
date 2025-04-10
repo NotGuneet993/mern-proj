@@ -69,8 +69,8 @@ function AddModal({ message, isOpen, onClose, onSave }: AddModalProps) {
       fetch(`${API_URL}/schedule/search?${params.toString()}`)
         .then((res) => res.json())
         .then((data) => {
-          const codes = data.map((cls: any) => cls.course_code);
-          setMatchedCourseCodes(codes);
+          const codes: string[] = data.map((cls: any) => cls.course_code);
+          setMatchedCourseCodes([... new Set(codes)]);
         })
         .catch((err) => console.error('Error fetching courseCode matches:', err));
     } else {
@@ -85,8 +85,8 @@ function AddModal({ message, isOpen, onClose, onSave }: AddModalProps) {
       fetch(`${API_URL}/schedule/search?${params.toString()}`)
         .then((res) => res.json())
         .then((data) => {
-          const names = data.map((cls: any) => cls.class_name);
-          setMatchedClassNames(names);
+          const names: string[] = data.map((cls: any) => cls.class_name);
+          setMatchedClassNames([...new Set(names)]);
         })
         .catch((err) => console.error('Error fetching className matches:', err));
     } else {
@@ -101,8 +101,8 @@ function AddModal({ message, isOpen, onClose, onSave }: AddModalProps) {
       fetch(`${API_URL}/schedule/search?${params.toString()}`)
         .then((res) => res.json())
         .then((data) => {
-          const profs = data.map((cls: any) => cls.professor);
-          setMatchedProfessors(profs);
+          const profs: string[] = data.map((cls: any) => cls.professor);
+          setMatchedProfessors([...new Set(profs)]);
         })
         .catch((err) => console.error('Error fetching professor matches:', err));
     } else {
@@ -117,8 +117,8 @@ function AddModal({ message, isOpen, onClose, onSave }: AddModalProps) {
       fetch(`${API_URL}/schedule/search?${params.toString()}`)
         .then((res) => res.json())
         .then((data) => {
-          const buildings = data.map((cls: any) => cls.building);
-          setMatchedBuildings(buildings);
+          const buildings: string[] = data.map((cls: any) => cls.building);
+          setMatchedBuildings([...new Set(buildings)]);
         })
         .catch((err) => console.error('Error fetching building matches:', err));
     } else {

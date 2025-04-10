@@ -185,7 +185,7 @@ const SchedulePage = ({ globalUser }: SchedulePageProps) => {
   // Handler for searching class sections (passed to SearchModal)
   const handleSearchClass = (searchClassData: ClassData) => {
     const params = new URLSearchParams({ 
-      course_code: searchClassData.course_code, professor: searchClassData.professor,
+      courseCode: searchClassData.course_code, professor: searchClassData.professor,
       meeting_type: searchClassData.meeting_type, type: searchClassData.type });
     let sections = [];
     fetch(`${API_URL}/schedule/search?${params.toString()}`)
@@ -203,6 +203,13 @@ const SchedulePage = ({ globalUser }: SchedulePageProps) => {
           building_prefix: cls.building_prefix,
           room_number: cls.room_number
         }));
+        console.log("params:", params);
+        console.log("paramsTS:", params.toString());
+        console.log("sections contains:", sections);
+        let i=0; while (i < sections.length) {
+
+          i += 1;
+        }
         
 
         setSearchResults(sections);
@@ -221,6 +228,7 @@ const SchedulePage = ({ globalUser }: SchedulePageProps) => {
 
   // Handler for adding a class (passed to AddModal)
   const handleAddClass = (newClassData: ClassData[]) => {
+    newClassData = Array.isArray(newClassData) ? newClassData : [newClassData];
     newClassData.forEach((cls) => {
       const body = JSON.stringify(cls);
       console.log(`Body contains: ${body}`);
