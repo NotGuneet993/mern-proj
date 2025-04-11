@@ -130,7 +130,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
       backgroundColor: Colors.grey[100],
       appBar: AppBar(
         title: const Text("Register"),
-        backgroundColor: const Color.fromARGB(255, 236, 220, 39),
+        backgroundColor: const Color.fromARGB(255, 255, 196, 0),
       ),
       body: Center(
         child: SingleChildScrollView(
@@ -195,7 +195,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
               ElevatedButton(
                 onPressed: isFormValid ? handleRegistration : null,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color.fromARGB(255, 236, 220, 39),
+                  backgroundColor: const Color.fromARGB(255, 255, 196, 0),
                   padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 14),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(8),

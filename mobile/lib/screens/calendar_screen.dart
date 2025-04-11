@@ -143,7 +143,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text("Calendar View"),
-        backgroundColor: const Color.fromARGB(255, 236, 220, 39),
+        backgroundColor: const Color.fromARGB(255, 255, 196, 0),
       ),
       body: Column(
         children: [
@@ -176,6 +176,11 @@ class _CalendarScreenState extends State<CalendarScreen> {
           ),
           const SizedBox(height: 8),
           // Display the events for the selected day
+          const Divider(
+          height: 1,
+          thickness: 1,
+          color: Colors.grey,
+        ),
           Expanded(
             child: _buildEventList(),
           ),
@@ -185,7 +190,8 @@ class _CalendarScreenState extends State<CalendarScreen> {
   }
 
   Widget _buildEventList() {
-    final dayEvents = _selectedDay == null ? [] : _getEventsForDay(_selectedDay!);
+    final DateTime displayDay = _selectedDay ?? _focusedDay;
+    final dayEvents = _getEventsForDay(displayDay);
     if (dayEvents.isEmpty) {
       return const Center(child: Text("No events"));
     }

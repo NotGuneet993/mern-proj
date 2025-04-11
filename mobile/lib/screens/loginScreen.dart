@@ -45,8 +45,10 @@ class _LoginScreenState extends State<LoginScreen> {
           MaterialPageRoute(builder: (context) => const DashboardScreen()),
         );
       } else {
+        final responseData = jsonDecode(response.body);
+        final errorMessage = responseData['message'] ?? 'Unknown error';
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Login failed: ${response.body}')),
+          SnackBar(content: Text('Login failed: $errorMessage')),
         );
       }
     } catch (error) {
@@ -99,7 +101,7 @@ class _LoginScreenState extends State<LoginScreen> {
               ElevatedButton(
                 onPressed: handleLogin,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Color.fromARGB(255, 236, 220, 39),
+                  backgroundColor: Color.fromARGB(255, 255, 196, 0),
                   padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 14),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(8),
@@ -115,7 +117,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 onPressed: navigateToRegistration,
                 child: const Text(
                   "Register",
-                  style: TextStyle(fontSize: 16, color: Color.fromARGB(255, 236, 220, 39)),
+                  style: TextStyle(fontSize: 16, color: Color.fromARGB(255, 255, 196, 0)),
                 ),
               ),
             ],

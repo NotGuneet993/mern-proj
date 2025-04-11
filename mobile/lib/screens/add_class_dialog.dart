@@ -25,17 +25,20 @@ class _ScheduleDay {
 }
 
 class AddClassDialog extends StatefulWidget {
-  const AddClassDialog({super.key});
+  // The list of building options for the autocomplete.
+  final List<String> buildingOptions;
+  const AddClassDialog({Key? key, required this.buildingOptions}) : super(key: key);
 
   @override
   State<AddClassDialog> createState() => _AddClassDialogState();
 }
 
 class _AddClassDialogState extends State<AddClassDialog> {
-  // Basic text controllers
+  // Basic text controllers.
   final TextEditingController _courseCodeCtrl = TextEditingController();
   final TextEditingController _classNameCtrl = TextEditingController();
   final TextEditingController _professorCtrl = TextEditingController();
+  // Initialize _buildingCtrl immediately to avoid late initialization issues.
   final TextEditingController _buildingCtrl = TextEditingController();
   final TextEditingController _buildingPrefixCtrl = TextEditingController();
   final TextEditingController _roomNumberCtrl = TextEditingController();
@@ -43,6 +46,7 @@ class _AddClassDialogState extends State<AddClassDialog> {
   String _meetingType = '';
   String _type = '';
 
+  // Schedule days.
   final List<String> _daysOfWeek = [
     'Monday',
     'Tuesday',
@@ -52,13 +56,12 @@ class _AddClassDialogState extends State<AddClassDialog> {
     'Saturday',
     'Sunday'
   ];
-
   late final List<_ScheduleDay> _schedule;
 
   @override
   void initState() {
     super.initState();
-    // Initialize each day
+    // Initialize each day's schedule.
     _schedule = _daysOfWeek.map((day) => _ScheduleDay(day: day)).toList();
   }
 
@@ -103,12 +106,9 @@ class _AddClassDialogState extends State<AddClassDialog> {
   Widget build(BuildContext context) {
     return AlertDialog(
       title: const Text("Add Class"),
-      
-      // Wrap content in a SizedBox + SingleChildScrollView
       content: SizedBox(
-        // You can adjust these values to your preference.
-        width: 400,   // sets the desired width
-        height: 500,  // sets the desired height
+        width: 400,
+        height: 500,
         child: SingleChildScrollView(
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -143,13 +143,11 @@ class _AddClassDialogState extends State<AddClassDialog> {
                   DropdownMenuItem(value: 'mixed-mode', child: Text("Mixed Mode")),
                   DropdownMenuItem(value: 'online', child: Text("Online")),
                 ],
-                onChanged: (val) {
-                  setState(() => _meetingType = val ?? '');
-                },
+                onChanged: (val) => setState(() => _meetingType = val ?? ''),
               ),
               const SizedBox(height: 8),
 
-              // TYPE
+              // CLASS TYPE
               DropdownButtonFormField<String>(
                 value: _type.isEmpty ? null : _type,
                 decoration: const InputDecoration(labelText: "Class Type"),
@@ -158,16 +156,40 @@ class _AddClassDialogState extends State<AddClassDialog> {
                   DropdownMenuItem(value: 'lab', child: Text("Lab")),
                   DropdownMenuItem(value: 'discussion', child: Text("Discussion")),
                 ],
-                onChanged: (val) {
-                  setState(() => _type = val ?? '');
-                },
+                onChanged: (val) => setState(() => _type = val ?? ''),
               ),
               const SizedBox(height: 8),
 
-              // BUILDING
-              TextField(
-                controller: _buildingCtrl,
-                decoration: const InputDecoration(labelText: "Building"),
+              // BUILDING: Use Autocomplete text input to show matching options.
+              Autocomplete<String>(
+                optionsBuilder: (TextEditingValue textEditingValue) {
+                  if (textEditingValue.text.isEmpty) {
+                    // When input is empty, display all options.
+                    return widget.buildingOptions;
+                  }
+                  return widget.buildingOptions.where((option) =>
+                      option.toLowerCase().contains(textEditingValue.text.toLowerCase()));
+                },
+                onSelected: (String selection) {
+                  // When an option is selected, update the building controller.
+                  _buildingCtrl.text = selection;
+                },
+                fieldViewBuilder: (
+                  BuildContext context,
+                  TextEditingController fieldTextEditingController,
+                  FocusNode fieldFocusNode,
+                  VoidCallback onFieldSubmitted,
+                ) {
+                  // Synchronize our controller with the field's controller.
+                  fieldTextEditingController.text = _buildingCtrl.text;
+                  _buildingCtrl.value = fieldTextEditingController.value;
+                  return TextField(
+                    controller: fieldTextEditingController,
+                    focusNode: fieldFocusNode,
+                    onEditingComplete: onFieldSubmitted,
+                    decoration: const InputDecoration(labelText: 'Building'),
+                  );
+                },
               ),
               const SizedBox(height: 8),
 
@@ -193,7 +215,6 @@ class _AddClassDialogState extends State<AddClassDialog> {
           ),
         ),
       ),
-
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(context),
@@ -225,51 +246,31 @@ class _AddClassDialogState extends State<AddClassDialog> {
         ),
         if (day.enabled)
           Padding(
-          padding: const EdgeInsets.only(left: 40, bottom: 8),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // START ROW
-              Row(
-                children: [
-                  const Text("Start: "),
-                  _buildTimeDropdown(
-                    day.startHour,
-                    (val) => setState(() => day.startHour = val),
-                    12,
-                  ),
-                  _buildMinuteDropdown(
-                    day.startMinute,
-                    (val) => setState(() => day.startMinute = val),
-                  ),
-                  _buildAmPmDropdown(
-                    day.startAMPM,
-                    (val) => setState(() => day.startAMPM = val),
-                  ),
-                ],
-              ),
-              // END ROW
-              Row(
-                children: [
-                  const Text("End: "),
-                  _buildTimeDropdown(
-                    day.endHour,
-                    (val) => setState(() => day.endHour = val),
-                    12,
-                  ),
-                  _buildMinuteDropdown(
-                    day.endMinute,
-                    (val) => setState(() => day.endMinute = val),
-                  ),
-                  _buildAmPmDropdown(
-                    day.endAMPM,
-                    (val) => setState(() => day.endAMPM = val),
-                  ),
-                ],
-              ),
-            ],
+            padding: const EdgeInsets.only(left: 40, bottom: 8),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // START ROW.
+                Row(
+                  children: [
+                    const Text("Start: "),
+                    _buildTimeDropdown(day.startHour, (val) => setState(() => day.startHour = val), 12),
+                    _buildMinuteDropdown(day.startMinute, (val) => setState(() => day.startMinute = val)),
+                    _buildAmPmDropdown(day.startAMPM, (val) => setState(() => day.startAMPM = val)),
+                  ],
+                ),
+                // END ROW.
+                Row(
+                  children: [
+                    const Text("End: "),
+                    _buildTimeDropdown(day.endHour, (val) => setState(() => day.endHour = val), 12),
+                    _buildMinuteDropdown(day.endMinute, (val) => setState(() => day.endMinute = val)),
+                    _buildAmPmDropdown(day.endAMPM, (val) => setState(() => day.endAMPM = val)),
+                  ],
+                ),
+              ],
+            ),
           ),
-        ),
       ],
     );
   }
