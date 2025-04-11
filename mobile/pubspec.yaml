@@ -74,7 +74,7 @@ flutter:
 flutter_icons:
   android: false
   ios: true
-  image_path: "lib/assets/Mobile_icon.png"
+  image_path: "lib/assets/IMG_1059.JPG"
 
   # To add assets to your application, add an assets section, like this:
   # assets:
