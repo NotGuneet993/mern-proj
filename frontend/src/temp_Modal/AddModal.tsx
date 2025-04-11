@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { AiOutlineCloseCircle } from 'react-icons/ai';
+import Select from 'react-select';
 const API_URL = import.meta.env.VITE_API_URL;
 
 interface AddModalProps {
@@ -29,6 +30,7 @@ function AddModal({ message, isOpen, onClose, onSave }: AddModalProps) {
   const [matchedProfessors, setMatchedProfessors] = useState<string[]>([]);
   const [matchedBuildings, setMatchedBuildings] = useState<string[]>([]);
   const [focusedField, setFocusedField] = useState<'courseCode' | 'className' | 'professor' | 'building' | null>(null);
+  const [locations, setLocations] = useState<string[]>([]);
 
   // Days of the week
   const daysOfWeek = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
@@ -239,6 +241,24 @@ function AddModal({ message, isOpen, onClose, onSave }: AddModalProps) {
     onClose();
   };
 
+  useEffect(() => {
+      const getLocations = async () => {
+          try {
+              const res = await fetch(`${API_URL}/locations/getLocation`)
+              if (!res.ok) throw new Error("Couldn't get location");
+
+              const data = await res.json();
+              setLocations(data);
+
+          } catch (error) {
+              console.log(error);
+          }
+      }
+
+      getLocations();
+
+  }, []);
+
   if (!isOpen) return null;
 
   return (
@@ -390,20 +410,19 @@ function AddModal({ message, isOpen, onClose, onSave }: AddModalProps) {
             <label htmlFor="building" className="block mb-1">
               Building
             </label>
-            <input
+            <select
               id="building"
-              type="text"
               value={building}
-              onFocus={() => setFocusedField('building')}
-              onBlur={() => {
-                setTimeout(() => {
-                  setMatchedBuildings([]);
-                  setFocusedField(null);
-                }, 150);
-              }}
               onChange={(e) => setBuilding(e.target.value)}
-              className="border p-1 w-full mb-2"
-            />
+              className="border p-1 w-full mb-4"
+            >
+              <option value="">Select a building</option>
+              {locations.map((b, index) => (
+                <option key={index} value={b}>
+                  {b}
+                </option>
+              ))}
+            </select>
             {focusedField === 'building' && matchedBuildings.length > 0 && (
               <ul className="border bg-white mb-2 max-h-40 overflow-y-auto">
                 {matchedBuildings.map((name, idx) => (
