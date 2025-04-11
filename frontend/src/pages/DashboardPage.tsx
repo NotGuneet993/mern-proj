@@ -4,7 +4,7 @@ import PathBar from '../components/PathBar';
 import PlusButtonMenu from '../components/PlusButtonMenu';
 import GeoJSONMap from '../components/GeoJSONMap';
 import DistanceComp from '../components/DistanceComp';
-import ClassNavigator from '../components/ClassNavigator';
+import MapClasses from '../components/MapClasses';
 
 
 function DashboardPage({globalUser} : {globalUser: string}) {
@@ -33,7 +33,11 @@ function DashboardPage({globalUser} : {globalUser: string}) {
           
         <GeoJSONMap path={path} />
 
-        {showNavigator && (<ClassNavigator globalUser={globalUser} setPath={setPath} setDistance={setDistance} />)}
+        {showNavigator && (
+          <div className='fixed top-[21%] right-[5%] z-70'>
+            <MapClasses user={user ?? 'Placeholder'} setPath={setPath} setDistance={setDistance}/>
+          </div>
+        )}
 
         <div className='fixed bottom-[5%] left-[5%] z-50'>
           <PlusButtonMenu globalUser={globalUser} onNavigateClick={toggleNavigator} />
