@@ -35,7 +35,7 @@ function DashboardPage({globalUser} : {globalUser: string}) {
 
         {showNavigator && (
           <div className='fixed top-[21%] right-[5%] z-70'>
-            <MapClasses user={user ?? 'Placeholder'}/>
+            <MapClasses user={user ?? 'Placeholder'} setPath={setPath} setDistance={setDistance}/>
           </div>
         )}
 

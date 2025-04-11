@@ -1,9 +1,12 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Select from 'react-select';
 const API_URL = import.meta.env.VITE_API_URL;
 
 type MapClassesProps = {
   user: string;
+  setPath: (validNodes: any) => void;
+  setDistance: (distance: number) => void;
+
 }
 
 type ScheduleItem = {
@@ -19,14 +22,14 @@ const weekdays = {
   Friday: 4,
 };
 
-export default function MapClasses({ user } : MapClassesProps) {
+export default function MapClasses({ user, setPath, setDistance } : MapClassesProps) {
 
     const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday']
     const [curDay, setCurDay] = useState('');
     const [schedule, setSchedule] = useState<ScheduleItem[]>([]);
+    const [classError, setClassError] = useState('');
 
     const fetchClass = async (day: keyof typeof weekdays) => {
- 
       const weekdayInt = weekdays[day];
       
       try { 
@@ -56,11 +59,61 @@ export default function MapClasses({ user } : MapClassesProps) {
 
         const scheduleData = await filteredClasses.json();
         setSchedule(scheduleData);
-        console.log(scheduleData);
 
       }
       catch (err) {
         console.log("AHHHHHH:", err);
+      }
+    }
+
+    const handleClick = async () => {
+      const checkboxes = document.querySelectorAll<HTMLInputElement>('input[type="checkbox"][data-building]');
+      const selectedBuildings: string[] = [];
+
+      checkboxes.forEach(box => {
+        if (box.checked) {
+          const building = box.getAttribute('data-building');
+          if (building) selectedBuildings.push(building);
+        }
+      });
+
+      const masterArr = []
+      let distance = 0;
+      if (selectedBuildings.length === 1) {
+
+        setClassError("Please select atleast two classes");
+
+      } else {
+
+        setClassError('');
+        for (let i = 0; i < selectedBuildings.length - 1; i++) {
+          try {
+            const response = await fetch(`${API_URL}/locations/getPath?location1=${encodeURIComponent(selectedBuildings[i])}&location2=${encodeURIComponent(selectedBuildings[i+1])}`);
+            if (!response.ok) throw new Error("Couldn't fetch path")
+            
+            const data = await response.json();
+
+            if (i === 0) masterArr.push(data.path[0])
+            for (let item of data.path) {
+                if (item.geometry.type === 'LineString') {
+                  masterArr.push(item);
+                  distance += item.properties.distance;
+                }
+            }
+
+            masterArr.push(data.path[data.path.length - 1]);
+
+          } catch (error) {
+              console.log(error);
+          }
+        }
+
+        setDistance(Math.round((60/3) * distance));
+        setPath({
+          "type": "FeatureCollection",
+          "features": masterArr
+        });
+
       }
     }
 
@@ -79,8 +132,8 @@ export default function MapClasses({ user } : MapClassesProps) {
                 fetchClass(selectedDay);
               }
               }}
-              placeholder="Start location"
-              maxMenuHeight={200}
+              placeholder="Select day"
+              maxMenuHeight={150}
             />
           </div>
           </div>
@@ -90,11 +143,24 @@ export default function MapClasses({ user } : MapClassesProps) {
             ) : (
               schedule.map((item, index) => (
                 <label key={index}>
-                  <input type="checkbox" className="mr-1" defaultChecked />
+                  <input type="checkbox" className="mr-1" data-building={item.building} defaultChecked />
                   {item.class_name}
                 </label>
               ))
+              
             )}
+            {schedule.length === 0 ? (
+              <div />
+            ) : (
+              <div className="flex flex-col justify-center items-center w-full">
+                <button className="mt-4 px-3 py-1 bg-linear-70 from-yellow-300 to-amber-500 text-md text-stone-900 rounded-4xl
+            hover:bg-linear-70 hover:from-yellow-400 hover:to-amber-600 hover:cursor-pointer" onClick={handleClick}>
+                  Path classes
+                </button>
+                {classError && (<p className="text-red-500 mt-">{classError}</p>)}
+              </div> 
+          )}
+
           </div>
       </div>
     );
