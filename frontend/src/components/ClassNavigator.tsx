@@ -12,7 +12,7 @@ type ClassNavigatorProps = {
 export default function ClassNavigator({globalUser, setPath, setDistance}: ClassNavigatorProps){
     const [selectedDay, setSelectedDay] = useState<string | null>(null);
 
-    const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+    const days = ["Sun", "Mon", "Tue", "Wed", "Thursday", "Fri", "Sat"];
 
     const dayNameToNumber = (dayName: string): number => {
         const mapping: { [key: string]: number } = {
@@ -25,7 +25,7 @@ export default function ClassNavigator({globalUser, setPath, setDistance}: Class
           Saturday: 6,
         };
         return mapping[dayName] ?? 0;
-      };
+    };
 
     async function getClassesForDay(username: string, weekday: number) {
         try {
@@ -35,7 +35,9 @@ export default function ClassNavigator({globalUser, setPath, setDistance}: Class
             throw new Error('Failed to fetch classes');
           }
           const classes = await classesResponse.json();
-      
+        
+          console.log(`A: ${classes[0]}`);
+
           // Get the classes for the day
           const scheduleResponse = await fetch(`${API_URL}/schedule/cbw`, {
             method: 'POST',
@@ -54,6 +56,7 @@ export default function ClassNavigator({globalUser, setPath, setDistance}: Class
       
           // Step 3: Return filtered and sorted class list
           const filteredClasses = await scheduleResponse.json();
+          console.log(`B: ${filteredClasses}`);
           return filteredClasses;
       
         } catch (error) {
@@ -80,7 +83,8 @@ export default function ClassNavigator({globalUser, setPath, setDistance}: Class
 
         // Await the async function and get the actual ClassData[]
         const curr_classes: ClassData[] = await getClassesForDay(globalUser, weekday);
-
+        console.log(curr_classes);
+        console.log("ran");
         try{
             for (let i = 0; i < curr_classes.length - 1; i++) {
                 const src: string = curr_classes[i].building ?? '';
@@ -158,7 +162,7 @@ export default function ClassNavigator({globalUser, setPath, setDistance}: Class
         })
         .then((res) => res.json())
         .then((data) => {
-            console.log("Fetched schedule data:", data);
+            // console.log("Fetched schedule data:", data);
             // If data is not an array, default to an empty array
             setClasses(Array.isArray(data) ? data : []);
         })
