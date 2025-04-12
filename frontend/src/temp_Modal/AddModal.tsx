@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { AiOutlineCloseCircle } from 'react-icons/ai';
-import Select from 'react-select';
 const API_URL = import.meta.env.VITE_API_URL;
 
 interface AddModalProps {
