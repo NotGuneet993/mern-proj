@@ -7,6 +7,7 @@ import interactionPlugin from '@fullcalendar/interaction';
 import AddModal from '../temp_Modal/AddModal'; 
 import SearchModal from '../temp_Modal/SearchModal'; 
 import ResultsModal from '../temp_Modal/ResultsModal'; 
+import DeleteModal from '../temp_Modal/DeleteModal';
 import { AiFillDelete } from 'react-icons/ai';
 import { ClassData } from '../types/ClassData';
 const API_URL = import.meta.env.VITE_API_URL;
@@ -27,6 +28,8 @@ const SchedulePage = ({ globalUser }: SchedulePageProps) => {
   const [found, setFound] = useState<boolean | null>(null); // null meaning we haven't searched yet
   const [searchResults, setSearchResults] = useState<ClassData[]>([]);
   const [manualMode, setManualMode] = useState(false); // for manual class addition
+  const [delMode, setDelMode] = useState(false); // for class deletion
+  const [delID, setDelID] = useState<string>("");
 
   // Handler for resetting search-related variables on modal close
   const handleCloseModal = () => {
@@ -171,6 +174,10 @@ const SchedulePage = ({ globalUser }: SchedulePageProps) => {
         loadClasses();
       })
       .catch((err) => console.error("Error deleting class:", err));
+    
+    setDelMode(false);
+    setDelID("");
+
   };
 
   // Handler for editing a class (placeholder)
@@ -299,15 +306,26 @@ const SchedulePage = ({ globalUser }: SchedulePageProps) => {
                       </div>
                     ))}
                 </div>
-                {/* Edit and Delete Buttons */}
+                {/* Delete Button */}
                 <div className="mt-2 flex justify-end space-x-2">
                   <button 
-                    className="px-2 py-1 bg-red-500 text-white rounded hover:bg-red-600"
-                    onClick={() => handleDeleteClass(cls._id)}
+                    className={`px-2 py-1 bg-red-500 text-white rounded ${(!delMode || (delMode && delID != cls._id)) ? "hover:bg-red-600" : ""}`}
+                    onClick={ () => { if(!delMode || (delMode && delID != cls._id)){setDelMode(true); setDelID(cls._id)} } }
                   >
                     <AiFillDelete className="inline-block mr-1" />
-                    <span className="text-xs">Delete</span>
+                    <span className="text-xs">{ (!delMode || (delMode && delID != cls._id)) ? "Delete" : "" }</span>
                   </button>
+                  {delMode && (
+                    <DeleteModal
+                      realID={delID}
+                      c_id={cls._id}
+                      c_code={cls.course_code}
+                      c_name={cls.class_name}
+                      isOpen={delMode}
+                      onDelete={() => handleDeleteClass(delID)}
+                      onCancel={() => {setDelMode(false); setDelID("")}}
+                    />
+                  )}
                 </div>
               </div>
             ))
