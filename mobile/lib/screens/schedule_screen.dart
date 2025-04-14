@@ -271,6 +271,32 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
     }
   }
 
+Future<void> _confirmDelete(BuildContext ctx, ClassData cls) async {
+  final bool? shouldDelete = await showDialog<bool>(
+    context: ctx,
+    builder: (context) => AlertDialog(
+      title: const Text('Delete class?'),
+      content: Text(
+        'Are you sure you want to remove "${cls.className}" (${cls.courseCode}) from your schedule?',
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context, false),
+          child: const Text('Cancel'),
+        ),
+        TextButton(
+          onPressed: () => Navigator.pop(context, true),
+          child: const Text('Yes, delete', style: TextStyle(color: Colors.red)),
+        ),
+      ],
+    ),
+  );
+
+  if (shouldDelete == true) {
+    await _deleteClass(cls.id);
+  }
+}
+
   Future<void> _handleAddClass(ClassData newClass) async {
     final username = globals.currentUser;
     if (username == null) return;
@@ -419,8 +445,8 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
                               children: [
                                 ElevatedButton(
                                   style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-                                  onPressed: () => _deleteClass(cls.id),
-                                  child: const Text("Delete", style: TextStyle(color: Colors.black)),
+                                  onPressed: () => _confirmDelete(context, cls),
+                                  child: const Text('Delete', style: TextStyle(color: Colors.black)),
                                 ),
                               ],
                             ),
