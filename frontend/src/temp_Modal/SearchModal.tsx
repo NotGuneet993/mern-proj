@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { AiOutlineCloseCircle } from 'react-icons/ai';
 const API_URL = import.meta.env.VITE_API_URL;
 
+import thumbsUp from '../assets/thumbsup.svg'
+
 interface SearchModalProps {
     isOpen: boolean;
     onClose: () => void;
@@ -119,6 +121,7 @@ function SearchModal({ isOpen, onClose, onSave }: SearchModalProps) {
                   <input
                     id="courseCode"
                     type="text"
+                    autoComplete='off'
                     value={courseCode}
                     onFocus={() => setFocusedField('courseCode')}
                     onBlur={() => {
@@ -151,6 +154,7 @@ function SearchModal({ isOpen, onClose, onSave }: SearchModalProps) {
                   <input
                     id="professor"
                     type="text"
+                    autoComplete='off'
                     value={professor}
                     onFocus={() => setFocusedField('professor')}
                     onBlur={() => {
@@ -220,7 +224,7 @@ function SearchModal({ isOpen, onClose, onSave }: SearchModalProps) {
 
                 {/* RIGHT COLUMN: Awesome thumbs up SVG */}
                 <div className="md:w-1/2 flex justify-center">
-                  <img src="/src/assets/thumbsup.svg" className="w-105 h-78 bg-white"/>
+                  <img src={thumbsUp} className="w-105 h-78 bg-white"/>
                 </div>
 
               </form>

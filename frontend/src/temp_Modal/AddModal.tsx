@@ -285,6 +285,7 @@ function AddModal({ message, isOpen, onClose, onSave }: AddModalProps) {
               id="courseCode"
               type="text"
               value={courseCode}
+              autoComplete='off'
               onFocus={() => setFocusedField('courseCode')}
               onBlur={() => {
                 setTimeout(() => {
@@ -317,6 +318,7 @@ function AddModal({ message, isOpen, onClose, onSave }: AddModalProps) {
               id="className"
               type="text"
               value={className}
+              autoComplete='off'
               onFocus={() => setFocusedField('className')}
               onBlur={() => {
                 setTimeout(() => {
@@ -349,6 +351,7 @@ function AddModal({ message, isOpen, onClose, onSave }: AddModalProps) {
               id="professor"
               type="text"
               value={professor}
+              autoComplete='off'
               onFocus={() => setFocusedField('professor')}
               onBlur={() => {
                 setTimeout(() => {
@@ -442,6 +445,7 @@ function AddModal({ message, isOpen, onClose, onSave }: AddModalProps) {
             </label>
             <input
               id="buildingPrefix"
+              autoComplete='off'
               type="text"
               value={buildingPrefix}
               onChange={(e) => setBuildingPrefix(e.target.value)}
@@ -454,6 +458,7 @@ function AddModal({ message, isOpen, onClose, onSave }: AddModalProps) {
             </label>
             <input
               id="roomNumber"
+              autoComplete='off'
               type="text"
               value={roomNumber}
               onChange={(e) => setRoomNumber(e.target.value)}
